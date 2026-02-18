@@ -1,18 +1,31 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
-from . import views   
+from . import views
 
 app_name = 'account'
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # Authentication
+    path('login/',
+         auth_views.LoginView.as_view(
+             template_name='account/login.html'
+         ),
+         name='login'),
 
-    path('', views.dashboard, name='dashboard'),
+    path('logout/',
+         auth_views.LogoutView.as_view(),
+         name='logout'),
 
+    # Dashboard
+    path('',
+         views.dashboard,
+         name='dashboard'),
+
+    # Password Change
     path('password_change/',
          auth_views.PasswordChangeView.as_view(
-             template_name='registration/password_change_form.html'
+             template_name='registration/password_change_form.html',
+             success_url=reverse_lazy('account:password_change_done')
          ),
          name='password_change'),
 
@@ -22,10 +35,12 @@ urlpatterns = [
          ),
          name='password_change_done'),
 
+    # Password Reset
     path('password_reset/',
          auth_views.PasswordResetView.as_view(
              template_name='registration/password_reset_form.html',
-             email_template_name='registration/password_reset_email.html'
+             email_template_name='registration/password_reset_email.html',
+             success_url=reverse_lazy('account:password_reset_done')
          ),
          name='password_reset'),
 
@@ -37,7 +52,8 @@ urlpatterns = [
 
     path('reset/<uidb64>/<token>/',
          auth_views.PasswordResetConfirmView.as_view(
-             template_name='registration/password_reset_confirm.html'
+             template_name='registration/password_reset_confirm.html',
+             success_url=reverse_lazy('account:password_reset_complete')
          ),
          name='password_reset_confirm'),
 

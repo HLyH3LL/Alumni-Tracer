@@ -1,16 +1,32 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}TIPians Connect{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bookmarks{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    <div id="header">
-        <span class="logo">Bookmarks</span>
-    </div>
+    <header id="header">
+        <a href="{% url 'account:dashboard' %}" class="logo">Bookmarks</a>
+        
+        {% if user.is_authenticated %}
+        <ul class="menu">
+            <li><a href="{% url 'account:password_change' %}">Change Password</a></li>
+            <li>
+                <form method="post" action="{% url 'account:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">Logout</button>
+                </form>
+            </li>
+        </ul>
+        {% endif %}
+    </header>
 
-    <div id="content">
+    <main id="content">
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 </body>
 </html>
