@@ -1,43 +1,13 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Log-in{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <h1>Login</h1>
-        <p class="auth-subtitle">Access your account</p>
+<h1>Log-in</h1>
 
-        <form method="post" class="auth-form">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <ul class="errorlist">
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-
-            <div class="form-group">
-                <label for="id_username">Username</label>
-                {{ form.username }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_password">Password</label>
-                {{ form.password }}
-            </div>
-
-            <div class="form-options">
-                <a href="{% url 'account:password_reset' %}" class="forgot-password">
-                    Forgot password?
-                </a>
-            </div>
-
-            <input type="submit" value="Login">
-        </form>
-    </div>
-</div>
+<form method="post">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Log-in"></p>
+</form>
 {% endblock %}
