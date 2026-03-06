@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Count
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.models import User  # This is important!
+from django.contrib.auth.models import User 
 
 from .Loginforms import LoginForm
 from .Registerforms import UserProfileForm, AlumniProfileForm

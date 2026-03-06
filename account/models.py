@@ -11,18 +11,11 @@ class Alumni(models.Model):
     ]
     
     PROGRAM_CHOICES = [
-        ('BSIT', 'Bachelor of Science in Information Technology'),
-        ('BSCS', 'Bachelor of Science in Computer Science'),
-        ('BSIS', 'Bachelor of Science in Information Systems'),
-        ('BSCE', 'Bachelor of Science in Computer Engineering'),
-        ('BSECE', 'Bachelor of Science in Electronics Engineering'),
-        ('BSEE', 'Bachelor of Science in Electrical Engineering'),
-        ('BSME', 'Bachelor of Science in Mechanical Engineering'),
-        ('BSCE', 'Bachelor of Science in Civil Engineering'),
-        ('BSA', 'Bachelor of Science in Accountancy'),
-        ('BSBA', 'Bachelor of Science in Business Administration'),
-        # Add your specific T.I.P. programs here
-    ]
+    ('BSCS', 'Bachelor of Science in Computer Science'),
+    ('BSIT', 'Bachelor of Science in Information Technology'),
+    ('BSE', 'Bachelor of Science in Education'),
+    # Add other programs here
+]
     
     # Link to User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='alumni')
@@ -36,16 +29,17 @@ class Alumni(models.Model):
     program = models.CharField(max_length=100, choices=PROGRAM_CHOICES)
     graduation_year = models.IntegerField()
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
-    company = models.CharField(max_length=200, blank=True, null=True)  # MISSING
-    position = models.CharField(max_length=100, blank=True, null=True)  # MISSING
-    bio = models.TextField(blank=True, null=True)  # MISSING
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)  # MISSING
+    company = models.CharField(max_length=200, blank=True, null=True)  
+    position = models.CharField(max_length=100, blank=True, null=True)  
+    bio = models.TextField(blank=True, null=True)  
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)  
     contact_number = models.CharField(max_length=20, blank=True, null=True)
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    from django.db import models
+    
+from django.db import models
 from django.contrib.auth.models import User
 
 class Alumni(models.Model):
@@ -65,14 +59,14 @@ class Alumni(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     
-    # Alumni Details - ADD THESE MISSING FIELDS
+    # Alumni Details
     program = models.CharField(max_length=120)  # ex: BSIT
     graduation_year = models.IntegerField()
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
-    company = models.CharField(max_length=200, blank=True, null=True)  # MISSING
-    position = models.CharField(max_length=100, blank=True, null=True)  # MISSING
-    bio = models.TextField(blank=True, null=True)  # MISSING
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)  # MISSING
+    company = models.CharField(max_length=200, blank=True, null=True)  
+    position = models.CharField(max_length=100, blank=True, null=True)  
+    bio = models.TextField(blank=True, null=True)  
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)  
     contact_number = models.CharField(max_length=20, blank=True, null=True)
     
     # Timestamps
