@@ -1,16 +1,33 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}TIPians Connect{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}T.I.P.ians Connect{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    <div id="header">
-        <span class="logo">Bookmarks</span>
-    </div>
+    <header id="header">
+        <a href="{% url 'account:dashboard' %}" class="logo">T.I.P.ians Connect</a>
+        
+        {# Only show these if user is authenticated AND not on login page #}
+        {% if user.is_authenticated and request.resolver_match.url_name != 'login' %}
+        <ul class="menu">
+            <li><a href="{% url 'account:password_change' %}">Change Password</a></li>
+            <li>
+                <form method="post" action="{% url 'account:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">Logout</button>
+                </form>
+            </li>
+        </ul>
+        {% endif %}
+    </header>
 
-    <div id="content">
+    <main id="content">
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 </body>
 </html>

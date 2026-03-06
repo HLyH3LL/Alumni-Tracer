@@ -2,18 +2,19 @@
 
 /* 1. VARIABLES */
 :root {
-    --primary-color: #12c064;
-    --primary-dark: #00a74f;
-    --primary-light: #1cdf78;
-    --text-dark: #333;
-    --text-light: #666;
-    --text-lighter: #999;
-    --white: #fff;
-    --bg-light: #f5f5f5;
-    --bg-white: #fff;
-    --border-color: #ddd;
-    --error-color: #dc3545;
-    --success-color: #28a745;
+    --primary-color: #ffc20f;      /* Main yellow */
+    --primary-dark: #e5ae0e;       /* Darker yellow for hover */
+    --primary-light: #ffcf3f;      /* Lighter yellow */
+    --text-dark: #070500;           /* Near black for text */
+    --text-light: #292929;          /* Dark gray for secondary text */
+    --text-lighter: #666;           /* Medium gray (keeping for hierarchy) */
+    --white: #ffffff;                /* Pure white */
+    --bg-light: #f5f5f5;             /* Light gray background (keeping for contrast) */
+    --bg-white: #ffffff;              /* White background */
+    --bg-dark: #070500;               /* Near black background */
+    --border-color: #ddd;             /* Light gray borders (keeping) */
+    --error-color: #dc3545;           /* Keeping error color */
+    --success-color: #28a745;         /* Keeping success color */
     --shadow: 0 2px 10px rgba(0,0,0,0.1);
     
     --spacing-xs: 5px;
@@ -57,7 +58,7 @@ h1 {
 
 h2 {
     font-size: 1.8em;
-    color: var(--primary-dark);
+    color: var(--text-light);
     margin: var(--spacing-lg) 0 var(--spacing-md);
 }
 
@@ -78,7 +79,7 @@ a:hover {
 
 /* 4. HEADER & NAVIGATION */
 #header {
-    background: var(--primary-color);
+    background: var(--bg-dark);
     padding: var(--spacing-md) var(--spacing-xl);
     box-shadow: var(--shadow);
     position: sticky;
@@ -99,8 +100,8 @@ a:hover {
 }
 
 #header .logo:hover {
-    color: var(--white);
-    opacity: 0.9;
+    color: var(--primary-color);
+    opacity: 1;
 }
 
 /* Menu Container */
@@ -124,7 +125,7 @@ a:hover {
     font-size: 0.9em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: opacity 0.3s ease;
+    transition: color 0.3s ease;
     cursor: pointer;
     background: none;
     border: none;
@@ -133,8 +134,8 @@ a:hover {
 
 .menu li a:hover,
 .link-button:hover {
-    opacity: 0.8;
-    color: var(--white);
+    color: var(--primary-color);
+    opacity: 1;
 }
 
 /* User section in header (alternative layout) */
@@ -283,6 +284,7 @@ a:hover {
     text-align: center;
     margin-bottom: var(--spacing-xs);
     border-bottom: none;
+    color: var(--text-dark);
 }
 
 .auth-subtitle {
@@ -329,14 +331,14 @@ form input[type="email"]:focus,
 form input[type="password"]:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(18, 192, 100, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 194, 15, 0.1);
 }
 
 form input[type="submit"],
 .dashboard-link,
 .btn {
     background: var(--primary-color);
-    color: var(--white);
+    color: var(--text-dark);
     padding: var(--spacing-sm) var(--spacing-md);
     border: none;
     border-radius: var(--border-radius);
@@ -355,6 +357,7 @@ form input[type="submit"]:hover,
 .dashboard-link:hover,
 .btn:hover {
     background: var(--primary-dark);
+    color: var(--text-dark);
 }
 
 .btn-block {
@@ -364,14 +367,17 @@ form input[type="submit"]:hover,
 
 .btn-primary {
     background: var(--primary-color);
+    color: var(--text-dark);
 }
 
 .btn-secondary {
     background: var(--text-light);
+    color: var(--white);
 }
 
 .btn-secondary:hover {
     background: var(--text-dark);
+    color: var(--white);
 }
 
 .btn-icon {
@@ -465,7 +471,7 @@ form input[type="submit"]:hover,
 }
 
 .alert-info {
-    background: rgba(18, 192, 100, 0.1);
+    background: rgba(255, 194, 15, 0.1);
     color: var(--primary-dark);
     border: 1px solid var(--primary-color);
 }
@@ -548,7 +554,7 @@ form input[type="submit"]:hover,
 
 /* 12. FOOTER */
 footer {
-    background: var(--text-dark);
+    background: var(--bg-dark);
     color: var(--white);
     padding: var(--spacing-md) 0;
     margin-top: var(--spacing-xl);
@@ -559,6 +565,14 @@ footer p {
     margin-bottom: 0;
     font-size: 0.9em;
     opacity: 0.8;
+}
+
+footer a {
+    color: var(--primary-color);
+}
+
+footer a:hover {
+    color: var(--primary-light);
 }
 
 /* 13. UTILITIES */
@@ -572,6 +586,353 @@ footer p {
 
 .mb-20 {
     margin-bottom: 20px;
+}
+
+/* Account Page Styles */
+.account-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.account-header {
+    margin-bottom: 2rem;
+}
+
+.account-header h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.account-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .account-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.account-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h2 {
+    font-size: 1.25rem;
+    color: #495057;
+    margin: 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Form Styles */
+.profile-form {
+    width: 100%;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 576px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.form-control-file {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0;
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px;
+    padding-right: 2rem;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.help-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Button Styles */
+.form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-primary {
+    display: inline-block;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    padding: 0.625rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary {
+    display: inline-block;
+    font-weight: 400;
+    color: #495057;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    padding: 0.625rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* Profile Picture */
+.current-image {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Messages */
+.messages {
+    margin-bottom: 2rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+
+/* Account Actions */
+.account-actions {
+    margin-top: 2rem;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.15s ease-in-out;
+}
+
+.action-button:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.action-text {
+    font-weight: 500;
+}
+
+/* Password Change Page */
+.password-change-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+.password-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.password-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* No Data Message */
+.no-data {
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 4px;
+    color: #6c757d;
+}
+
+/* Link Button */
+.link-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.link-button:hover {
+    color: #0056b3;
 }
 
 /* 14. ANIMATIONS */
@@ -645,3 +1006,4 @@ footer p {
         align-items: flex-start;
     }
 }
+

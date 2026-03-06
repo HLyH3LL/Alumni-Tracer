@@ -1,13 +1,92 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Log-in{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
-<h1>Log-in</h1>
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .login-container h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+    
+    .login-container .btn-primary {
+        display: block;
+        width: 200px;
+        margin: 2rem auto 1.5rem;
+        text-align: center;
+    }
+    
+    .login-container p {
+        text-align: center;
+        margin: 1rem 0;
+    }
+    
+    .login-container p a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .login-container p a:hover {
+        text-decoration: underline;
+    }
+</style>
 
-<form method="post">
-    {{ form.as_p }}
-    {% csrf_token %}
-    <p><input type="submit" value="Log-in"></p>
-</form>
+<div class="login-container">
+    <h1>Login</h1>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'account:login' %}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="error-messages">
+            {% for error in form.non_field_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+            <p class="error">{{ form.username.errors.0 }}</p>
+            {% endif %}
+            
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">Password:</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+            <p class="error">{{ form.password.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn-primary">Login</button>
+    </form>
+    
+    <p><a href="{% url 'account:password_reset' %}">Forgot password?</a></p>
+    <p>Don't have an account? <a href="{% url 'account:register' %}">Register here</a></p>
+</div>
 {% endblock %}

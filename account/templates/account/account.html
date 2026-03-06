@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Account{% endblock %}
+
+{% block header_links %}
+{% if user.is_authenticated %}
+<ul class="menu">
+    <li><a href="{% url 'account:dashboard' %}" {% if section == 'dashboard' %}class="active"{% endif %}>Dashboard</a></li>
+    <li><a href="{% url 'account:account' %}" {% if section == 'account' %}class="active"{% endif %}>My Account</a></li>
+    <li><a href="{% url 'account:password_change' %}">Change Password</a></li>
+    <li>
+        <form method="post" action="{% url 'account:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="link-button">Logout</button>
+        </form>
+    </li>
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <div class="account-header">
+        <h1>My Account</h1>
+        <p>Manage your profile and account settings</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="account-grid">
+        <!-- Profile Information Section -->
+        <div class="account-card">
+            <div class="card-header">
+                <h2>Profile Information</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ user_form.first_name.id_for_label }}">First Name</label>
+                            {{ user_form.first_name }}
+                            {% if user_form.first_name.errors %}
+                            <div class="error">{{ user_form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+                            {{ user_form.last_name }}
+                            {% if user_form.last_name.errors %}
+                            <div class="error">{{ user_form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ user_form.email.id_for_label }}">Email Address</label>
+                        {{ user_form.email }}
+                        {% if user_form.email.errors %}
+                        <div class="error">{{ user_form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" value="{{ user.username }}" class="form-control" disabled readonly>
+                        <small class="text-muted">Username cannot be changed</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" name="update_profile" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Alumni Details Section -->
+        <div class="account-card">
+            <div class="card-header">
+                <h2>Alumni Details</h2>
+            </div>
+            <div class="card-body">
+                {% if alumni_form %}
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ alumni_form.program.id_for_label }}">Program</label>
+                        {{ alumni_form.program }}
+                        {% if alumni_form.program.errors %}
+                        <div class="error">{{ alumni_form.program.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ alumni_form.graduation_year.id_for_label }}">Graduation Year</label>
+                            {{ alumni_form.graduation_year }}
+                            {% if alumni_form.graduation_year.errors %}
+                            <div class="error">{{ alumni_form.graduation_year.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ alumni_form.employment_status.id_for_label }}">Employment Status</label>
+                            {{ alumni_form.employment_status }}
+                            {% if alumni_form.employment_status.errors %}
+                            <div class="error">{{ alumni_form.employment_status.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ alumni_form.company.id_for_label }}">Company</label>
+                            {{ alumni_form.company }}
+                            {% if alumni_form.company.errors %}
+                            <div class="error">{{ alumni_form.company.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ alumni_form.position.id_for_label }}">Position</label>
+                            {{ alumni_form.position }}
+                            {% if alumni_form.position.errors %}
+                            <div class="error">{{ alumni_form.position.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ alumni_form.contact_number.id_for_label }}">Contact Number</label>
+                        {{ alumni_form.contact_number }}
+                        {% if alumni_form.contact_number.errors %}
+                        <div class="error">{{ alumni_form.contact_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ alumni_form.bio.id_for_label }}">Bio</label>
+                        {{ alumni_form.bio }}
+                        {% if alumni_form.bio.errors %}
+                        <div class="error">{{ alumni_form.bio.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ alumni_form.profile_picture.id_for_label }}">Profile Picture</label>
+                        {{ alumni_form.profile_picture }}
+                        {% if alumni_form.profile_picture.errors %}
+                        <div class="error">{{ alumni_form.profile_picture.errors.0 }}</div>
+                        {% endif %}
+                        
+                        {% if alumni and alumni.profile_picture %}
+                        <div class="current-image">
+                            <img src="{{ alumni.profile_picture.url }}" alt="Profile Picture" class="profile-thumbnail">
+                            <small>Current profile picture</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" name="update_alumni" class="btn-primary">Update Alumni Details</button>
+                    </div>
+                </form>
+                {% else %}
+                <p class="no-data">No alumni profile found. Please contact administrator.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Actions Section -->
+    <div class="account-card account-actions">
+        <div class="card-header">
+            <h2>Account Actions</h2>
+        </div>
+        <div class="card-body">
+            <div class="action-grid">
+                <a href="{% url 'account:change_password' %}" class="action-button">
+                    <span class="action-icon">🔑</span>
+                    <span class="action-text">Change Password</span>
+                </a>
+                <a href="#" class="action-button" onclick="return confirm('Are you sure you want to deactivate your account?');">
+                    <span class="action-icon">⚫</span>
+                    <span class="action-text">Deactivate Account</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
