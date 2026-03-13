@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Admin{% endblock %}</title>
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef3fb;}
+    .topbar{
+      height:64px;
+      background:#2e5f9e;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px;
+      box-shadow:0 8px 18px rgba(0,0,0,.12);
+    }
+    .brand{font-weight:700;letter-spacing:.2px}
+    .wrap{display:flex;min-height:calc(100vh - 64px);}
+    .sidebar{
+      width:250px;
+      background:#2b578f;
+      color:#fff;
+      padding:18px 0;
+    }
+    .nav a{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color:#fff;
+      text-decoration:none;
+      padding:12px 18px;
+      opacity:.95;
+      font-weight:600;
+    }
+    .nav a:hover{background:rgba(255,255,255,.14);}
+    .content{flex:1;padding:22px;}
+
+    .title{font-size:34px;font-weight:900;margin:6px 0 18px;color:#1b2b44;}
+    .grid{display:grid;grid-template-columns: 340px 1fr 1fr;gap:16px;align-items:stretch;}
+    .card{
+      background:#fff;
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 10px 26px rgba(14,30,37,.10);
+    }
+    .muted{color:#6c7a92;font-size:14px}
+    .big{font-size:42px;font-weight:900;margin-top:6px;color:#1b2b44}
+
+    .section-title{font-size:18px;font-weight:800;margin:22px 0 12px;color:#1b2b44;}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 26px rgba(14,30,37,.10);}
+    th,td{padding:12px;border-bottom:1px solid #e7eef9;text-align:left;}
+    th{background:#f6f9ff;font-weight:800;color:#2a3b57;}
+    .badge{padding:6px 10px;border-radius:999px;font-size:12px;color:#fff;font-weight:700;display:inline-block;}
+    .b-emp{background:#2e9f6e}
+    .b-un{background:#d94d4d}
+    .b-self{background:#f0a23a}
+    .b-stud{background:#3a78d6}
+    .b-unk{background:#8999aa}
+
+    .btn{
+      padding:8px 12px;border:0;border-radius:10px;
+      background:#2e5f9e;color:#fff;cursor:pointer;font-weight:700;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="brand">Technological Institute of the Philippines — Alumni Tracking System</div>
+    <div>{{ request.user.username }}</div>
+  </div>
+
+  <div class="wrap">
+    <aside class="sidebar">
+      <nav class="nav">
+        <a href="{% url 'account:admin_dashboard' %}">Dashboard</a>
+        <a href="#">Alumni Records</a>
+        <a href="#">Profile Verification</a>
+        <a href="#">Announcements</a>
+        <a href="#">Reports</a>
+        <a href="#">User Management</a>
+        <a href="#">Settings</a>
+        <a href="{% url 'account:logout' %}">Logout</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>
