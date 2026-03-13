@@ -13,6 +13,16 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
+ path('', views.home, name='home'),
+    path('register/', views.register, name='register'),
+
+    path('login/', auth_views.LoginView.as_view(
+        template_name='registration/User_Login.html'
+    ), name='login'),
+
+
+
+
     # password management (unchanged)
     path('password_change/',
          auth_views.PasswordChangeView.as_view(

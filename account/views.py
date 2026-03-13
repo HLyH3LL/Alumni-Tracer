@@ -83,3 +83,18 @@ def user_login(request):
         form = LoginForm()
 
     return render(request, "registration/login.html", {"form": form})
+
+
+def home(request):
+    return render(request, 'home.html')
+
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/register.html', {'form': form})
