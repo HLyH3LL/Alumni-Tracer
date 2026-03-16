@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
+from .forms import AlumniRegistrationForm 
+from django.contrib import messages 
 
 from .Loginforms import LoginForm
 from .models import Alumni
@@ -10,7 +12,7 @@ from .models import Alumni
 
 @login_required
 def dashboard(request):
-    return render(request, "account/dashboard.html", {"section": "dashboard"})
+    return render(request, "account/User_Dashboard.html", {"section": "dashboard"})
 
 
 # staff-only decorator
@@ -42,7 +44,7 @@ def admin_dashboard(request):
 
     recent = Alumni.objects.order_by("-created_at")[:10]
 
-    # ✅ Pass data to the template (design)
+    # Pass data to the template (design)
     context = {
         "total_alumni": total_alumni,
         "status_breakdown": list(status_breakdown),
@@ -70,10 +72,11 @@ def user_login(request):
                 if user.is_active:
                     login(request, user)
 
-                    # ✅ role-based redirect
+                    # role-based redirect
                     if user.is_staff:
                         return redirect("account:admin_dashboard")
-                    return redirect("account:dashboard")
+                    else:
+                        return redirect("account:dashboard")
 
                 return HttpResponse("Disabled account")
 
@@ -82,7 +85,7 @@ def user_login(request):
     else:
         form = LoginForm()
 
-    return render(request, "registration/login.html", {"form": form})
+    return render(request, "registration/User_Login.html", {"form": form})
 
 
 def home(request):
@@ -90,11 +93,14 @@ def home(request):
 
 def register(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = AlumniRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')
+            messages.success(request, 'Registration successful! You can now login with your Student ID.')
+            return redirect('account:login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
-        form = UserCreationForm()
-
-    return render(request, 'registration/register.html', {'form': form})
+        form = AlumniRegistrationForm()
+    
+    return render(request, 'registration/User_Register.html', {'form': form})

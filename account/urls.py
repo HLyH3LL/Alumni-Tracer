@@ -5,23 +5,21 @@ from . import views
 app_name = 'account'
 
 urlpatterns = [
-    # ✅ Use your custom login (role-based redirect)
+    # Use your custom login (role-based redirect)
     path('login/', views.user_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     # dashboards
-    path('', views.dashboard, name='dashboard'),
+    path('', views.home, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
- path('', views.home, name='home'),
+    # register
     path('register/', views.register, name='register'),
 
     path('login/', auth_views.LoginView.as_view(
         template_name='registration/User_Login.html'
     ), name='login'),
-
-
-
 
     # password management (unchanged)
     path('password_change/',

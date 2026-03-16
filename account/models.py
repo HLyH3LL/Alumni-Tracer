@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Alumni(models.Model):
     EMPLOYMENT_STATUS = [
@@ -8,14 +9,15 @@ class Alumni(models.Model):
         ("STUDENT", "Further Studies"),
         ("UNKNOWN", "Unknown"),
     ]
-
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='alumni_profile', null=True, blank=True)
+    
     student_id = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=80)
     last_name = models.CharField(max_length=80)
     email = models.EmailField(blank=True, null=True)
     contact_number = models.CharField(max_length=30, blank=True, null=True)
 
-    program = models.CharField(max_length=120)  # ex: BSIT
+    program = models.CharField(max_length=120)
     graduation_year = models.PositiveIntegerField()
 
     employment_status = models.CharField(
