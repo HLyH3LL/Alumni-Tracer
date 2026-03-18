@@ -4,10 +4,15 @@ from django.contrib.auth.models import User
 from .models import Alumni
 import re
 
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder': 'Enter your Student ID.'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password.'})
+    )
+
 class AlumniRegistrationForm(UserCreationForm):
-    """Combined form for User and Alumni registration"""
-    
-    # Alumni model fields
     student_id = forms.CharField(
         max_length=30,
         required=True,
@@ -16,12 +21,12 @@ class AlumniRegistrationForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=80,
         required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Enter first name'})
+        widget=forms.TextInput(attrs={'placeholder': 'Enter first name.'})
     )
     last_name = forms.CharField(
         max_length=80,
         required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Enter last name'})
+        widget=forms.TextInput(attrs={'placeholder': 'Enter last name.'})
     )
     email = forms.EmailField(
         required=False,
@@ -92,14 +97,14 @@ class AlumniRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Student ID must be 7 digits (e.g., YY12345)')
     
         if Alumni.objects.filter(student_id=student_id).exists():
-            raise forms.ValidationError('This Student ID is already registered')
+            raise forms.ValidationError('This Student ID is already registered.')
         return student_id
 
     def clean_email(self):
         """Check if email is already used"""
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('This email is already registered')
+            raise forms.ValidationError('This email is already registered.')
         return email
 
     def save(self, commit=True):

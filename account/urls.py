@@ -1,27 +1,36 @@
 from django.urls import path
+from . import views
 from django.contrib.auth import views as auth_views
-from . import views   
 
 app_name = 'account'
 
 urlpatterns = [
-    # Use your custom login (role-based redirect)
+    # Authentication
     path('login/', views.user_login, name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-    # dashboards
-    path('', views.home, name='home'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-
-    # register
+    path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
-
-    path('login/', auth_views.LoginView.as_view(
-        template_name='registration/User_Login.html'
-    ), name='login'),
-
-    # password management (unchanged)
+    path('home/', views.home, name='home'),
+    
+    # Dashboard
+    path('dashboard/', views.alumni_dashboard, name='alumni_dashboard'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    
+    # Account Settings (Profile Management)
+    path('settings/', views.account_settings, name='account_settings'),
+    
+    # Employment Management
+    path('employment/', views.employment_list, name='employment_list'),
+    path('employment/add/', views.add_employment, name='add_employment'),
+    path('employment/<int:employment_id>/edit/', views.edit_employment, name='edit_employment'),
+    path('employment/<int:employment_id>/delete/', views.delete_employment, name='delete_employment'),
+    
+    # Further Studies Management
+    path('studies/', views.studies_list, name='studies_list'),
+    path('studies/add/', views.add_study, name='add_study'),
+    path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
+    path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
+    
+    # password management
     path('password_change/',
          auth_views.PasswordChangeView.as_view(
              template_name='registration/password_change_form.html'
