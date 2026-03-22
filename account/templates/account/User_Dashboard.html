@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,9 +33,7 @@
 
         /* TIP Color Scheme */
         :root {
-            --tip-maroon: #28282B;
-            --tip-maroon-dark: #000000;
-            --tip-maroon-light: #343434;
+            --tip-matte-black: #28282B;
             --tip-gold: #FFD700;
             --tip-gold-dark: #e5c100;
             --tip-gold-light: #fde910;
@@ -76,6 +75,14 @@
             letter-spacing: 1.5px;
             margin-top: 2px;
             font-weight: 500;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex: 1;
+            margin-left: 40px;
         }
 
         .menu {
@@ -121,10 +128,68 @@
             color: var(--tip-gold);
         }
 
+        /* Dropdown Menu */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(40, 40, 43, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            min-width: 250px;
+            margin-top: 8px;
+            z-index: 1001;
+            padding: 8px 0;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--tip-gold);
+            border-left-color: var(--tip-gold);
+            padding-left: 24px;
+        }
+
+        .dropdown-menu a i {
+            width: 20px;
+            color: var(--tip-gold);
+        }
+
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+            margin-left: auto;
         }
 
         .user-name {
@@ -133,10 +198,33 @@
             font-size: 0.9em;
         }
 
-        .logout-btn {
+        .hamburger-menu {
+            background: none;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--tip-gold);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hamburger-menu:hover {
             background: var(--tip-gold);
-            border: none;
-            color: var(--tip-maroon);
+            color: var(--tip-matte-black);
+            border-color: var(--tip-gold);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--tip-gold);
             padding: 8px 18px;
             border-radius: 6px;
             cursor: pointer;
@@ -145,13 +233,12 @@
             font-size: 0.85em;
             text-transform: uppercase;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
 
         .logout-btn:hover {
-            background: var(--tip-gold-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+            background: var(--tip-gold);
+            color: var(--tip-matte-black);
+            border-color: var(--tip-gold);
         }
 
         #content {
@@ -174,7 +261,7 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
         }
@@ -342,7 +429,7 @@
             gap: 15px;
         }
 
-        .section-title .view-all {
+        .view-all {
             font-size: 0.65em;
             color: var(--white);
             text-decoration: none;
@@ -357,11 +444,12 @@
             font-weight: 600;
         }
 
-        .section-title .view-all:hover {
+        .view-all:hover {
             background: var(--tip-gold);
-            color: var(--tip-maroon);
+            color: var(--tip-matte-black);
             border-color: var(--tip-gold);
             transform: translateY(-2px);
+            text-decoration: none;
         }
 
         /* Profile Completion */
@@ -392,7 +480,7 @@
         .completion-percent {
             font-size: 1.6em;
             font-weight: 700;
-            color: var(--tip-maroon);
+            color: var(--tip-matte-black);
             background: var(--tip-gold);
             padding: 8px 20px;
             border-radius: 20px;
@@ -436,79 +524,6 @@
         .missing-tag:hover {
             background: rgba(255, 215, 0, 0.15);
             border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        /* Quick Actions */
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .action-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 25px 20px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .action-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 215, 0, 0.3);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.3);
-        }
-
-        .action-card:hover::before {
-            top: -20%;
-            right: -20%;
-        }
-
-        .action-icon {
-            font-size: 2.2em;
-            position: relative;
-            z-index: 1;
-        }
-
-        .action-card h3 {
-            color: var(--white);
-            margin-bottom: 5px;
-            font-size: 1.05em;
-            position: relative;
-            z-index: 1;
-            font-weight: 600;
-        }
-
-        .action-card p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85em;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
         }
 
         /* Tables */
@@ -592,75 +607,98 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .btn-edit:hover {
             background: var(--tip-gold);
-            color: var(--tip-maroon);
+            color: var(--tip-matte-black);
             border-color: var(--tip-gold);
         }
 
-        /* Career Timeline */
-        .timeline {
-            position: relative;
-            padding: 20px 0 20px 50px;
+        /* Recent Activity Timeline */
+        .activity-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--tip-gold), rgba(255, 215, 0, 0.3));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 35px;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: -34px;
-            top: 0;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--tip-gold);
-            border: 3px solid var(--tip-maroon);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-        }
-
-        .timeline-content {
+        .activity-item {
             background: rgba(255, 215, 0, 0.08);
             border: 1px solid rgba(255, 215, 0, 0.15);
             border-left: 3px solid var(--tip-gold);
-            padding: 20px;
             border-radius: 8px;
+            padding: 15px 20px;
             backdrop-filter: blur(10px);
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
         }
 
-        .timeline-content h4 {
-            color: var(--white);
-            margin-bottom: 5px;
-            font-size: 1.1em;
+        .activity-item:hover {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateX(5px);
         }
 
-        .timeline-date {
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: var(--tip-gold);
-            font-size: 0.85em;
-            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            color: var(--white);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .activity-description {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            color: var(--tip-gold);
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 0.3px;
             font-weight: 600;
         }
 
-        .timeline-content p {
+        .empty-state {
+            text-align: center;
+            padding: 40px;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95em;
-            line-height: 1.6;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            margin-bottom: 15px;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            margin-top: 10px;
         }
 
         footer {
@@ -678,48 +716,56 @@
             opacity: 0.9;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .empty-state p {
-            margin-bottom: 15px;
-        }
-
-        .empty-state a {
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 1024px) {
-            .welcome-section {
-                flex-direction: column;
-                gap: 20px;
+        /* Responsive */
+        @media (max-width: 1200px) {
+            #header {
+                flex-wrap: wrap;
+                gap: 15px;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .nav-wrapper {
+                margin-left: 0;
+                gap: 20px;
+                order: 3;
+                width: 100%;
+            }
+
+            .user-menu {
+                margin-left: 0;
             }
         }
 
         @media (max-width: 768px) {
             #header {
                 padding: 12px 20px;
-                flex-direction: column;
-                gap: 12px;
+            }
+
+            #header .logo {
+                font-size: 1.2em;
+            }
+
+            .nav-wrapper {
+                gap: 15px;
+                display: none;
             }
 
             .menu {
                 gap: 15px;
                 flex-wrap: wrap;
-                justify-content: center;
             }
 
-            .user-menu {
-                flex-direction: column;
-                gap: 10px;
+            .menu li a {
+                font-size: 0.8em;
+            }
+
+            .hamburger-menu {
+                font-size: 0.8em;
+                padding: 6px 10px;
+                display: flex;
+            }
+
+            .dropdown-menu {
+                min-width: 200px;
             }
 
             #content {
@@ -740,11 +786,6 @@
             }
 
             .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .actions-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
@@ -757,11 +798,30 @@
                 padding: 10px 8px;
                 font-size: 0.85em;
             }
+
+            .activity-item {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
-            #header .logo {
-                font-size: 1.2em;
+            #header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-wrapper {
+                width: 100%;
+                gap: 10px;
+            }
+
+            .menu {
+                gap: 10px;
+            }
+
+            .user-menu {
+                width: 100%;
+                flex-direction: column;
             }
 
             .dashboard-header {
@@ -772,7 +832,12 @@
                 padding: 15px;
             }
 
-            .actions-grid {
+            .welcome-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -793,12 +858,27 @@
             TIPIANS<span style="color: white;">CONNECT</span>
             <span class="logo-tagline">ALUMNI DASHBOARD</span>
         </a>
-        <ul class="menu">
-            <li><a href="{% url 'account:home' %}">Home</a></li>
-            <li><a href="{% url 'account:alumni_dashboard' %}" class="active">Dashboard</a></li>
-        </ul>
+
         <div class="user-menu">
-            <span class="user-name">Welcome, {{ user.first_name|default:user.username }}</span>
+            <span class="user-name">{{ user.first_name|default:user.username }}</span>
+            
+            <div style="position: relative;">
+                <button class="hamburger-menu" onclick="toggleDropdown()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="{% url 'account:add_employment' %}">
+                        <i class="fas fa-building"></i> Add Employment
+                    </a>
+                    <a href="{% url 'account:add_study' %}">
+                        <i class="fas fa-book"></i> Further Studies
+                    </a>
+                    <a href="{% url 'account:account_settings' %}">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </div>
+            </div>
+
             <form method="post" action="{% url 'account:logout' %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -811,7 +891,7 @@
             <div class="dashboard-header">
                 <div class="welcome-section">
                     <div class="welcome-text">
-                        <h1>Welcome back, {{ alumni.first_name|default:user.username }}!</h1>
+                        <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
                         <p>Your alumni dashboard • Last login: {{ user.last_login|date:"F j, Y" }}</p>
                     </div>
                     <div class="profile-summary">
@@ -826,16 +906,16 @@
                 <!-- Profile Completion -->
                 <div class="profile-completion">
                     <div class="completion-header">
-                        <h3><i class="fas fa-user-check"></i> Profile Completion</h3>
-                        <span class="completion-percent">{{ profile_completion }}%</span>
+                        <h3>Profile Completion</h3>
+                        <span class="completion-percent">{{ profile_completion|default:75 }}%</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ profile_completion }}%;"></div>
+                        <div class="progress-fill" style="width: {{ profile_completion|default:75 }}%"></div>   
                     </div>
                     {% if missing_fields %}
                     <div class="missing-items">
                         {% for field in missing_fields %}
-                        <span class="missing-tag">{{ field }}</span>
+                        <span class="missing-tag"><i class="fas fa-circle-notch"></i> {{ field }}</span>
                         {% endfor %}
                     </div>
                     {% else %}
@@ -850,14 +930,14 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div class="stat-content">
-                            <h3>{{ alumni.graduation_year }}</h3>
+                            <h3>{{ alumni.graduation_year|default:"N/A" }}</h3>
                             <p>Graduation Year</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
                         <div class="stat-content">
-                            <h3>{{ employment_count }}</h3>
+                            <h3>{{ employment_count|default:0 }}</h3>
                             <p>Companies Worked</p>
                         </div>
                     </div>
@@ -871,48 +951,10 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
                         <div class="stat-content">
-                            <h3>{{ alumni.program|truncatewords:2 }}</h3>
+                            <h3>{{ alumni.program|truncatewords:2|default:"N/A" }}</h3>
                             <p>Program</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <h2 class="section-title">
-                    Quick Actions
-                </h2>
-                
-                <div class="actions-grid">
-                    <a href="{% url 'account:account_settings' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-edit"></i></div>
-                        <h3>Update Profile</h3>
-                        <p>Keep your information current</p>
-                    </a>
-                    <a href="{% url 'account:add_employment' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-building"></i></div>
-                        <h3>Add Employment</h3>
-                        <p>Share your career journey</p>
-                    </a>
-                    <a href="{% url 'account:add_study' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-book"></i></div>
-                        <h3>Further Studies</h3>
-                        <p>Add post-graduate education</p>
-                    </a>
-                    <a href="{% url 'account:employment_list' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-briefcase"></i></div>
-                        <h3>View Employment</h3>
-                        <p>See your career history</p>
-                    </a>
-                    <a href="{% url 'account:studies_list' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-book-open"></i></div>
-                        <h3>View Studies</h3>
-                        <p>See your study records</p>
-                    </a>
-                    <a href="{% url 'account:account_settings' %}" class="action-card">
-                        <div class="action-icon"><i class="fas fa-cog"></i></div>
-                        <h3>Settings</h3>
-                        <p>Manage your account</p>
-                    </a>
                 </div>
 
                 <!-- Employment History -->
@@ -948,7 +990,7 @@
                 </div>
                 {% else %}
                 <div class="empty-state">
-                    <p><i class="fas fa-briefcase fa-3x"></i></p>
+                    <p><i class="fas fa-briefcase"></i></p>
                     <p>No employment records yet. <a href="{% url 'account:add_employment' %}" class="view-all">Add your first job</a></p>
                 </div>
                 {% endif %}
@@ -957,7 +999,7 @@
                 {% if further_studies %}
                 <h2 class="section-title">
                     Further Studies
-                    <a href="{% url 'account:add_study' %}" class="view-all"><i class="fas fa-plus"></i> Add New</a>
+                    <a href="{% url 'account:further_studies' %}" class="view-all"><i class="fas fa-plus"></i> Add New</a>
                 </h2>
                 
                 <div class="table-container">
@@ -977,8 +1019,8 @@
                                 <td>{{ study.school_name }}</td>
                                 <td>{{ study.program }}</td>
                                 <td>{{ study.field_of_study|default:"Not specified" }}</td>
-                                <td>{{ study.get_duration_display }}</td>
-                                <td><a href="{% url 'account:edit_study' study.id %}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a></td>
+                                <td>{{ study.get_duration_display|default:"N/A" }}</td>
+                                <td><a href="#" class="btn-edit"><i class="fas fa-edit"></i> Edit</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -987,28 +1029,29 @@
                 {% endif %}
 
                 <!-- Recent Activity -->
+                <h2 class="section-title">
+                    </i> Recent Activity
+                </h2>
+
                 {% if recent_activities %}
-                <h2 class="section-title">Recent Activity</h2>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Activity</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for activity in recent_activities %}
-                            <tr>
-                                <td>{{ activity.created_at|date:"M d, Y" }}</td>
-                                <td>{{ activity.get_activity_type_display }}</td>
-                                <td>{{ activity.description|default:"No details" }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="activity-timeline">
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-{% if 'profile' in activity.get_activity_type_display|lower %}edit{% elif 'employment' in activity.get_activity_type_display|lower %}briefcase{% elif 'study' in activity.get_activity_type_display|lower %}book{% else %}star{% endif %}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ activity.get_activity_type_display }}</div>
+                            <div class="activity-description">{{ activity.description|default:"Action completed" }}</div>
+                            <div class="activity-time">{{ activity.created_at|date:"M d, Y \a\t H:i" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p><i class="fas fa-inbox"></i></p>
+                    <p>No recent activity yet. Start by updating your profile or adding employment history.</p>
                 </div>
                 {% endif %}
             </div>
@@ -1017,7 +1060,31 @@
 
     <footer>
         <p>© 2024 Technological Institute of the Philippines - Manila. All rights reserved.</p>
-        <p style="font-size: 0.8em; margin-top: 5px;">TipiansConnect: Alumni Tracer System for IT Graduates</p>
+        <p style="font-size: 0.8em; margin-top: 5px;">T.I.P.ians Connect: Alumni Tracer System for IT Graduates</p>
     </footer>
+
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const button = document.querySelector('.hamburger-menu');
+            
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Close dropdown when a link is clicked
+        document.querySelectorAll('.dropdown-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('dropdownMenu').classList.remove('active');
+            });
+        });
+    </script>
 </body>
 </html>

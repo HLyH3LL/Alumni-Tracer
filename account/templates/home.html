@@ -1,16 +1,944 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}TIPians Connect{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T.I.P.ians Connect - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tip-matte-black: #28282B;
+            --tip-pure-black: #000000;
+            --tip-jet-black: #343434;
+            --tip-gold: {{ config.primary_color|default:"#FFD700" }};
+            --tip-gold-dark: #e5c100;
+            --tip-gold-light: #fde910;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray: #666666;
+            --gray-dark: #333333;
+            --dark-bg: #1a1a1a;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #28282B 25%, #343434 50%, #28282B 75%, #FFD700 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            background-attachment: fixed;
+            color: var(--white);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Background decorations */
+        .bg-decoration {
+            position: fixed;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 50%;
+            top: -200px;
+            left: -200px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -150px;
+            right: -150px;
+            animation: float 10s ease-in-out infinite 2s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(40px); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 60px;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .logo span {
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 18px;
+            letter-spacing: 0.2px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--tip-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--tip-gold);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-login, .btn-signup {
+            padding: 12px 28px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-login {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-signup {
+            background: linear-gradient(135deg, #FFD700 0%, #e5c100 100%);
+            color: #000000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-signup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-signup:hover::before {
+            left: 100%;
+        }
+
+        /* Carousel */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide-content {
+            max-width: 900px;
+            width: 100%;
+            padding: 60px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide:nth-child(1) .slide-content {
+            animation-delay: 0.2s;
+        }
+
+        .carousel-slide:nth-child(2) .slide-content {
+            animation-delay: 0.2s;
+        }
+
+        .carousel-slide:nth-child(3) .slide-content {
+            animation-delay: 0.2s;
+        }
+
+        /* About Section */
+        .about-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-hero {
+            text-align: center;
+            padding: 80px 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .section-hero h2 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .section-hero h2 span {
+            background: linear-gradient(135deg, #FFD700 0%, #fde910 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-hero p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .max-width-1200 {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title span {
+            color: var(--tip-gold);
+        }
+
+        /* Mission & Vision */
+        .mission-vision {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
+            text-align: center;
+        }
+
+        .glass-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--tip-gold);
+        }
+
+        .glass-card p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+        }
+
+        /* Values Grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .value-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .value-icon {
+            font-size: 50px;
+            color: var(--tip-gold);
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .value-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .slide-icon {
+            font-size: 80px;
+            color: var(--tip-gold);
+            margin-bottom: 30px;
+            display: block;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.2s forwards;
+        }
+
+        .slide-title {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.3s forwards;
+        }
+
+        .slide-title span {
+            display: block;
+            background: linear-gradient(135deg, #FFD700 0%, #fde910 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 40px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.4s forwards;
+        }
+
+        .slide-cta {
+            display: inline-flex;
+            gap: 20px;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 14px 40px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #e5c100 100%);
+            color: #000000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Carousel Controls */
+        .carousel-controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .control-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .control-dot.active {
+            background: var(--tip-gold);
+            transform: scale(1.4);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .control-dot:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Arrow Controls */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            transition: all 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: var(--tip-gold);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-arrow.prev {
+            left: 40px;
+        }
+
+        .carousel-arrow.next {
+            right: 40px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--tip-gold);
+            padding: 25px;
+            margin-top: auto;
+            text-align: center;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        footer p {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            nav {
+                padding: 20px 40px;
+            }
+
+            .slide-content {
+                padding: 40px 30px;
+            }
+
+            .slide-title {
+                font-size: 42px;
+            }
+
+            .carousel-arrow {
+                display: none;
+            }
+
+            .max-width-1200 {
+                padding: 40px 30px;
+            }
+
+            .mission-vision {
+                grid-template-columns: 1fr;
+            }
+
+            .section-hero {
+                padding: 60px 40px;
+            }
+
+            .section-hero h2 {
+                font-size: 42px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+                display: none;
+            }
+
+            .carousel-container {
+                margin-top: 70px;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .slide-content {
+                padding: 30px 20px;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .slide-title {
+                font-size: 32px;
+            }
+
+            .slide-description {
+                font-size: 16px;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 12px 30px;
+                font-size: 0.9em;
+            }
+
+            .slide-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .carousel-controls {
+                bottom: 30px;
+                gap: 10px;
+            }
+
+            .control-dot {
+                width: 12px;
+                height: 12px;
+            }
+
+            .max-width-1200 {
+                padding: 30px 20px;
+            }
+
+            .section-hero {
+                padding: 40px 20px;
+            }
+
+            .section-hero h2 {
+                font-size: 32px;
+            }
+
+            .section-hero p {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .glass-card {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="header">
-        <span class="logo">Bookmarks</span>
+    <div class="bg-decoration circle-1"></div>
+    <div class="bg-decoration circle-2"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{% static 'images/logo.svg' %}" alt="logo">
+                <span>T.I.P.ians Connect</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'account:home' %}">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="{% url 'account:register' %}">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="{% url 'account:login' %}" class="btn-login">Login</a>
+                <a href="{% url 'account:register' %}" class="btn-signup">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- DYNAMIC CAROUSEL -->
+    <div class="carousel-container">
+        <div class="carousel-track">
+            {% for slide in slides %}
+            <div class="carousel-slide" style="background: linear-gradient(135deg, rgba(40, 40, 43, 0.7) 0%, rgba(52, 52, 52, 0.7) 100%), url('{{ slide.background_image.url }}') center/cover;">
+                <div class="slide-content">
+                    <h1 class="slide-title">
+                        {{ slide.title }}
+                        <span>{{ slide.subtitle }}</span>
+                    </h1>
+                    <p class="slide-description">{{ slide.description }}</p>
+                    <div class="slide-cta">
+                        <a href="{{ slide.primary_button_url }}" class="btn-primary">
+                            {{ slide.primary_button_text }}
+                        </a>
+                        {% if slide.secondary_button_text %}
+                        <a href="{{ slide.secondary_button_url }}" class="btn-secondary">
+                            {{ slide.secondary_button_text }}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="carousel-slide" style="background: linear-gradient(135deg, rgba(52, 52, 52, 0.7) 0%, rgba(40, 40, 43, 0.7) 100%);">
+                <div class="slide-content">
+                    <h1 class="slide-title">Welcome to <span>TipiansConnect</span></h1>
+                    <p class="slide-description">No slides configured. Please add slides in the admin panel.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Arrow Controls -->
+        <button class="carousel-arrow prev" onclick="prevSlide()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-arrow next" onclick="nextSlide()">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Carousel Controls -->
+        <div class="carousel-controls">
+            {% for slide in slides %}
+            <div class="control-dot {% if forloop.first %}active{% endif %}" onclick="scrollToSlide({{ forloop.counter0 }})"></div>
+            {% empty %}
+            <div class="control-dot active"></div>
+            {% endfor %}
+        </div>
     </div>
 
-    <div id="content">
-        {% block content %}
-        {% endblock %}
-    </div>
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <!-- Hero Section -->
+        <div class="section-hero">
+            {% if about_hero_title %}
+                <h2>{{ about_hero_title.title }} <span>T.I.P.ians Connect</span></h2>
+            {% else %}
+                <h2>About <span>T.I.P.ians Connect</span></h2>
+            {% endif %}
+            
+            {% if about_description %}
+                <p>{{ about_description.content }}</p>
+            {% else %}
+                <p>Building bridges between T.I.P Manila alumni, fostering professional growth, and creating a thriving community that advances careers and strengthens bonds.</p>
+            {% endif %}
+        </div>
+
+        <!-- Mission & Vision -->
+        <div class="section max-width-1200">
+            <div class="mission-vision">
+                {% if mission %}
+                <div class="glass-card">
+                    <h3>Our Mission</h3>
+                    <p>{{ mission.content }}</p>
+                </div>
+                {% endif %}
+
+                {% if vision %}
+                <div class="glass-card">
+                    <h3>Our Vision</h3>
+                    <p>{{ vision.content }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Core Values -->
+        <div class="section max-width-1200">
+            <h2 class="section-title">Our <span>Core Values</span></h2>
+            <div class="values-grid">
+                {% for value in values %}
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="{{ value.icon_class }}"></i>
+                    </div>
+                    <h3>{{ value.title }}</h3>
+                    <p>{{ value.description }}</p>
+                </div>
+                {% empty %}
+                <p style="grid-column: 1/-1; text-align: center; color: rgba(255, 255, 255, 0.7);">
+                    No core values added yet. Please add values in the admin panel.
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© {% now "Y" %} {{ config.company_name }}. All rights reserved.</p>
+        <p style="font-size: 0.8em; margin-top: 5px;">{{ config.tagline }}</p>
+    </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = {{ slide_count|default:1 }};
+        let autoPlayInterval;
+
+        function updateCarousel() {
+            const track = document.querySelector('.carousel-track');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            // Update control dots
+            document.querySelectorAll('.control-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides) % slides;
+            updateCarousel();
+        }
+
+        function scrollToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+            resetAutoPlay(); // Reset timer when user manually changes slide
+        }
+
+        // Auto-play carousel every 5 seconds
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                nextSlide();
+            }, 5000); // 5000 milliseconds = 5 seconds
+        }
+
+        function resetAutoPlay() {
+            clearInterval(autoPlayInterval);
+            startAutoPlay();
+        }
+
+        // Start auto-play on page load
+        startAutoPlay();
+
+        // Pause auto-play on mouse enter, resume on mouse leave
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoPlayInterval);
+        });
+        carouselContainer.addEventListener('mouseleave', () => {
+            startAutoPlay();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+                resetAutoPlay();
+            }
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+                resetAutoPlay();
+            }
+        });
+
+        // Touch swipe support
+        let startX = 0;
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+                resetAutoPlay();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TipiansConnect - Alumni Portal</title>
+    <title>T.I.P.ians Connect - Alumni Login</title>
     <style>
         * {
             margin: 0;
@@ -29,6 +29,7 @@
             --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.1);
             --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.15);
             --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.2);
+            --error-color: #ff6b6b;
         }
 
         body {
@@ -95,7 +96,7 @@
             border-radius: 32px;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(31, 38, 135, 0.37),
+                0 8px 32px rgba(51, 0, 105, 0.37),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -147,21 +148,6 @@
             position: relative;
             z-index: 2;
             margin-bottom: 40px;
-        }
-
-        .brand-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease-out 0.2s forwards;
-        }
-
-        .brand-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
         }
 
         .heading {
@@ -219,6 +205,7 @@
             justify-content: center;
             position: relative;
             z-index: 2;
+            overflow-y: auto;
         }
 
         .form-container {
@@ -244,8 +231,26 @@
             letter-spacing: 0.3px;
         }
 
+        /* Top-level form errors */
+        .form-errors {
+            background: rgba(255, 107, 107, 0.12);
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-errors .errorlist {
+            margin: 0;
+        }
+
         .form-group {
             margin-bottom: 22px;
+        }
+
+        .form-group.has-error {
+            margin-bottom: 28px;
         }
 
         .form-label {
@@ -290,6 +295,25 @@
             border-color: rgba(255, 255, 255, 0.25);
         }
 
+        /* Error state for inputs */
+        .form-group.has-error .form-input {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .form-group.has-error .form-input:focus {
+            background: rgba(255, 107, 107, 0.15);
+            border-color: rgba(255, 107, 107, 0.7);
+            box-shadow: 
+                0 0 0 3px rgba(255, 107, 107, 0.1),
+                inset 0 1px 2px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-group.has-error .form-input:hover {
+            background: rgba(255, 107, 107, 0.12);
+            border-color: rgba(255, 107, 107, 0.6);
+        }
+
         /* Password toggle styling */
         .password-group {
             position: relative;
@@ -322,6 +346,41 @@
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
+        }
+
+        /* Error messages */
+        .errorlist {
+            list-style: none;
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 6px;
+            margin-bottom: 0;
+        }
+
+        .errorlist li {
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: slideInError 0.3s ease-out;
+        }
+
+        .errorlist li::before {
+            content: '⚠';
+            font-size: 14px;
+            color: var(--error-color);
+            flex-shrink: 0;
+        }
+
+        @keyframes slideInError {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .form-footer {
@@ -424,23 +483,6 @@
             transform: translateY(0);
         }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            margin-bottom: 22px;
-            gap: 12px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        }
-
         .btn-google {
             width: 100%;
             padding: 12px;
@@ -504,18 +546,6 @@
             width: 100%;
         }
 
-        /* Error messages */
-        .errorlist {
-            list-style: none;
-            color: #ffcdd2;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .errorlist li {
-            padding: 5px 0;
-        }
-
         /* Responsive */
         @media (max-width: 968px) {
             .container {
@@ -566,6 +596,11 @@
             .description {
                 font-size: 13px;
             }
+
+            .right-section {
+                overflow-y: auto;
+                max-height: 100vh;
+            }
         }
     </style>
 </head>
@@ -593,20 +628,11 @@
                     <p class="form-subtitle">Log in to your account</p>
                 </div>
 
-                <!-- Display Form Errors if any -->
-                {% if form.non_field_errors %}
-                    <div class="errorlist">
-                        {% for error in form.non_field_errors %}
-                            <li style="color: #ffcdd2; font-size: 13px; margin-bottom: 10px;">{{ error }}</li>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
                 <form method="POST" action="{% url 'account:login' %}">
                     {% csrf_token %}
 
                     <!-- Student ID -->
-                    <div class="form-group">
+                    <div class="form-group {% if form.username.errors %}has-error{% endif %}">
                         <label class="form-label" for="id_username">Student ID</label>
                         <input 
                             type="text" 
@@ -615,18 +641,19 @@
                             class="form-input" 
                             placeholder="Enter your Student ID"
                             required
+                            value="{{ form.username.value|default:'' }}"
                         >
                         {% if form.username.errors %}
-                            <div class="errorlist">
+                            <ul class="errorlist">
                                 {% for error in form.username.errors %}
                                     <li>{{ error }}</li>
                                 {% endfor %}
-                            </div>
+                            </ul>
                         {% endif %}
                     </div>
 
                     <!-- Password -->
-                    <div class="form-group">
+                    <div class="form-group {% if form.password.errors %}has-error{% endif %}">
                         <label class="form-label" for="id_password">Password</label>
                         <div class="password-group">
                             <input 
@@ -645,11 +672,11 @@
                             </button>
                         </div>
                         {% if form.password.errors %}
-                            <div class="errorlist">
+                            <ul class="errorlist">
                                 {% for error in form.password.errors %}
                                     <li>{{ error }}</li>
                                 {% endfor %}
-                            </div>
+                            </ul>
                         {% endif %}
                     </div>
 
@@ -661,6 +688,17 @@
                         </label>
                         <a href="{% url 'account:password_reset' %}" class="forgot-link">Forgot password?</a>
                     </div>
+
+                    <!-- Display Form Errors if any -->
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            <ul class="errorlist">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
 
                     <!-- Log In Button -->
                     <button type="submit" class="btn-login">LOG IN</button>
@@ -682,11 +720,9 @@
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                // Change icon to eye-off (closed eye)
                 eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
             } else {
                 passwordInput.type = 'password';
-                // Change icon back to eye (open eye)
                 eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
             }
         }

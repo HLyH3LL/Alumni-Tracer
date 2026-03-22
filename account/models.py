@@ -20,6 +20,19 @@ class Alumni(models.Model):
         ("UNKNOWN", "Unknown"),
     ]
 
+    PROGRAMS = [
+        ("BS CS", "BS Computer Science"),
+        ("BS CpE", "BS Computer Engineering"),
+        ("BS ECE", "BS Electronics Engineering"),
+        ("BS EE", "BS Electrical Engineering"),
+        ("BS ME", "BS Mechanical Engineering"),
+        ("BS CE","BS Civil Engineering"),
+        ("BS Arch","BS Architecture"),
+        ("BS IE","BS Industrial Engineering"),
+        ("BS Accountancy","BS Accountancy"),
+        ("BS BA","BS Business Administration"),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='alumni_profile', null=True, blank=True)
     
     student_id = models.CharField(max_length=30, unique=True)
@@ -130,9 +143,9 @@ class Employment(models.Model):
     job_title = models.CharField(max_length=200)
     date_hired = models.DateField(blank=True, null=True)
 
-    is_job_related = models.BooleanField(default=False)  # related to degree
+    is_job_related = models.BooleanField(default=False)
     salary_range = models.CharField(max_length=100, blank=True, null=True)
-    employment_type = models.CharField(max_length=100, blank=True, null=True)  # full-time/part-time/contract
+    employment_type = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -224,3 +237,99 @@ class Activity(models.Model):
  
     def __str__(self):
         return f"{self.alumni} - {self.get_activity_type_display()}"
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Program(models.Model):
+    """Store all academic programs - replaces hardcoded dropdown"""
+    code = models.CharField(max_length=20, unique=True) 
+    full_name = models.CharField(max_length=100) 
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', 'code']
+        verbose_name = "Program"
+        verbose_name_plural = "Programs"
+    
+    def __str__(self):
+        return f"{self.code} - {self.full_name}"
+
+
+class EmploymentStatus(models.Model):
+    value = models.CharField(max_length=20, unique=True) 
+    label = models.CharField(max_length=50)  
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Employment Status"
+        verbose_name_plural = "Employment Statuses"
+    
+    def __str__(self):
+        return self.label
+
+
+class Feature(models.Model):
+    """Store registration page features - replaces hardcoded features"""
+    title = models.CharField(max_length=50)  # "Network"
+    description = models.TextField()  # "Connect with fellow alumni..."
+    icon = models.CharField(max_length=100, default="fas fa-network-wired")  # Font Awesome
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Feature"
+        verbose_name_plural = "Features"
+    
+    def __str__(self):
+        return self.title
+
+
+class RegistrationPageContent(models.Model):
+    """Store all registration page text content"""
+    # Hero Section
+    hero_title = models.CharField(
+        max_length=200, 
+        default="WELCOME TO THE T.I.P.ian ALUMNI COMMUNITY"
+    )
+    hero_tagline = models.CharField(
+        max_length=200, 
+        default="Your professional network starts here!"
+    )
+    hero_description = models.TextField(
+        default="Join thousands of T.I.P Manila alumni and expand your professional horizons. Connect, collaborate, and grow with our thriving community."
+    )
+    
+    # Form Section
+    form_title = models.CharField(
+        max_length=100, 
+        default="ALUMNI REGISTRATION"
+    )
+    form_subtitle = models.CharField(
+        max_length=200, 
+        default="Join the T.I.P Manila Alumni Community"
+    )
+    login_text = models.CharField(
+        max_length=100, 
+        default="Already have an account?"
+    )
+    
+    # Metadata
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Registration Page Content"
+        verbose_name_plural = "Registration Page Content"
+    
+    def __str__(self):
+        return "Registration Page Configuration"

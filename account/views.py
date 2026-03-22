@@ -8,9 +8,13 @@ from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
+from django.contrib.auth.models import User
+from django.contrib import messages
+from datetime import datetime
  
 from .auth_forms import LoginForm, AlumniRegistrationForm
-from .models import Alumni, Employment, FurtherStudy, Activity
+from .models import Alumni, Employment, FurtherStudy, Activity, Program, EmploymentStatus, Feature, RegistrationPageContent
+from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
 
 @login_required
 def dashboard(request):
@@ -109,7 +113,8 @@ def user_login(request):
 
                 return HttpResponse("Disabled account")
 
-            return HttpResponse("Invalid login")
+            form.add_error(None, "Invalid Student ID or Password. Please try again.")
+            return render(request, "registration/User_Login.html", {"form": form})
 
     else:
         form = LoginForm()
@@ -123,32 +128,67 @@ def user_logout(request):
     return redirect("account:home")
 
 def home(request):
-    return render(request, 'home.html')
+    # Get slides from database
+    slides = CarouselSlide.objects.filter(is_active=True).order_by('order')
+    
+    # Get values from database
+    values = CoreValue.objects.filter(is_active=True).order_by('order')
+    
+    # Get page content
+    about_hero_title = PageContent.objects.filter(section='about_hero').first()
+    about_description = PageContent.objects.filter(section='about_description').first()
+    mission = PageContent.objects.filter(section='mission').first()
+    vision = PageContent.objects.filter(section='vision').first()
+    
+    # Get config
+    config = SiteConfig.get_config()
+    
+    # Pass to template
+    context = {
+        'slides': slides,
+        'slide_count': slides.count(),
+        'values': values,
+        'about_hero_title': about_hero_title,
+        'about_description': about_description,
+        'mission': mission,
+        'vision': vision,
+        'config': config,
+    }
+    
+    return render(request, 'home.html', context)
 
 def register(request):
-    """Handle alumni registration"""
-    if request.user.is_authenticated:
-        if request.user.is_staff:
-            return redirect("account:admin_dashboard")
-        return redirect("account:alumni_dashboard")
+    """Registration view with dynamic data from database"""
     
-    if request.method == "POST":
-        form = AlumniRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, 
-                'Registration successful! You can now login with your Student ID.'
-            )
-            return redirect('account:login')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
-    else:
-        form = AlumniRegistrationForm()
+    if request.method == 'POST':
+        pass
     
-    return render(request, 'registration/User_Register.html', {'form': form})
+    # Get all active programs from database
+    programs = Program.objects.filter(is_active=True)
+    
+    # Get all active employment statuses from database
+    employment_statuses = EmploymentStatus.objects.filter(is_active=True)
+    
+    # Get all active features from database
+    features = Feature.objects.filter(is_active=True)
+    
+    # Get page content (or use defaults)
+    page_content = RegistrationPageContent.objects.first()
+    
+    # Generate graduation years dynamically
+    current_year = datetime.now().year
+    graduation_years = list(range(current_year, 2010, -1))
+    
+    context = {
+        'programs': programs,
+        'employment_statuses': employment_statuses,
+        'features': features,
+        'page_content': page_content,
+        'graduation_years': graduation_years,
+    }
+    
+    return render(request, 'registration/User_Register.html', context)
+    
 
 @login_required
 def alumni_dashboard(request):
