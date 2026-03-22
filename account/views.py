@@ -159,10 +159,17 @@ def home(request):
 
 def register(request):
     """Registration view with dynamic data from database"""
-    
     if request.method == 'POST':
-        pass
-    
+        form = AlumniRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, 'Registration successful! You can now login with your Student ID.')
+            return redirect('account:login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AlumniRegistrationForm()
+
     # Get all active programs from database
     programs = Program.objects.filter(is_active=True)
     
