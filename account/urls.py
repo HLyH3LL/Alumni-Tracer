@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .voice_views import voice_update 
 
 app_name = 'account'
 
@@ -40,6 +41,9 @@ urlpatterns = [
     path('studies/add/', views.add_study, name='add_study'),
     path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
     path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
+
+    # Voice
+    path('voice-update/', voice_update, name='voice_update'),
 
     # ===============================
     # 🔑 PASSWORD MANAGEMENT

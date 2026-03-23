@@ -5,3 +5,11 @@ pillow==12.1.1
 psycopg2-binary==2.9.11
 sqlparse==0.5.5
 tzdata==2025.3
+
+# Audio Processing - Voice Feature
+openai-whisper==20231117
+torch==2.0.1
+torchaudio==2.0.2
+scipy
+librosa
+python-dateutil

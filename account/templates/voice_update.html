@@ -1,0 +1,321 @@
+<!-- Voice Update Feature - Add to Employment Form Template -->
+<!-- Include this in your Base_Form_FINAL.html or Employment_Form_STYLED.html -->
+
+<style>
+    /* Voice Recorder Styles */
+    .voice-recorder-container {
+        margin: 30px 0;
+        padding: 20px;
+        background: rgba(255, 215, 0, 0.08);
+        border: 2px dashed rgba(255, 215, 0, 0.4);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .voice-recorder-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .voice-recorder-header h3 {
+        margin: 0;
+        color: #FFD700;
+        font-size: 1.1em;
+    }
+
+    .voice-badge {
+        background: rgba(255, 215, 0, 0.2);
+        color: #FFD700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .voice-recorder-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .voice-btn {
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 2px solid;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.9);
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border-color: rgba(255, 215, 0, 0.3);
+    }
+
+    .voice-btn:hover:not(:disabled) {
+        background: rgba(255, 215, 0, 0.2);
+        border-color: #FFD700;
+        transform: translateY(-2px);
+    }
+
+    .voice-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    #voice-record-btn {
+        border-color: #FFD700;
+    }
+
+    #voice-record-btn:hover:not(:disabled) {
+        background: rgba(255, 215, 0, 0.15);
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+
+    #voice-stop-btn {
+        border-color: #f44336;
+        display: none;
+    }
+
+    #voice-stop-btn:not(:disabled) {
+        display: flex;
+        background: rgba(244, 67, 54, 0.15);
+        border-color: #f44336;
+        color: #ef5350;
+    }
+
+    #voice-stop-btn:hover:not(:disabled) {
+        background: #f44336;
+        color: white;
+    }
+
+    #voice-play-btn {
+        border-color: #4caf50;
+    }
+
+    #voice-play-btn:hover:not(:disabled) {
+        background: rgba(76, 175, 80, 0.15);
+        border-color: #4caf50;
+    }
+
+    #voice-play-btn:disabled {
+        opacity: 0.3;
+    }
+
+    #voice-upload-btn {
+        grid-column: 1 / -1;
+        border-color: #FFD700;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+    }
+
+    #voice-upload-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 215, 0, 0.2) 100%);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    #voice-upload-btn:disabled {
+        opacity: 0.3;
+    }
+
+    .voice-status-message {
+        display: none;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95em;
+        animation: slideDown 0.4s ease-out;
+    }
+
+    .alert-recording {
+        background: rgba(244, 67, 54, 0.15);
+        border-left-color: #f44336;
+        color: #ef5350;
+    }
+
+    .alert-loading {
+        background: rgba(255, 215, 0, 0.15);
+        border-left-color: #FFD700;
+        color: #FFD700;
+    }
+
+    .alert-success {
+        background: rgba(76, 175, 80, 0.15);
+        border-left-color: #4caf50;
+        color: #81c784;
+    }
+
+    .alert-error {
+        background: rgba(244, 67, 54, 0.15);
+        border-left-color: #f44336;
+        color: #ef5350;
+    }
+
+    .alert-info {
+        background: rgba(33, 150, 243, 0.15);
+        border-left-color: #2196f3;
+        color: #90caf9;
+    }
+
+    .voice-help-text {
+        font-size: 0.85em;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+    }
+
+    .voice-example {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .voice-example-item {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 10px 15px;
+        border-radius: 6px;
+        border-left: 3px solid #FFD700;
+        font-size: 0.85em;
+        color: rgba(255, 255, 255, 0.8);
+        flex: 1;
+    }
+
+    .voice-example-item strong {
+        color: #FFD700;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Spinner animation */
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #FFD700;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .voice-recorder-buttons {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        #voice-upload-btn {
+            grid-column: 1 / -1;
+        }
+
+        .voice-example {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .voice-recorder-buttons {
+            grid-template-columns: 1fr;
+        }
+
+        .voice-recorder-header h3 {
+            font-size: 1em;
+        }
+
+        .voice-example-item {
+            font-size: 0.8em;
+        }
+    }
+</style>
+
+<!-- Voice Recorder Widget -->
+<div class="voice-recorder-container" data-form-type="employment">
+    <div class="voice-recorder-header">
+        <i class="fas fa-microphone"></i>
+        <h3>Voice Update</h3>
+        <span class="voice-badge">Beta</span>
+    </div>
+
+    <div class="voice-recorder-buttons">
+        <button type="button" id="voice-record-btn" class="voice-btn" title="Start recording">
+            <i class="fas fa-microphone"></i> Record Voice
+        </button>
+
+        <button type="button" id="voice-stop-btn" class="voice-btn" title="Stop recording" disabled>
+            <i class="fas fa-stop-circle"></i> Stop
+        </button>
+
+        <button type="button" id="voice-play-btn" class="voice-btn" title="Play recording" disabled>
+            <i class="fas fa-play"></i> Replay
+        </button>
+
+        <button type="button" id="voice-upload-btn" class="voice-btn" title="Upload and process voice" disabled>
+            <i class="fas fa-cloud-upload-alt"></i> Upload Voice
+        </button>
+    </div>
+
+    <!-- Status message -->
+    <div id="voice-status" class="voice-status-message">
+        <i class="fas fa-info-circle"></i>
+        <span>Ready to record. Click the microphone button to start.</span>
+    </div>
+
+    <!-- Help text -->
+    <div class="voice-help-text">
+        <strong>💡 How it works:</strong>
+        <ol style="margin: 8px 0; padding-left: 20px;">
+            <li>Click <strong>Record Voice</strong></li>
+            <li>Speak naturally about your employment (e.g., "I started a new job as Senior Developer at Google")</li>
+            <li>Click <strong>Stop</strong> when done</li>
+            <li>Review and click <strong>Upload Voice</strong></li>
+            <li>Fields will auto-populate, then click Save</li>
+        </ol>
+
+        <div class="voice-example">
+            <div class="voice-example-item">
+                <strong>✨ Example 1:</strong>
+                "I got hired at Meta as a Software Engineer starting January 2024 as full-time"
+            </div>
+            <div class="voice-example-item">
+                <strong>✨ Example 2:</strong>
+                "I worked at Microsoft from 2020 to 2023 as a Principal Engineer earning 150k"
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include the voice recorder script -->
+<script>
+document.getElementById("voice-record-btn").onclick = function() {
+    alert("Button works!");
+};
+</script>
