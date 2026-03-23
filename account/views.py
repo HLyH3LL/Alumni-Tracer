@@ -142,16 +142,17 @@ def user_logout(request):
 # ===============================
 @login_required
 def alumni_dashboard(request):
+    """Main alumni dashboard view"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
-
-    context = {
-        'alumni': alumni,
-        'section': 'dashboard',
-    }
+    
+    # ✅ MUST call this to get employment data!
+    context = get_alumni_dashboard_context(alumni)
+    
+    # ✅ MUST pass context to template!
     return render(request, "account/User_Dashboard.html", context)
 
 
@@ -251,66 +252,187 @@ def employment_list(request):
 
 @login_required
 def add_employment(request):
+    """Add a new employment record for the logged-in alumni"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found. Please complete your profile.")
         return redirect('account:account_settings')
 
-    if request.method == 'POST':
-        company = request.POST.get('company_name', '').strip()
-        title = request.POST.get('job_title', '').strip()
-        date_hired = request.POST.get('date_hired') or None
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                # Get and validate form data
+                company_name = request.POST.get("company_name", "").strip()
+                job_title = request.POST.get("job_title", "").strip()
+                date_hired = request.POST.get("date_hired") or None
+                date_left = request.POST.get("date_left") or None
+                
+                # Validate required fields
+                if not company_name or not job_title:
+                    messages.error(request, "Company name and job title are required.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "employment",
+                        "object": None
+                    })
+                
+                # Validate date logic
+                if date_hired and date_left:
+                    if date_hired > date_left:
+                        messages.error(request, "Start date must be before end date.")
+                        return render(request, "forms/Base_Form.html", {
+                            "type": "employment",
+                            "object": None
+                        })
+                
+                # Create employment record
+                emp = Employment.objects.create(
+                    alumni=alumni,
+                    company_name=company_name,
+                    job_title=job_title,
+                    employment_type=request.POST.get("employment_type") or None,
+                    salary_range=request.POST.get("salary_range") or None,
+                    is_job_related=request.POST.get("is_job_related") == "on",
+                    date_hired=date_hired,
+                    date_left=date_left,
+                )
+                
+                # Log activity
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type="EMPLOYMENT_ADD",
+                    description=f"Added employment at {company_name} as {job_title}"
+                )
+                
+                # Show success message
+                messages.success(
+                    request, 
+                    f"✓ Employment at {company_name} added successfully!"
+                )
+                
+                return redirect("account:alumni_dashboard")
+                
+        except Exception as e:
+            messages.error(request, f"Error saving employment: {str(e)}")
+            return render(request, "forms/Base_Form.html", {
+                "type": "employment",
+                "object": None
+            })
 
-        Employment.objects.create(
-            alumni=alumni,
-            company_name=company,
-            job_title=title,
-            date_hired=date_hired
-        )
-        messages.success(request, 'Employment record added.')
-        return redirect('account:employment_list')
-
-    return render(request, 'account/add_employment.html')
-
+    return render(request, "forms/Base_Form.html", {
+        "type": "employment",
+        "object": None
+    })
 
 @login_required
 def edit_employment(request, employment_id):
+    """Edit an employment record"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found.")
         return redirect('account:account_settings')
 
-    employment = get_object_or_404(Employment, pk=employment_id, alumni=alumni)
+    # Get the employment record
+    emp = get_object_or_404(Employment, id=employment_id, alumni=alumni)
 
-    if request.method == 'POST':
-        employment.company_name = request.POST.get('company_name', employment.company_name)
-        employment.job_title = request.POST.get('job_title', employment.job_title)
-        employment.date_hired = request.POST.get('date_hired') or employment.date_hired
-        employment.save()
-        messages.success(request, 'Employment record updated.')
-        return redirect('account:employment_list')
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                # Validate required fields
+                company_name = request.POST.get("company_name", "").strip()
+                job_title = request.POST.get("job_title", "").strip()
 
-    return render(request, 'account/edit_employment.html', {'employment': employment})
+                if not company_name or not job_title:
+                    messages.error(request, "Company and job title are required.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "employment",
+                        "object": emp
+                    })
+
+                # Get dates
+                date_hired = request.POST.get("date_hired") or None
+                date_left = request.POST.get("date_left") or None
+
+                # Validate date logic
+                if date_hired and date_left:
+                    if date_hired > date_left:
+                        messages.error(request, "Start date must be before end date.")
+                        return render(request, "forms/Base_Form.html", {
+                            "type": "employment",
+                            "object": emp
+                        })
+
+                # Update the record
+                emp.company_name = company_name
+                emp.job_title = job_title
+                emp.employment_type = request.POST.get("employment_type") or None
+                emp.salary_range = request.POST.get("salary_range") or None
+                emp.is_job_related = request.POST.get("is_job_related") == "on"
+                emp.date_hired = date_hired
+                emp.date_left = date_left
+                emp.save()
+
+                # Log activity
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type="EMPLOYMENT_UPDATE",
+                    description=f"Updated employment at {company_name}"
+                )
+
+                messages.success(request, f"✓ {company_name} updated successfully!")
+                return redirect("account:alumni_dashboard")
+
+        except Exception as e:
+            messages.error(request, f"Error updating employment: {str(e)}")
+            return render(request, "forms/Base_Form.html", {
+                "type": "employment",
+                "object": emp
+            })
+
+    return render(request, "forms/Base_Form.html", {
+        "type": "employment",
+        "object": emp
+    })
 
 
 @login_required
 def delete_employment(request, employment_id):
+    """Delete an employment record"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found.")
         return redirect('account:account_settings')
 
-    employment = get_object_or_404(Employment, pk=employment_id, alumni=alumni)
+    emp = get_object_or_404(Employment, id=employment_id, alumni=alumni)
+    
     if request.method == 'POST':
-        employment.delete()
-        messages.success(request, 'Employment record deleted.')
-        return redirect('account:employment_list')
+        try:
+            company_name = emp.company_name
+            
+            # Delete the record
+            emp.delete()
 
-    return render(request, 'account/confirm_delete_employment.html', {'employment': employment})
+            # Log activity
+            Activity.objects.create(
+                alumni=alumni,
+                activity_type="PROFILE_UPDATE",  # Or create EMPLOYMENT_DELETE type
+                description=f"Deleted employment record: {company_name}"
+            )
 
+            messages.success(request, f"✓ {company_name} deleted successfully!")
+            return redirect('account:alumni_dashboard')
+
+        except Exception as e:
+            messages.error(request, f"Error deleting employment: {str(e)}")
+            return redirect('account:alumni_dashboard')
+
+    # GET request - show confirmation page
+    return render(request, 'account/confirm_delete_employment.html', {
+        'employment': emp,
+        'title': f'Delete {emp.company_name}?'
+    })
 
 # ===============================
 # ✅ FURTHER STUDIES CRUD (minimal safe stubs)
@@ -329,64 +451,271 @@ def studies_list(request):
 
 @login_required
 def add_study(request):
+    """Add a new further study record for the logged-in alumni"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found.")
         return redirect('account:account_settings')
 
-    if request.method == 'POST':
-        school = request.POST.get('school_name', '').strip()
-        program = request.POST.get('program', '').strip()
-        start_year = request.POST.get('start_year') or None
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                # Validate required fields
+                school_name = request.POST.get("school_name", "").strip()
+                program = request.POST.get("program", "").strip()
+                start_year = request.POST.get("start_year")
+                status = request.POST.get("status")
+                
+                if not school_name or not program or not start_year:
+                    messages.error(request, "School, program, and start year are required.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "study",
+                        "object": None
+                    })
+                
+                # Validate completion logic
+                if status == "COMPLETED" and not request.POST.get("end_year"):
+                    messages.error(request, "End year is required for completed programs.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "study",
+                        "object": None
+                    })
+                
+                # Create study record
+                study = FurtherStudy.objects.create(
+                    alumni=alumni,
+                    school_name=school_name,
+                    program=program,
+                    field_of_study=request.POST.get("field_of_study") or None,
+                    status=status,
+                    start_year=int(start_year),
+                    end_year=int(request.POST.get("end_year")) if request.POST.get("end_year") else None,
+                    is_ongoing=request.POST.get("is_ongoing") == "on",
+                    description=request.POST.get("description") or None,
+                    school_website=request.POST.get("school_website") or None,
+                )
+                
+                # Log activity
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type="STUDY_ADD",
+                    description=f"Added further studies: {program} at {school_name}"
+                )
+                
+                messages.success(
+                    request,
+                    f"✓ Further studies ({program}) added successfully!"
+                )
+                
+                return redirect("account:alumni_dashboard")
+                
+        except ValueError as e:
+            messages.error(request, "Please check your input values (especially years).")
+            return render(request, "forms/Base_Form.html", {
+                "type": "study",
+                "object": None
+            })
+        except Exception as e:
+            messages.error(request, f"Error saving study record: {str(e)}")
+            return render(request, "forms/Base_Form.html", {
+                "type": "study",
+                "object": None
+            })
 
-        FurtherStudy.objects.create(
-            alumni=alumni,
-            school_name=school,
-            program=program,
-            start_year=start_year
-        )
-        messages.success(request, 'Study record added.')
-        return redirect('account:studies_list')
+    return render(request, "forms/Base_Form.html", {
+        "type": "study",
+        "object": None
+    })
 
-    return render(request, 'account/add_study.html')
 
+from django.contrib import messages
+from django.db import transaction
 
 @login_required
 def edit_study(request, study_id):
+    """Edit a further study record"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found.")
         return redirect('account:account_settings')
 
-    study = get_object_or_404(FurtherStudy, pk=study_id, alumni=alumni)
+    # Get the study record
+    study = get_object_or_404(FurtherStudy, id=study_id, alumni=alumni)
 
-    if request.method == 'POST':
-        study.school_name = request.POST.get('school_name', study.school_name)
-        study.program = request.POST.get('program', study.program)
-        study.start_year = request.POST.get('start_year') or study.start_year
-        study.end_year = request.POST.get('end_year') or study.end_year
-        study.is_ongoing = bool(request.POST.get('is_ongoing', study.is_ongoing))
-        study.save()
-        messages.success(request, 'Study record updated.')
-        return redirect('account:studies_list')
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                # Validate required fields
+                school_name = request.POST.get("school_name", "").strip()
+                program = request.POST.get("program", "").strip()
+                start_year = request.POST.get("start_year", "").strip()
+                status = request.POST.get("status")
 
-    return render(request, 'account/edit_study.html', {'study': study})
+                # Validation
+                if not school_name or not program or not start_year:
+                    messages.error(request, "School, program, and start year are required.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "study",
+                        "object": study
+                    })
+
+                # Validate years
+                try:
+                    start_year_int = int(start_year)
+                    end_year_int = None
+                    if request.POST.get("end_year"):
+                        end_year_int = int(request.POST.get("end_year"))
+                        
+                        # Validate logic
+                        if start_year_int > end_year_int:
+                            messages.error(request, "End year must be same or after start year.")
+                            return render(request, "forms/Base_Form.html", {
+                                "type": "study",
+                                "object": study
+                            })
+                    
+                    # Validate completion
+                    if status == "COMPLETED" and not end_year_int:
+                        messages.error(request, "End year required for completed programs.")
+                        return render(request, "forms/Base_Form.html", {
+                            "type": "study",
+                            "object": study
+                        })
+                
+                except ValueError:
+                    messages.error(request, "Years must be valid numbers.")
+                    return render(request, "forms/Base_Form.html", {
+                        "type": "study",
+                        "object": study
+                    })
+
+                # Update the record
+                study.school_name = school_name
+                study.program = program
+                study.field_of_study = request.POST.get("field_of_study") or None
+                study.status = status
+                study.start_year = start_year_int
+                study.end_year = end_year_int
+                study.is_ongoing = request.POST.get("is_ongoing") == "on"
+                study.description = request.POST.get("description") or None
+                study.school_website = request.POST.get("school_website") or None
+                study.save()
+
+                # Log activity
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type="STUDY_UPDATE",
+                    description=f"Updated further studies: {program}"
+                )
+
+                messages.success(request, f"✓ {program} updated successfully!")
+                return redirect("account:alumni_dashboard")
+
+        except Exception as e:
+            messages.error(request, f"Error updating study: {str(e)}")
+            return render(request, "forms/Base_Form.html", {
+                "type": "study",
+                "object": study
+            })
+
+    return render(request, "forms/Base_Form.html", {
+        "type": "study",
+        "object": study
+    })
 
 
 @login_required
 def delete_study(request, study_id):
+    """Delete a further study record"""
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
+        messages.error(request, "Alumni profile not found.")
         return redirect('account:account_settings')
 
-    study = get_object_or_404(FurtherStudy, pk=study_id, alumni=alumni)
+    study = get_object_or_404(FurtherStudy, id=study_id, alumni=alumni)
+    
     if request.method == 'POST':
-        study.delete()
-        messages.success(request, 'Study record deleted.')
-        return redirect('account:studies_list')
+        try:
+            program_name = study.program
+            study_school = study.school_name
+            
+            # Delete the record
+            study.delete()
 
-    return render(request, 'account/confirm_delete_study.html', {'study': study})
+            # Log activity
+            Activity.objects.create(
+                alumni=alumni,
+                activity_type="PROFILE_UPDATE",  # Or create STUDY_DELETE type
+                description=f"Deleted study record: {program_name}"
+            )
+
+            messages.success(request, f"✓ {program_name} deleted successfully!")
+            return redirect('account:alumni_dashboard')
+
+        except Exception as e:
+            messages.error(request, f"Error deleting study: {str(e)}")
+            return redirect('account:alumni_dashboard')
+
+    # GET request - show confirmation page
+    return render(request, 'account/confirm_delete_study.html', {
+        'study': study,
+        'title': f'Delete {study.program}?'
+    })
+
+@login_required
+def get_alumni_dashboard_context(alumni):
+    """
+    Helper function to gather all data needed for alumni dashboard
+    Returns a context dictionary with all necessary information
+    """
+    current_employment = alumni.get_current_employment()
+    all_employments = alumni.employments.all()
+    further_studies = alumni.further_studies.all()
+    recent_activities = alumni.activities.all()[:5]
+    
+    # Get career timeline data (all employments ordered by date)
+    career_timeline = alumni.employments.all().order_by('-date_hired')
+    
+    # Calculate career duration statistics
+    total_years_employed = 0
+    first_job_date = None
+    latest_job_date = None
+    
+    if career_timeline.exists():
+        # Get first job (oldest)
+        first_job = career_timeline.last()
+        if first_job and first_job.date_hired:
+            first_job_date = first_job.date_hired
+        
+        # Get current/latest job
+        latest_job = career_timeline.first()
+        if latest_job and latest_job.date_hired:
+            latest_job_date = latest_job.date_hired
+            
+            # Calculate total years of experience if there's a start date
+            if first_job_date:
+                from datetime import date
+                end_date = date.today() if not latest_job.date_left else latest_job.date_left
+                total_years_employed = (end_date.year - first_job_date.year)
+    
+    context = {
+        'alumni': alumni,
+        'profile_completion': alumni.get_profile_completion_percentage(),
+        'missing_fields': alumni.get_missing_profile_fields(),
+        'employment_count': alumni.get_employment_count(),
+        'current_employment': current_employment,
+        'all_employments': all_employments,
+        'further_studies': further_studies,
+        'recent_activities': recent_activities,
+        'years_since_graduation': alumni.get_years_since_graduation(),
+        'career_timeline': career_timeline,
+        'total_years_employed': total_years_employed,
+        'first_job_date': first_job_date,
+        'latest_job_date': latest_job_date,
+        'section': 'dashboard',
+    }
+    
+    return context

@@ -13,6 +13,17 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --tip-matte-black: #28282B;
+            --tip-gold: #FFD700;
+            --tip-gold-dark: #e5c100;
+            --tip-gold-light: #fde910;
+            --white: #ffffff;
+            --info-blue: #1976d2;
+            --success-green: #4caf50;
+            --error-red: #f44336;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             line-height: 1.6;
@@ -31,18 +42,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* TIP Color Scheme */
-        :root {
-            --tip-matte-black: #28282B;
-            --tip-gold: #FFD700;
-            --tip-gold-dark: #e5c100;
-            --tip-gold-light: #fde910;
-            --white: #ffffff;
-            --gray-light: #f5f5f5;
-            --gray: #666666;
-            --gray-dark: #333333;
-        }
-
         #header {
             background: rgba(40, 40, 43, 0.95);
             backdrop-filter: blur(10px);
@@ -58,7 +57,6 @@
         }
 
         #header .logo {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 1.5em;
             font-weight: 700;
             color: var(--tip-gold);
@@ -77,63 +75,63 @@
             font-weight: 500;
         }
 
-        .nav-wrapper {
+        .user-menu {
             display: flex;
             align-items: center;
-            gap: 40px;
-            flex: 1;
-            margin-left: 40px;
+            gap: 15px;
+            margin-left: auto;
         }
 
-        .menu {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .menu li a {
-            color: rgba(255, 255, 255, 0.8);
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--tip-gold);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hamburger-menu:hover {
+            background: var(--tip-gold);
+            color: var(--tip-matte-black);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--tip-gold);
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
             font-size: 0.85em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-decoration: none;
             transition: all 0.3s ease;
-            padding: 8px 0;
-            position: relative;
         }
 
-        .menu li a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
+        .logout-btn:hover {
             background: var(--tip-gold);
-            transition: width 0.3s ease;
+            color: var(--tip-matte-black);
         }
 
-        .menu li a:hover {
-            color: var(--tip-gold);
-        }
-
-        .menu li a:hover::after,
-        .menu li a.active::after {
-            width: 100%;
-        }
-
-        .menu li a.active {
-            color: var(--tip-gold);
-        }
-
-        /* Dropdown Menu */
+        /* Dropdown */
         .dropdown-menu {
             display: none;
             position: absolute;
             top: 100%;
-            left: 0;
+            right: 0;
             background: rgba(40, 40, 43, 0.98);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 215, 0, 0.2);
@@ -180,65 +178,48 @@
             padding-left: 24px;
         }
 
-        .dropdown-menu a i {
-            width: 20px;
-            color: var(--tip-gold);
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+            max-width: 400px;
         }
 
-        .user-menu {
+        .alert {
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-left: auto;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease-out;
         }
 
-        .user-name {
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            font-size: 0.9em;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .hamburger-menu {
-            background: none;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: var(--tip-gold);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .alert-success {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #4caf50;
+            color: #2e7d32;
         }
 
-        .hamburger-menu:hover {
-            background: var(--tip-gold);
-            color: var(--tip-matte-black);
-            border-color: var(--tip-gold);
-        }
-
-        .logout-btn {
-            background: none;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: var(--tip-gold);
-            padding: 8px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: var(--tip-gold);
-            color: var(--tip-matte-black);
-            border-color: var(--tip-gold);
+        .alert-error {
+            background: rgba(244, 67, 54, 0.15);
+            border-color: #f44336;
+            color: #d32f2f;
         }
 
         #content {
@@ -255,7 +236,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Dashboard Layout */
         .dashboard-container {
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
             backdrop-filter: blur(12px);
@@ -263,12 +243,6 @@
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
             overflow: hidden;
-            animation: slideUp 0.6s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .dashboard-header {
@@ -303,7 +277,6 @@
         }
 
         .welcome-text h1 {
-            font-family: inherit;
             font-size: 2.2em;
             color: var(--white);
             margin-bottom: 8px;
@@ -313,7 +286,6 @@
         .welcome-text p {
             font-size: 0.95em;
             opacity: 0.85;
-            letter-spacing: 0.5px;
         }
 
         .profile-summary {
@@ -326,9 +298,6 @@
         }
 
         .profile-summary-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             color: rgba(255, 255, 255, 0.9);
             font-size: 0.95em;
         }
@@ -360,31 +329,12 @@
             align-items: center;
             gap: 20px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--tip-gold), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
         .stat-card:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 215, 0, 0.3);
             transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.3);
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
         }
 
         .stat-icon {
@@ -396,6 +346,7 @@
             align-items: center;
             justify-content: center;
             font-size: 2.2em;
+            color: var(--tip-gold);
             flex-shrink: 0;
         }
 
@@ -410,13 +361,11 @@
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.85em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-top: 5px;
         }
 
-        /* Section Titles */
+        /* Section Title */
         .section-title {
-            font-family: inherit;
             font-size: 1.6em;
             color: var(--white);
             margin: 40px 0 25px;
@@ -436,12 +385,12 @@
             padding: 8px 16px;
             border: 1px solid rgba(255, 215, 0, 0.3);
             border-radius: 20px;
-            transition: all 0.3s ease;
             background: rgba(255, 215, 0, 0.1);
             backdrop-filter: blur(10px);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .view-all:hover {
@@ -452,174 +401,201 @@
             text-decoration: none;
         }
 
-        /* Profile Completion */
-        .profile-completion {
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--tip-gold), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 100px;
+            padding-bottom: 30px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: var(--tip-gold);
+            border: 3px solid rgba(40, 40, 43, 0.95);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .timeline-item.study::before {
+            background: var(--tip-gold);
+        }
+
+        .timeline-item.activity::before {
+            background: var(--success-green);
+        }
+
+        .timeline-content {
             background: rgba(255, 215, 0, 0.08);
             border: 1px solid rgba(255, 215, 0, 0.15);
+            border-left: 3px solid var(--tip-gold);
+            border-radius: 8px;
+            padding: 20px;
             backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
 
-        .completion-header {
+        .timeline-item.study .timeline-content {
+            border-left-color: var(--tip-gold);
+        }
+
+        .timeline-item.activity .timeline-content {
+            border-left-color: var(--success-green);
+        }
+
+        .timeline-content:hover {
+            background: rgba(255, 215, 0, 0.12);
+            transform: translateX(8px);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .timeline-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .completion-header h3 {
-            color: var(--white);
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-
-        .completion-percent {
-            font-size: 1.6em;
-            font-weight: 700;
-            color: var(--tip-matte-black);
-            background: var(--tip-gold);
-            padding: 8px 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--tip-gold), var(--tip-gold-light));
-            border-radius: 10px;
-            transition: width 0.5s ease;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-
-        .missing-items {
-            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .missing-tag {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-size: 0.85em;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .missing-tag:hover {
-            background: rgba(255, 215, 0, 0.15);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 30px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: rgba(40, 40, 43, 0.6);
-            color: var(--tip-gold);
-            padding: 16px;
-            text-align: left;
+        .timeline-title {
+            color: var(--white);
             font-weight: 700;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            font-size: 1.1em;
         }
 
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.95em;
-        }
-
-        tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        tbody tr:hover {
-            background: rgba(255, 215, 0, 0.08);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 16px;
+        .timeline-date {
+            color: var(--tip-gold);
             font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+        }
+
+        .timeline-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .timeline-description {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .timeline-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .timeline-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline-meta-item i {
+            color: var(--tip-gold);
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
             font-weight: 600;
             text-transform: uppercase;
-        }
-
-        .status-employed {
-            background: rgba(76, 175, 80, 0.2);
-            color: #81c784;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .status-unemployed {
-            background: rgba(244, 67, 54, 0.2);
-            color: #ef5350;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        .status-studying {
-            background: rgba(255, 193, 7, 0.2);
-            color: #fbc02d;
-            border: 1px solid rgba(255, 193, 7, 0.3);
-        }
-
-        .btn-edit {
+            background: rgba(255, 215, 0, 0.15);
             color: var(--tip-gold);
-            text-decoration: none;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .timeline-badge.related {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .timeline-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .timeline-action-link {
+            color: var(--tip-gold);
             font-size: 0.85em;
+            text-decoration: none;
             padding: 6px 12px;
             border: 1px solid rgba(255, 215, 0, 0.3);
             border-radius: 6px;
             transition: all 0.3s ease;
             background: rgba(255, 215, 0, 0.1);
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
         }
 
-        .btn-edit:hover {
+        .timeline-action-link:hover {
             background: var(--tip-gold);
             color: var(--tip-matte-black);
             border-color: var(--tip-gold);
         }
 
-        /* Recent Activity Timeline */
-        .activity-timeline {
+        .timeline-action-link.delete {
+            color: var(--error-red);
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+
+        .timeline-action-link.delete:hover {
+            background: var(--error-red);
+            color: var(--white);
+            border-color: var(--error-red);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            margin-bottom: 15px;
+        }
+
+         .activity-timeline {
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -680,26 +656,6 @@
             font-weight: 600;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .empty-state i {
-            font-size: 3em;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            margin-bottom: 15px;
-        }
-
-        .empty-state a {
-            display: inline-block;
-            margin-top: 10px;
-        }
 
         footer {
             background: rgba(0, 0, 0, 0.5);
@@ -717,55 +673,14 @@
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
-            #header {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-
-            .nav-wrapper {
-                margin-left: 0;
-                gap: 20px;
-                order: 3;
-                width: 100%;
-            }
-
-            .user-menu {
-                margin-left: 0;
-            }
-        }
-
         @media (max-width: 768px) {
             #header {
                 padding: 12px 20px;
+                flex-wrap: wrap;
             }
 
             #header .logo {
                 font-size: 1.2em;
-            }
-
-            .nav-wrapper {
-                gap: 15px;
-                display: none;
-            }
-
-            .menu {
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-
-            .menu li a {
-                font-size: 0.8em;
-            }
-
-            .hamburger-menu {
-                font-size: 0.8em;
-                padding: 6px 10px;
-                display: flex;
-            }
-
-            .dropdown-menu {
-                min-width: 200px;
             }
 
             #content {
@@ -794,60 +709,53 @@
                 font-size: 1.3em;
             }
 
-            th, td {
-                padding: 10px 8px;
-                font-size: 0.85em;
+            .timeline {
+                padding: 20px 0 20px 10px;
             }
 
-            .activity-item {
-                flex-direction: column;
+            .timeline::before {
+                left: 10px;
+            }
+
+            .timeline-item::before {
+                left: -5px;
+                width: 20px;
+                height: 20px;
+            }
+
+            .timeline-item {
+                padding-left: 50px;
             }
         }
 
         @media (max-width: 480px) {
-            #header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .nav-wrapper {
-                width: 100%;
-                gap: 10px;
-            }
-
-            .menu {
-                gap: 10px;
-            }
-
-            .user-menu {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .dashboard-header {
-                padding: 15px;
-            }
-
-            .dashboard-body {
-                padding: 15px;
-            }
-
-            .welcome-section {
-                flex-direction: column;
-                gap: 15px;
-            }
-
             .stats-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .welcome-text h1 {
-                font-size: 1.4em;
             }
 
             .stat-card {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .timeline {
+                padding: 20px 0 20px 0;
+            }
+
+            .timeline::before {
+                left: 0;
+            }
+
+            .timeline-item::before {
+                left: -15px;
+            }
+
+            .timeline-item {
+                padding-left: 30px;
+            }
+
+            .timeline-content {
+                padding: 15px;
             }
         }
     </style>
@@ -871,7 +779,7 @@
                         <i class="fas fa-building"></i> Add Employment
                     </a>
                     <a href="{% url 'account:add_study' %}">
-                        <i class="fas fa-book"></i> Further Studies
+                        <i class="fas fa-book"></i> Add Studies
                     </a>
                     <a href="{% url 'account:account_settings' %}">
                         <i class="fas fa-cog"></i> Settings
@@ -886,13 +794,25 @@
         </div>
     </header>
 
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div id="content">
         <div class="dashboard-container">
             <div class="dashboard-header">
                 <div class="welcome-section">
                     <div class="welcome-text">
                         <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
-                        <p>Your alumni dashboard • Last login: {{ user.last_login|date:"F j, Y" }}</p>
+                        <p>Your career journey timeline • Last login: {{ user.last_login|date:"F j, Y" }}</p>
                     </div>
                     <div class="profile-summary">
                         <div class="profile-summary-item">
@@ -903,28 +823,6 @@
             </div>
 
             <div class="dashboard-body">
-                <!-- Profile Completion -->
-                <div class="profile-completion">
-                    <div class="completion-header">
-                        <h3>Profile Completion</h3>
-                        <span class="completion-percent">{{ profile_completion|default:75 }}%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ profile_completion|default:75 }}%"></div>   
-                    </div>
-                    {% if missing_fields %}
-                    <div class="missing-items">
-                        {% for field in missing_fields %}
-                        <span class="missing-tag"><i class="fas fa-circle-notch"></i> {{ field }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="missing-items">
-                        <span class="missing-tag"><i class="fas fa-check-circle"></i> Profile Complete!</span>
-                    </div>
-                    {% endif %}
-                </div>
-
                 <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -942,95 +840,155 @@
                         </div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-book"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ further_studies|length|default:0 }}</h3>
+                            <p>Further Studies</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
                         <div class="stat-content">
                             <h3>{{ alumni.seniority_level|default:"Unknown" }}</h3>
                             <p>Current Level</p>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
-                        <div class="stat-content">
-                            <h3>{{ alumni.program|truncatewords:2|default:"N/A" }}</h3>
-                            <p>Program</p>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Employment History -->
+                <!-- Career Timeline -->
                 <h2 class="section-title">
-                    Employment History
+                    <span>Career Timeline</span>
                     <a href="{% url 'account:add_employment' %}" class="view-all"><i class="fas fa-plus"></i> Add New</a>
                 </h2>
 
                 {% if all_employments %}
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Company</th>
-                                <th>Position</th>
-                                <th>Type</th>
-                                <th>Hired Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for employment in all_employments %}
-                            <tr>
-                                <td>{{ employment.company_name }}</td>
-                                <td>{{ employment.job_title }}</td>
-                                <td>{{ employment.employment_type|default:"Not specified" }}</td>
-                                <td>{{ employment.date_hired|date:"M d, Y"|default:"Not set" }}</td>
-                                <td><a href="{% url 'account:edit_employment' employment.id %}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="timeline">
+                    {% for employment in all_employments %}
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div>
+                                    <div class="timeline-title">{{ employment.company_name }}</div>
+                                    <div class="timeline-subtitle">{{ employment.job_title }}</div>
+                                </div>
+                                <div class="timeline-date">
+                                    {{ employment.date_hired|date:"M Y"|default:"Date not set" }}
+                                    {% if employment.date_left %}
+                                    — {{ employment.date_left|date:"M Y" }}
+                                    {% else %}
+                                    — Present
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-meta">
+                                {% if employment.employment_type %}
+                                <div class="timeline-meta-item">
+                                    <i class="fas fa-briefcase"></i>
+                                    {{ employment.employment_type }}
+                                </div>
+                                {% endif %}
+                                {% if employment.is_job_related %}
+                                <div class="timeline-badge related">
+                                    <i class="fas fa-check"></i> Related to Studies
+                                </div>
+                                {% endif %}
+                                {% if employment.salary_range %}
+                                <div class="timeline-meta-item">
+                                    <i class="fas fa-money-bill"></i>
+                                    {{ employment.salary_range }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="timeline-actions">
+                                <a href="{% url 'account:edit_employment' employment.id %}" class="timeline-action-link">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'account:delete_employment' employment.id %}" class="timeline-action-link delete">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state">
-                    <p><i class="fas fa-briefcase"></i></p>
-                    <p>No employment records yet. <a href="{% url 'account:add_employment' %}" class="view-all">Add your first job</a></p>
+                    <i class="fas fa-briefcase"></i>
+                    <p>No employment records yet.</p>
+                    <a href="{% url 'account:add_employment' %}" class="view-all">Add your first job</a>
                 </div>
                 {% endif %}
 
-                <!-- Further Studies -->
+                <!-- Education Timeline -->
                 {% if further_studies %}
                 <h2 class="section-title">
-                    Further Studies
-                    <a href="{% url 'account:further_studies' %}" class="view-all"><i class="fas fa-plus"></i> Add New</a>
+                    <span>Further Education</span>
+                    <a href="{% url 'account:add_study' %}" class="view-all"><i class="fas fa-plus"></i> Add New</a>
                 </h2>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>School</th>
-                                <th>Program</th>
-                                <th>Field of Study</th>
-                                <th>Duration</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for study in further_studies %}
-                            <tr>
-                                <td>{{ study.school_name }}</td>
-                                <td>{{ study.program }}</td>
-                                <td>{{ study.field_of_study|default:"Not specified" }}</td>
-                                <td>{{ study.get_duration_display|default:"N/A" }}</td>
-                                <td><a href="#" class="btn-edit"><i class="fas fa-edit"></i> Edit</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+                <div class="timeline">
+                    {% for study in further_studies %}
+                    <div class="timeline-item study">
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div>
+                                    <div class="timeline-title">{{ study.program }}</div>
+                                    <div class="timeline-subtitle">{{ study.school_name }}</div>
+                                </div>
+                                <div class="timeline-date">
+                                    {{ study.start_year }}
+                                    {% if study.end_year %}
+                                    — {{ study.end_year }}
+                                    {% else %}
+                                    — Ongoing
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if study.field_of_study %}
+                            <div class="timeline-description">
+                                <strong>Field of Study:</strong> {{ study.field_of_study }}
+                            </div>
+                            {% endif %}
+
+                            <div class="timeline-meta">
+                                <div class="timeline-meta-item">
+                                    <i class="fas fa-circle"></i>
+                                    <span style="text-transform: uppercase;">{{ study.status }}</span>
+                                </div>
+                                {% if study.description %}
+                                <div class="timeline-meta-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ study.description|truncatewords:10 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="timeline-actions">
+                                <a href="{% url 'account:edit_study' study.id %}" class="timeline-action-link">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'account:delete_study' study.id %}" class="timeline-action-link delete">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-graduation-cap"></i>
+                    <p>No further studies yet.</p>
+                    <a href="{% url 'account:add_study' %}" class="view-all">Add your studies</a>
                 </div>
                 {% endif %}
 
                 <!-- Recent Activity -->
                 <h2 class="section-title">
-                    </i> Recent Activity
+                    <span>Recent Activity</span>
                 </h2>
 
                 {% if recent_activities %}
@@ -1060,7 +1018,7 @@
 
     <footer>
         <p>© 2024 Technological Institute of the Philippines - Manila. All rights reserved.</p>
-        <p style="font-size: 0.8em; margin-top: 5px;">T.I.P.ians Connect: Alumni Tracer System for IT Graduates</p>
+        <p style="font-size: 0.8em;">T.I.P.ians Connect: Alumni Tracer System for IT Graduates</p>
     </footer>
 
     <script>
@@ -1069,7 +1027,6 @@
             dropdown.classList.toggle('active');
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('dropdownMenu');
             const button = document.querySelector('.hamburger-menu');
@@ -1079,11 +1036,18 @@
             }
         });
 
-        // Close dropdown when a link is clicked
         document.querySelectorAll('.dropdown-menu a').forEach(link => {
             link.addEventListener('click', function() {
                 document.getElementById('dropdownMenu').classList.remove('active');
             });
+        });
+
+        // Auto-hide messages after 5 seconds
+        document.querySelectorAll('.messages .alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
         });
     </script>
 </body>

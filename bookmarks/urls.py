@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from account import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),   # Django Admin
+    path('', views.home, name='landing'), # User landing page
     path('account/', include('account.urls')), # Your app routes
 ]
 

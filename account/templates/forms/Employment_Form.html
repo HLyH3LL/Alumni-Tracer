@@ -1,21 +1,4 @@
-<!-- ============================================
-     EMPLOYMENT FORM PARTIAL - COMPLETE VERSION
-     Include this in Base_Form.html
-     ============================================ -->
-
 <style>
-    /* Employment Form Styles */
-    .form-container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 16px;
-        padding: 40px;
-        box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
-    }
-
     .form-header {
         margin-bottom: 40px;
         padding-bottom: 20px;
@@ -116,6 +99,12 @@
         background-repeat: no-repeat;
         background-position: right 12px center;
         padding-right: 40px;
+    }
+
+    .form-group select option {
+    background: #28282B;
+    color: #FFD700;
+    padding: 8px;
     }
 
     .section-title {
@@ -367,36 +356,18 @@
 
 <!-- Employment Form HTML -->
 <div class="form-container">
-    <div class="form-header">
-        <h1>
-            <i class="fas fa-briefcase"></i>
-            {% if object %}
-                Edit Employment
-            {% else %}
-                Add Employment
-            {% endif %}
-        </h1>
-        <p>
-            {% if object %}
-                Update your employment history
-            {% else %}
-                Add a new job to your career timeline
-            {% endif %}
-        </p>
-    </div>
-
     <form method="POST" id="employment-form" novalidate>
         {% csrf_token %}
 
         <!-- Company Details Section -->
         <div class="section-title">
-            <i class="fas fa-building"></i> Company Details
+           Company Details
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="company_name">
-                    <i class="fas fa-building"></i> Company Name
+                    Company Name
                     <span class="required">*</span>
                 </label>
                 <input 
@@ -414,7 +385,7 @@
 
             <div class="form-group">
                 <label for="job_title">
-                    <i class="fas fa-briefcase"></i> Job Title
+                    Job Title
                     <span class="required">*</span>
                 </label>
                 <input 
@@ -434,7 +405,7 @@
         <div class="form-row full">
             <div class="form-group">
                 <label for="employment_type">
-                    <i class="fas fa-clock"></i> Employment Type
+                    Employment Type
                 </label>
                 <select id="employment_type" name="employment_type">
                     <option value="">-- Select Employment Type --</option>
@@ -463,13 +434,13 @@
 
         <!-- Employment Period Section -->
         <div class="section-title">
-            <i class="fas fa-calendar"></i> Employment Period
+            Employment Period
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="date_hired">
-                    <i class="fas fa-calendar-check"></i> Date Started
+                    Date Started
                     <span class="required">*</span>
                 </label>
                 <input 
@@ -484,7 +455,7 @@
 
             <div class="form-group">
                 <label for="date_left">
-                    <i class="fas fa-calendar-times"></i> Date Left
+                    Date Left
                 </label>
                 <input 
                     type="date" 
@@ -498,13 +469,13 @@
 
         <!-- Compensation Section -->
         <div class="section-title">
-            <i class="fas fa-money-bill-wave"></i> Compensation & Benefits
+            Compensation & Benefits
         </div>
 
         <div class="form-row full">
             <div class="form-group">
                 <label for="salary_range">
-                    <i class="fas fa-peso-sign"></i> Salary Range
+                    <i class="fas fa-peso-sign"></i>Salary Range
                 </label>
                 <input 
                     type="text" 
@@ -527,7 +498,6 @@
                 {% if object.is_job_related %}checked{% endif %}
             >
             <label for="is_job_related">
-                <i class="fas fa-graduation-cap"></i>
                 Job Related to Course
             </label>
         </div>
@@ -535,7 +505,6 @@
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="btn-submit">
-                <i class="fas fa-save"></i>
                 {% if object %}
                     Update Employment
                 {% else %}

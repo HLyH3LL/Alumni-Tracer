@@ -146,6 +146,7 @@ class Employment(models.Model):
     is_job_related = models.BooleanField(default=False)
     salary_range = models.CharField(max_length=100, blank=True, null=True)
     employment_type = models.CharField(max_length=100, blank=True, null=True)
+    date_left = models.DateField(null=True, blank=True, verbose_name="Date Left")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

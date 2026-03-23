@@ -1,21 +1,4 @@
-<!-- ============================================
-     EMPLOYMENT FORM PARTIAL - COMPLETE VERSION
-     Include this in Base_Form.html
-     ============================================ -->
-
 <style>
-    /* Employment Form Styles */
-    .form-container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 16px;
-        padding: 40px;
-        box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
-    }
-
     .form-header {
         margin-bottom: 40px;
         padding-bottom: 20px;
@@ -111,11 +94,22 @@
 
     .form-group select {
         cursor: pointer;
+        border-color: #FFD700;
         appearance: none;
+        background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            color: var(--white);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFD700' d='M1 0l5 8 5-8z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 12px center;
         padding-right: 40px;
+    }
+
+    .form-group select option {
+    background: #28282B;
+    color: #FFD700;
+    padding: 8px;
     }
 
     .section-title {
@@ -365,188 +359,204 @@
     }
 </style>
 
-<!-- Employment Form HTML -->
+<!-- Study Form HTML -->
 <div class="form-container">
-    <div class="form-header">
-        <h1>
-            <i class="fas fa-briefcase"></i>
-            {% if object %}
-                Edit Employment
-            {% else %}
-                Add Employment
-            {% endif %}
-        </h1>
-        <p>
-            {% if object %}
-                Update your employment history
-            {% else %}
-                Add a new job to your career timeline
-            {% endif %}
-        </p>
-    </div>
-
-    <form method="POST" id="employment-form" novalidate>
+    <form method="POST" id="study-form" novalidate>
         {% csrf_token %}
 
-        <!-- Company Details Section -->
+        <!-- School Details Section -->
         <div class="section-title">
-            <i class="fas fa-building"></i> Company Details
+            School Details
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="company_name">
-                    <i class="fas fa-building"></i> Company Name
+                <label for="school_name">
+                    School/Institution Name
                     <span class="required">*</span>
                 </label>
                 <input 
                     type="text" 
-                    id="company_name"
-                    name="company_name" 
-                    placeholder="e.g., Microsoft Corporation"
-                    value="{{ object.company_name|default:'' }}"
+                    id="school_name"
+                    name="school_name" 
+                    placeholder="e.g., University of the Philippines"
+                    value="{{ object.school_name|default:'' }}"
                     required
                     minlength="2"
                     maxlength="200"
                 >
-                <span class="form-help">Full name of the company or organization</span>
+                <span class="form-help">Full name of the school or institution</span>
             </div>
 
             <div class="form-group">
-                <label for="job_title">
-                    <i class="fas fa-briefcase"></i> Job Title
-                    <span class="required">*</span>
+                <label for="school_website">
+                   School Website
                 </label>
                 <input 
                     type="text" 
-                    id="job_title"
-                    name="job_title" 
-                    placeholder="e.g., Senior Software Engineer"
-                    value="{{ object.job_title|default:'' }}"
-                    required
-                    minlength="2"
-                    maxlength="200"
+                    id="school_website"
+                    name="school_website" 
+                    placeholder="https://www.example.com"
+                    value="{{ object.school_website|default:'' }}"
+                    maxlength="250"
                 >
-                <span class="form-help">Your position or role at the company</span>
+                <span class="form-help">Official website of the school (optional)</span>
             </div>
         </div>
 
-        <div class="form-row full">
-            <div class="form-group">
-                <label for="employment_type">
-                    <i class="fas fa-clock"></i> Employment Type
-                </label>
-                <select id="employment_type" name="employment_type">
-                    <option value="">-- Select Employment Type --</option>
-                    <option value="FULL_TIME" {% if object.employment_type == "FULL_TIME" %}selected{% endif %}>
-                        Full-Time
-                    </option>
-                    <option value="PART_TIME" {% if object.employment_type == "PART_TIME" %}selected{% endif %}>
-                        Part-Time
-                    </option>
-                    <option value="CONTRACT" {% if object.employment_type == "CONTRACT" %}selected{% endif %}>
-                        Contract
-                    </option>
-                    <option value="FREELANCE" {% if object.employment_type == "FREELANCE" %}selected{% endif %}>
-                        Freelance
-                    </option>
-                    <option value="INTERNSHIP" {% if object.employment_type == "INTERNSHIP" %}selected{% endif %}>
-                        Internship
-                    </option>
-                    <option value="TEMPORARY" {% if object.employment_type == "TEMPORARY" %}selected{% endif %}>
-                        Temporary
-                    </option>
-                </select>
-                <span class="form-help">Type of employment arrangement</span>
-            </div>
-        </div>
-
-        <!-- Employment Period Section -->
+        <!-- Program Details Section -->
         <div class="section-title">
-            <i class="fas fa-calendar"></i> Employment Period
+            Program Details
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="date_hired">
-                    <i class="fas fa-calendar-check"></i> Date Started
+                <label for="program">
+                    Program/Course
                     <span class="required">*</span>
                 </label>
                 <input 
-                    type="date" 
-                    id="date_hired"
-                    name="date_hired"
-                    value="{% if object.date_hired %}{{ object.date_hired|date:'Y-m-d' }}{% endif %}"
+                    type="text" 
+                    id="program"
+                    name="program" 
+                    placeholder="e.g., Master of Science in Computer Science"
+                    value="{{ object.program|default:'' }}"
                     required
+                    minlength="2"
+                    maxlength="200"
                 >
-                <span class="form-help">When did you start this job?</span>
+                <span class="form-help">Name of the program or degree</span>
             </div>
 
             <div class="form-group">
-                <label for="date_left">
-                    <i class="fas fa-calendar-times"></i> Date Left
-                </label>
-                <input 
-                    type="date" 
-                    id="date_left"
-                    name="date_left"
-                    value="{% if object.date_left %}{{ object.date_left|date:'Y-m-d' }}{% endif %}"
-                >
-                <span class="form-help">Leave blank if you're currently employed here</span>
-            </div>
-        </div>
-
-        <!-- Compensation Section -->
-        <div class="section-title">
-            <i class="fas fa-money-bill-wave"></i> Compensation & Benefits
-        </div>
-
-        <div class="form-row full">
-            <div class="form-group">
-                <label for="salary_range">
-                    <i class="fas fa-peso-sign"></i> Salary Range
+                <label for="field_of_study">
+                    Field of Study
                 </label>
                 <input 
                     type="text" 
-                    id="salary_range"
-                    name="salary_range" 
-                    placeholder="e.g., ₱80,000 - ₱120,000 per month"
-                    value="{{ object.salary_range|default:'' }}"
+                    id="field_of_study"
+                    name="field_of_study" 
+                    placeholder="e.g., Computer Science, Business Administration"
+                    value="{{ object.field_of_study|default:'' }}"
                     maxlength="150"
                 >
-                <span class="form-help">Your salary or wage range (optional, keep it general if preferred)</span>
+                <span class="form-help">Specialization or major field (optional)</span>
             </div>
         </div>
 
-        <!-- Job Related to Course -->
+        <!-- Study Period Section -->
+        <div class="section-title">
+            Study Period
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="start_year">
+                    Start Year
+                    <span class="required">*</span>
+                </label>
+                <input 
+                    type="number" 
+                    id="start_year"
+                    name="start_year" 
+                    placeholder="e.g., 2020"
+                    value="{{ object.start_year|default:'' }}"
+                    min="1950"
+                    max="2100"
+                    required
+                >
+                <span class="form-help">Year you started the program</span>
+            </div>
+
+            <div class="form-group">
+                <label for="end_year">
+                    End Year
+                </label>
+                <input 
+                    type="number" 
+                    id="end_year"
+                    name="end_year" 
+                    placeholder="e.g., 2022"
+                    value="{{ object.end_year|default:'' }}"
+                    min="1950"
+                    max="2100"
+                >
+                <span class="form-help">Leave blank if still studying</span>
+            </div>
+        </div>
+
+        <!-- Status & Notes Section -->
+        <div class="section-title">
+            Status & Notes
+        </div>
+
+        <div class="form-row full">
+            <div class="form-group">
+                <label for="status">
+                    Status
+                    <span class="required">*</span>
+                </label>
+                <select id="status" name="status" required>
+                    <option value="">-- Select Study Status --</option>
+                    <option value="ONGOING" {% if object.status == "ONGOING" %}selected{% endif %}>
+                        Ongoing
+                    </option>
+                    <option value="COMPLETED" {% if object.status == "COMPLETED" %}selected{% endif %}>
+                        Completed
+                    </option>
+                    <option value="DROPPED" {% if object.status == "DROPPED" %}selected{% endif %}>
+                        Dropped
+                    </option>
+                    <option value="INTERRUPTED" {% if object.status == "INTERRUPTED" %}selected{% endif %}>
+                        Interrupted
+                    </option>
+                </select>
+                <span class="form-help">Current status of your studies</span>
+            </div>
+        </div>
+
+        <div class="form-row full">
+            <div class="form-group">
+                <label for="description">
+                    Additional Notes
+                </label>
+                <textarea 
+                    id="description"
+                    name="description" 
+                    placeholder="Add any additional information about your studies (thesis topic, achievements, etc.)"
+                    maxlength="500"
+                >{{ object.description|default:'' }}</textarea>
+                <span class="form-help">Optional notes about your studies (max 500 characters)</span>
+            </div>
+        </div>
+
+        <!-- Currently Studying -->
         <div class="checkbox-group">
             <input 
                 type="checkbox" 
-                id="is_job_related"
-                name="is_job_related"
-                {% if object.is_job_related %}checked{% endif %}
+                id="is_ongoing"
+                name="is_ongoing"
+                {% if object.is_ongoing %}checked{% endif %}
             >
-            <label for="is_job_related">
-                <i class="fas fa-graduation-cap"></i>
-                Job Related to Course
+            <label for="is_ongoing">
+                <i class="fas fa-check"></i> I'm Currently Studying This Program
             </label>
         </div>
 
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="btn-submit">
-                <i class="fas fa-save"></i>
                 {% if object %}
-                    Update Employment
+                    Update Studies
                 {% else %}
-                    Add Employment
+                    Add Studies
                 {% endif %}
             </button>
             <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">
                 <i class="fas fa-times"></i> Cancel
             </a>
             {% if object %}
-            <a href="{% url 'account:delete_employment' object.id %}" class="btn-danger">
+            <a href="{% url 'account:delete_study' object.id %}" class="btn-danger">
                 <i class="fas fa-trash"></i> Delete
             </a>
             {% endif %}
@@ -557,9 +567,11 @@
 <!-- JavaScript Validation -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('employment-form');
-        const dateHiredInput = document.getElementById('date_hired');
-        const dateLeftInput = document.getElementById('date_left');
+        const form = document.getElementById('study-form');
+        const startYearInput = document.getElementById('start_year');
+        const endYearInput = document.getElementById('end_year');
+        const statusSelect = document.getElementById('status');
+        const isOngoingCheckbox = document.getElementById('is_ongoing');
 
         if (form) {
             // Form Submission Handler
@@ -568,49 +580,57 @@
                 const errorElements = document.querySelectorAll('.form-error');
                 errorElements.forEach(el => el.remove());
 
-                // Validate company name
-                const companyName = document.getElementById('company_name').value.trim();
-                if (!companyName) {
-                    showError('Company name is required');
+                // Validate school name
+                const schoolName = document.getElementById('school_name').value.trim();
+                if (!schoolName) {
+                    showError('School/Institution name is required');
                     e.preventDefault();
                     return false;
                 }
 
-                // Validate job title
-                const jobTitle = document.getElementById('job_title').value.trim();
-                if (!jobTitle) {
-                    showError('Job title is required');
+                // Validate program
+                const program = document.getElementById('program').value.trim();
+                if (!program) {
+                    showError('Program/Course name is required');
                     e.preventDefault();
                     return false;
                 }
 
-                // Validate date range
-                if (dateHiredInput.value && dateLeftInput.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    const dateLeft = new Date(dateLeftInput.value);
-                    
-                    if (dateHired > dateLeft) {
-                        showError('Date started must be before date left');
+                // Validate start year
+                const startYear = parseInt(startYearInput.value);
+                if (!startYear || startYear < 1950 || startYear > new Date().getFullYear()) {
+                    showError('Start year must be between 1950 and current year');
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Validate end year if provided
+                if (endYearInput.value) {
+                    const endYear = parseInt(endYearInput.value);
+                    if (endYear < startYear) {
+                        showError('End year must be after start year');
                         e.preventDefault();
                         return false;
                     }
-
-                    // Check if date left is in the future
-                    if (dateLeft > new Date()) {
-                        showError('Date left cannot be in the future');
+                    if (endYear > new Date().getFullYear()) {
+                        showError('End year cannot be in the future');
                         e.preventDefault();
                         return false;
                     }
                 }
 
-                // Check if date hired is in the future
-                if (dateHiredInput.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    if (dateHired > new Date()) {
-                        showError('Date started cannot be in the future');
-                        e.preventDefault();
-                        return false;
-                    }
+                // Validate status selection
+                if (!statusSelect.value) {
+                    showError('Please select a study status');
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Validate ongoing checkbox logic
+                if (statusSelect.value === 'COMPLETED' && isOngoingCheckbox.checked) {
+                    showError('Cannot mark as completed and ongoing at the same time');
+                    e.preventDefault();
+                    return false;
                 }
 
                 // If all validations pass, show loading state
@@ -621,19 +641,26 @@
                 }
             });
 
-            // Real-time date validation
-            dateLeftInput.addEventListener('change', function() {
-                if (dateHiredInput.value && this.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    const dateLeft = new Date(this.value);
+            // Real-time year validation
+            endYearInput.addEventListener('change', function() {
+                if (startYearInput.value && this.value) {
+                    const startYear = parseInt(startYearInput.value);
+                    const endYear = parseInt(this.value);
                     
-                    if (dateHired > dateLeft) {
-                        dateLeftInput.style.borderColor = '#f44336';
-                        dateLeftInput.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
+                    if (endYear < startYear) {
+                        endYearInput.style.borderColor = '#f44336';
+                        endYearInput.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
                     } else {
-                        dateLeftInput.style.borderColor = 'rgba(255, 215, 0, 0.3)';
-                        dateLeftInput.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                        endYearInput.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                        endYearInput.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
                     }
+                }
+            });
+
+            // Update ongoing status when status changes
+            statusSelect.addEventListener('change', function() {
+                if (this.value === 'COMPLETED' || this.value === 'DROPPED') {
+                    isOngoingCheckbox.checked = false;
                 }
             });
 
