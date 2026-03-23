@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI';
+            background: linear-gradient(135deg, #000000, #343434);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .container {
+            width: 400px;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: gold;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .face-btn {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>ADMIN LOGIN</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text" name="username" placeholder="Enter Username" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
+
+        <button type="submit">LOGIN</button>
+    </form>
+
+    <!-- Future Face Recognition -->
+    <button class="face-btn" onclick="startFaceLogin()">
+        Login with Face Recognition
+    </button>
+</div>
+
+<script>
+function startFaceLogin() {
+    alert("Face Recognition Coming Soon 🚀");
+}
+</script>
+
+</body>
+</html>

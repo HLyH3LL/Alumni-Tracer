@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-vpkob!ooli&r6hxmff_7!f4hb2^5#@1(zz1ev-p9q6qk$ey%w0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,12 +76,12 @@ WSGI_APPLICATION = 'bookmarks.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        'postgresql://tipians_admin:7Qf8JMCBPIvs49PpcjBXZl0hYhFPA5Xz@dpg-d70db0aa214c73e7v47g-a.oregon-postgres.render.com/tipiansconnect',
+        conn_max_age=600,
+        ssl_require=True  # 🔥 REQUIRED for Render
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -118,11 +119,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-LOGIN_REDIRECT_URL = 'account:dashboard'
+# 🔐 Authentication settings
 LOGIN_URL = 'account:login'
-LOGOUT_URL = 'account:logout'
 
+# ✅ Default fallback redirect
+LOGIN_REDIRECT_URL = 'account:alumni_dashboard'
+
+LOGOUT_URL = 'account:logout'
+LOGOUT_REDIRECT_URL = 'account:login'
+
+# 📧 Email backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# 📁 Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

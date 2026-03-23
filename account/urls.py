@@ -5,32 +5,45 @@ from django.contrib.auth import views as auth_views
 app_name = 'account'
 
 urlpatterns = [
-    # Authentication
-    path('login/', views.user_login, name='login'),
+    # ===============================
+    # 🔐 AUTHENTICATION
+    # ===============================
+    path('login/', views.user_login, name='login'),                 # Alumni login
+    path('admin/login/', views.admin_login, name='admin_login'),   # ✅ Admin login (NEW)
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('home/', views.home, name='home'),
-    
-    # Dashboard
+
+    # ===============================
+    # 📊 DASHBOARDS
+    # ===============================
     path('dashboard/', views.alumni_dashboard, name='alumni_dashboard'),
-    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    
-    # Account Settings (Profile Management)
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # ✅ FIXED PATH
+
+    # ===============================
+    # ⚙️ ACCOUNT SETTINGS
+    # ===============================
     path('settings/', views.account_settings, name='account_settings'),
-    
-    # Employment Management
+
+    # ===============================
+    # 💼 EMPLOYMENT MANAGEMENT
+    # ===============================
     path('employment/', views.employment_list, name='employment_list'),
     path('employment/add/', views.add_employment, name='add_employment'),
     path('employment/<int:employment_id>/edit/', views.edit_employment, name='edit_employment'),
     path('employment/<int:employment_id>/delete/', views.delete_employment, name='delete_employment'),
-    
-    # Further Studies Management
+
+    # ===============================
+    # 🎓 FURTHER STUDIES
+    # ===============================
     path('studies/', views.studies_list, name='studies_list'),
     path('studies/add/', views.add_study, name='add_study'),
     path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
     path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
-    
-    # password management
+
+    # ===============================
+    # 🔑 PASSWORD MANAGEMENT
+    # ===============================
     path('password_change/',
          auth_views.PasswordChangeView.as_view(
              template_name='registration/password_change_form.html'
