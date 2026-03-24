@@ -1,0 +1,47 @@
+ALUMNI TRACER
+
+AUTHENTICATION URLS
+────────────────────────────────────────────────────────────────────────────────
+URL: http://127.0.0.1:8000/account/login/
+NAME: 'account:login'
+VIEW: views.user_login()
+TEMPLATE: registration/User_Login.html
+DESCRIPTION: User login page
+
+URL: http://127.0.0.1:8000/account/logout/
+NAME: 'account:logout'
+VIEW: views.user_logout()
+DESCRIPTION: Log out current user
+
+URL: http://127.0.0.1:8000/account/register/
+NAME: 'account:register'
+VIEW: views.register()
+TEMPLATE: registration/User_Register.html
+DESCRIPTION: New user registration
+
+URL: http://127.0.0.1:8000/account/home/
+NAME: 'account:home'
+VIEW: views.home()
+METHOD: GET
+TEMPLATE: home.html
+DESCRIPTION: Home page
+
+
+DASHBOARD URLS
+────────────────────────────────────────────────────────────────────────────────
+
+URL: http://127.0.0.1:8000/account/dashboard/
+NAME: 'account:alumni_dashboard'
+VIEW: views.alumni_dashboard()
+TEMPLATE: account/User_Dashboard.html
+DESCRIPTION: Main alumni dashboard with profile summary, employment history, 
+             studies, and activities
+
+URL: http://127.0.0.1:8000/account/admin-dashboard/
+NAME: 'account:admin_dashboard'
+VIEW: views.admin_dashboard()
+TEMPLATE: account/admin/dashboard.html
+DESCRIPTION: Admin statistics dashboard showing alumni breakdown by status,
+             program, graduation year, and recent registrations
+
+

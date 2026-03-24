@@ -1,0 +1,810 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Account Settings - Alumni Dashboard{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1><i class="fas fa-cog"></i> Account Settings</h1>
+                    <p>Manage your profile information and preferences</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="settings-container">
+                <form method="post" enctype="multipart/form-data" class="settings-form">
+                    {% csrf_token %}
+                    
+                    <!-- Profile Photo Section -->
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-image"></i> Profile Photo</h3>
+                            <span class="section-badge">Optional</span>
+                        </div>
+                        <div class="profile-photo-section">
+                            <div class="photo-container">
+                                {% if alumni.profile_photo %}
+                                    <img src="{{ alumni.profile_photo.url }}" alt="Profile Photo" class="profile-photo-current">
+                                {% else %}
+                                    <div class="profile-photo-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="photo-upload">
+                                <label for="profile_photo" class="upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i> Choose Photo
+                                </label>
+                                <input type="file" name="profile_photo" id="profile_photo" class="form-control-file" accept="image/*">
+                                <small class="text-hint"><i class="fas fa-info-circle"></i> Square image, at least 200x200px (JPG, PNG)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-user-circle"></i> Basic Information</h3>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name"><i class="fas fa-user"></i> First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                       value="{{ alumni.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name"><i class="fas fa-user"></i> Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                       value="{{ alumni.last_name }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ alumni.email }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact_number"><i class="fas fa-phone"></i> Contact Number</label>
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number" 
+                                   value="{{ alumni.contact_number }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bio"><i class="fas fa-quote-left"></i> Biography</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="4" placeholder="Tell us about yourself...">{{ alumni.bio }}</textarea>
+                            <small class="text-hint"><i class="fas fa-lightbulb"></i> Share a brief biography (max 500 characters)</small>
+                        </div>
+                    </div>
+
+                    <!-- Professional Information -->
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-briefcase"></i> Professional Information</h3>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="current_job_title"><i class="fas fa-heading"></i> Current Job Title</label>
+                                <input type="text" class="form-control" id="current_job_title" name="current_job_title" 
+                                       placeholder="e.g., Senior Software Engineer" value="{{ alumni.current_job_title }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="current_company"><i class="fas fa-building"></i> Current Company</label>
+                                <input type="text" class="form-control" id="current_company" name="current_company" 
+                                       placeholder="e.g., Tech Solutions Inc." value="{{ alumni.current_company }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seniority_level"><i class="fas fa-chart-line"></i> Seniority Level</label>
+                            <select class="form-control" id="seniority_level" name="seniority_level">
+                                <option value="">Select your seniority level</option>
+                                <option value="entry">Entry Level</option>
+                                <option value="junior">Junior</option>
+                                <option value="mid">Mid Level</option>
+                                <option value="senior">Senior</option>
+                                <option value="lead">Lead</option>
+                                <option value="executive">Executive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Social Networks -->
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-share-alt"></i> Social Networks & Links</h3>
+                            <span class="section-badge">Optional</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="linkedin_url"><i class="fab fa-linkedin"></i> LinkedIn Profile</label>
+                            <div class="input-with-icon">
+                                <input type="url" class="form-control" id="linkedin_url" name="linkedin_url" 
+                                       placeholder="https://linkedin.com/in/yourprofile" value="{{ alumni.linkedin_url }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="facebook_url"><i class="fab fa-facebook"></i> Facebook Profile</label>
+                            <div class="input-with-icon">
+                                <input type="url" class="form-control" id="facebook_url" name="facebook_url" 
+                                       placeholder="https://facebook.com/yourprofile" value="{{ alumni.facebook_url }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="instagram_url"><i class="fab fa-instagram"></i> Instagram Profile</label>
+                            <div class="input-with-icon">
+                                <input type="url" class="form-control" id="instagram_url" name="instagram_url" 
+                                       placeholder="https://instagram.com/yourprofile" value="{{ alumni.instagram_url }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="github_url"><i class="fab fa-github"></i> GitHub Profile</label>
+                            <div class="input-with-icon">
+                                <input type="url" class="form-control" id="github_url" name="github_url" 
+                                       placeholder="https://github.com/yourprofile" value="{{ alumni.github_url }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="personal_website"><i class="fas fa-globe"></i> Personal Website</label>
+                            <div class="input-with-icon">
+                                <input type="url" class="form-control" id="personal_website" name="personal_website" 
+                                       placeholder="https://yourwebsite.com" value="{{ alumni.personal_website }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="{% url 'account:alumni_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Account & Security Section -->
+            <div class="settings-section security-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-lock"></i> Account & Security</h3>
+                </div>
+                <div class="security-options">
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div>
+                                <h5><i class="fas fa-lock"></i> Change Password</h5>
+                                <p>Update your password to keep your account secure</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'account:password_change' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-right"></i> Change
+                        </a>
+                    </div>
+
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h5><i class="fas fa-exclamation-triangle"></i> Two-Factor Authentication</h5>
+                                <p>Add an extra layer of security to your account</p>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-right"></i> Setup
+                        </a>
+                    </div>
+
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div>
+                                <h5><i class="fas fa-clock"></i> Active Sessions</h5>
+                                <p>View and manage your active login sessions</p>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-right"></i> Manage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --tip-matte-black: #28282B;
+        --tip-pure-black: #000000;
+        --tip-jet-black: #343434;
+        --tip-gold: #FFD700;
+        --tip-gold-dark: #e5c100;
+        --tip-gold-light: #fde910;
+        --white: #ffffff;
+        --gray-light: #f5f5f5;
+        --gray: #666666;
+        --gray-dark: #333333;
+    }
+
+    #content {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 20px;
+        animation: fadeIn 0.5s ease-out;
+        flex: 1;
+        width: 100%;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-container {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, rgba(40, 40, 43, 0.8) 0%, rgba(52, 52, 52, 0.8) 100%);
+        padding: 40px;
+        color: var(--white);
+        border-bottom: 2px solid var(--tip-gold);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .welcome-section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-text h1 {
+        font-size: 2.2em;
+        color: var(--white);
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .welcome-text h1 i {
+        color: var(--tip-gold);
+        margin-right: 12px;
+    }
+
+    .welcome-text p {
+        font-size: 0.95em;
+        opacity: 0.85;
+        letter-spacing: 0.5px;
+    }
+
+    .dashboard-body {
+        padding: 40px;
+    }
+
+    .settings-container {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .settings-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .settings-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .section-header h3 {
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.3em;
+        margin: 0;
+    }
+
+    .section-header h3 i {
+        color: var(--tip-gold);
+        margin-right: 10px;
+    }
+
+    .section-badge {
+        background: rgba(255, 215, 0, 0.2);
+        color: var(--tip-gold);
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    /* Profile Photo Section */
+    .profile-photo-section {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+        padding: 25px;
+        background: rgba(255, 215, 0, 0.08);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .photo-container {
+        flex-shrink: 0;
+    }
+
+    .profile-photo-current {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--tip-gold);
+        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+    }
+
+    .profile-photo-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 215, 0, 0.1);
+        border: 3px dashed var(--tip-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tip-gold);
+        font-size: 3em;
+    }
+
+    .photo-upload {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .upload-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--tip-gold);
+        color: var(--tip-matte-black);
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: fit-content;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85em;
+    }
+
+    .upload-label:hover {
+        background: var(--tip-gold-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .form-control-file {
+        display: none;
+    }
+
+    /* Form Styles */
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95em;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .form-group label i {
+        color: var(--tip-gold);
+        margin-right: 8px;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(10px);
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 0.95em;
+        color: var(--white);
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .form-control:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 215, 0, 0.5);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+        color: var(--white);
+    }
+
+    .form-control:focus::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon input {
+        width: 100%;
+    }
+
+    .text-hint {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85em;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .text-hint i {
+        color: rgba(255, 215, 0, 0.6);
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--tip-gold) 0%, var(--tip-gold-dark) 100%);
+        color: var(--tip-matte-black);
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 215, 0, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--tip-gold);
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--tip-gold);
+        color: var(--tip-matte-black);
+        border-color: var(--tip-gold);
+        transform: translateY(-2px);
+    }
+
+    /* Security Section */
+    .security-section {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+    }
+
+    .security-options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .security-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: rgba(255, 215, 0, 0.08);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+        border-left: 3px solid var(--tip-gold);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .security-item:hover {
+        background: rgba(255, 215, 0, 0.12);
+        border-color: rgba(255, 215, 0, 0.3);
+    }
+
+    .security-info {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        flex: 1;
+    }
+
+    .security-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tip-gold);
+        font-size: 1.5em;
+        flex-shrink: 0;
+    }
+
+    .security-item h5 {
+        color: var(--white);
+        margin-bottom: 5px;
+        font-size: 1em;
+        font-weight: 600;
+    }
+
+    .security-item h5 i {
+        color: var(--tip-gold);
+        margin-right: 8px;
+    }
+
+    .security-item p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9em;
+        margin: 0;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border-left: 3px solid var(--tip-gold);
+        background: rgba(255, 215, 0, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert i {
+        color: var(--tip-gold);
+        font-size: 1.1em;
+    }
+
+    .alert-success {
+        border-left-color: #81c784;
+    }
+
+    .alert-success i {
+        color: #81c784;
+    }
+
+    .alert-error {
+        border-left-color: #ef5350;
+    }
+
+    .alert-error i {
+        color: #ef5350;
+    }
+
+    .btn-close {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.3s ease;
+    }
+
+    .btn-close:hover {
+        color: var(--white);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 25px;
+        }
+
+        .dashboard-body {
+            padding: 25px;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.6em;
+        }
+
+        .settings-container {
+            padding: 20px;
+        }
+
+        .profile-photo-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .photo-upload {
+            width: 100%;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .security-item {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .security-info {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #content {
+            padding: 0 10px;
+        }
+
+        .dashboard-header {
+            padding: 15px;
+        }
+
+        .dashboard-body {
+            padding: 15px;
+        }
+
+        .settings-container {
+            padding: 15px;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.4em;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .profile-photo-current,
+        .profile-photo-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
+{% endblock %}
