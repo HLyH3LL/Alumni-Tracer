@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Alumni
+from datetime import datetime
+from .models import Alumni, Program, EmploymentStatus
 import re
 
 class LoginForm(forms.Form):
@@ -37,39 +38,9 @@ class AlumniRegistrationForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'e.g., 0917-123-4567'})
     )
-    program = forms.ChoiceField(
-        choices=[
-            ('', 'Select Program'),
-            ('BS Information Technology', 'BS Information Technology'),
-            ('BS Computer Science', 'BS Computer Science'),
-            ('BS Computer Engineering', 'BS Computer Engineering'),
-            ('BS Electronics Engineering', 'BS Electronics Engineering'),
-            ('BS Electrical Engineering', 'BS Electrical Engineering'),
-            ('BS Mechanical Engineering', 'BS Mechanical Engineering'),
-            ('BS Civil Engineering', 'BS Civil Engineering'),
-            ('BS Architecture', 'BS Architecture'),
-            ('BS Industrial Engineering', 'BS Industrial Engineering'),
-            ('BS Accountancy', 'BS Accountancy'),
-            ('BS Business Administration', 'BS Business Administration'),
-            ('Other', 'Other'),
-        ],
-        required=True
-    )
-    graduation_year = forms.ChoiceField(
-        choices=[('', 'Select Year')] + [(str(year), str(year)) for year in range(2024, 2009, -1)],
-        required=True
-    )
-    employment_status = forms.ChoiceField(
-        choices=[
-            ('', 'Select Status'),
-            ('EMPLOYED', 'Employed'),
-            ('UNEMPLOYED', 'Unemployed'),
-            ('SELF_EMPLOYED', 'Self-employed'),
-            ('STUDENT', 'Further Studies'),
-            ('UNKNOWN', 'Prefer not to say'),
-        ],
-        required=True
-    )
+    program = forms.ChoiceField(choices=[('', 'Select Program')], required=True)
+    graduation_year = forms.ChoiceField(choices=[('', 'Select Year')], required=True)
+    employment_status = forms.ChoiceField(choices=[('', 'Select Status')], required=True)
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -77,6 +48,22 @@ class AlumniRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Keep form choices aligned with the registration page dropdowns.
+        current_year = datetime.now().year
+        self.fields['graduation_year'].choices = [('', 'Select Year')] + [
+            (str(year), str(year)) for year in range(current_year, 2010, -1)
+        ]
+
+        program_choices = [('', 'Select Program')] + [
+            (p.full_name, p.full_name) for p in Program.objects.filter(is_active=True).order_by('order', 'code')
+        ]
+        self.fields['program'].choices = program_choices
+
+        employment_choices = [('', 'Select Status')] + [
+            (s.value, s.label) for s in EmploymentStatus.objects.filter(is_active=True).order_by('order')
+        ]
+        self.fields['employment_status'].choices = employment_choices
       
         self.fields['password1'].widget.attrs.update({
             'placeholder': 'Create a password',

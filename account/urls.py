@@ -20,11 +20,7 @@ urlpatterns = [
     # ===============================
     path('dashboard/', views.alumni_dashboard, name='alumni_dashboard'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # ✅ FIXED PATH
-
-    # ===============================
-    # ⚙️ ACCOUNT SETTINGS
-    # ===============================
-    path('settings/', views.account_settings, name='account_settings'),
+    path('profile/edit/', views.edit_alumni_profile, name='edit_alumni_profile'),
 
     # ===============================
     # 💼 EMPLOYMENT MANAGEMENT
@@ -84,4 +80,10 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+
+    # ===============================
+    # 🧾 LEGAL PAGES
+    # ===============================
+    path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 ]

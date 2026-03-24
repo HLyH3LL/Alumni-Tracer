@@ -1,0 +1,207 @@
+{# Glass confirm modal + toast; set window.__csrfToken before include. #}
+<style>
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-glass {
+        max-width: 420px;
+        width: 100%;
+        padding: 28px;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: 0 8px 32px rgba(51, 0, 105, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(16px);
+        color: #fff;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #FFD700;
+        margin-bottom: 10px;
+    }
+    .modal-body {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    .modal-btn {
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        border: 1px solid rgba(255, 215, 0, 0.35);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .modal-btn-cancel {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.9);
+    }
+    .modal-btn-cancel:hover {
+        background: rgba(255, 215, 0, 0.12);
+        border-color: #FFD700;
+        color: #FFD700;
+    }
+    .modal-btn-danger {
+        background: linear-gradient(135deg, #FFD700 0%, #e5c100 100%);
+        color: #28282B;
+        border-color: transparent;
+    }
+    .modal-btn-danger:hover {
+        filter: brightness(1.05);
+    }
+    .toast-stack {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 6000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 360px;
+        pointer-events: none;
+    }
+    .toast {
+        padding: 14px 18px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(145deg, rgba(40, 40, 43, 0.92) 0%, rgba(52, 52, 52, 0.88) 100%);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+        color: #fff;
+        pointer-events: auto;
+    }
+    .toast-show { opacity: 1; transform: translateY(0); }
+    .toast-success { border-left: 4px solid #4caf50; }
+    .toast-error { border-left: 4px solid #f44336; }
+</style>
+<div id="delete-confirm-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-glass" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <h3 id="delete-modal-title" class="modal-title">Confirm delete</h3>
+        <p id="delete-modal-body" class="modal-body">This cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="modal-btn modal-btn-cancel" id="delete-modal-cancel">Cancel</button>
+            <button type="button" class="modal-btn modal-btn-danger" id="delete-modal-confirm">Delete</button>
+        </div>
+    </div>
+</div>
+<div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+<script>
+(function () {
+    const overlay = document.getElementById("delete-confirm-overlay");
+    const bodyEl = document.getElementById("delete-modal-body");
+    const btnCancel = document.getElementById("delete-modal-cancel");
+    const btnConfirm = document.getElementById("delete-modal-confirm");
+    const toastStack = document.getElementById("toast-stack");
+    if (!overlay || !btnCancel || !btnConfirm) return;
+
+    let pendingUrl = null;
+    let pendingRow = null;
+    let pendingKind = null;
+
+    function getCsrf() {
+        return window.__csrfToken || "";
+    }
+
+    function showToast(message, isError) {
+        if (!toastStack) return;
+        const t = document.createElement("div");
+        t.className = "toast toast-" + (isError ? "error" : "success");
+        t.textContent = message;
+        toastStack.appendChild(t);
+        requestAnimationFrame(() => t.classList.add("toast-show"));
+        setTimeout(() => {
+            t.classList.remove("toast-show");
+            setTimeout(() => t.remove(), 300);
+        }, 4200);
+    }
+
+    function closeModal() {
+        overlay.classList.remove("active");
+        overlay.setAttribute("aria-hidden", "true");
+        pendingUrl = null;
+        pendingRow = null;
+        pendingKind = null;
+    }
+
+    btnCancel.addEventListener("click", closeModal);
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    btnConfirm.addEventListener("click", function () {
+        if (!pendingUrl) return;
+        const url = pendingUrl;
+        const row = pendingRow;
+        closeModal();
+        fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "X-CSRFToken": getCsrf(),
+                "X-Requested-With": "XMLHttpRequest",
+                Accept: "application/json",
+            },
+        })
+            .then(function (r) {
+                return r.json().then(function (data) {
+                    return { ok: r.ok, data: data };
+                });
+            })
+            .then(function (res) {
+                if (res.ok && res.data && res.data.ok) {
+                    showToast(res.data.message || "Deleted.", false);
+                    if (row && row.parentNode) row.parentNode.removeChild(row);
+                    else window.location.reload();
+                } else {
+                    const msg =
+                        (res.data && res.data.message) ||
+                        "Could not delete. Please try again.";
+                    showToast(msg, true);
+                }
+            })
+            .catch(function () {
+                showToast("Network error. Please try again.", true);
+            });
+    });
+
+    document.addEventListener("click", function (e) {
+        const trigger = e.target.closest("[data-delete-url]");
+        if (!trigger) return;
+        e.preventDefault();
+        pendingUrl = trigger.getAttribute("data-delete-url");
+        pendingRow = trigger.closest("[data-timeline-row]");
+        pendingKind = trigger.getAttribute("data-delete-kind") || "item";
+        const label = trigger.getAttribute("data-delete-label") || "this entry";
+        if (bodyEl) {
+            bodyEl.textContent =
+                "Delete " + label + "? This will remove it from your timeline.";
+        }
+        overlay.classList.add("active");
+        overlay.setAttribute("aria-hidden", "false");
+    });
+})();
+</script>

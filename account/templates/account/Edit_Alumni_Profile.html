@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile — T.I.P.ians Connect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --tip-matte-black: #28282B;
+            --tip-gold: #FFD700;
+            --tip-gold-dark: #e5c100;
+            --white: #ffffff;
+            --glass-light: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --error-color: #ff6b6b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FFD700 0%, #28282B 25%, #343434 50%, #28282B 75%, #FFD700 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--white);
+            padding: 40px 20px 60px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .bg-decoration {
+            position: fixed;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .circle-1 {
+            width: 400px; height: 400px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            top: -120px; left: -120px;
+            animation: float 8s ease-in-out infinite;
+        }
+        .circle-2 {
+            width: 300px; height: 300px;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 50%;
+            bottom: -80px; right: -80px;
+            animation: float 10s ease-in-out infinite 2s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(28px); }
+        }
+
+        .wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 28px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            padding: 40px 36px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #FFD700 0%, #fde910 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sub {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 28px;
+        }
+
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .field input[type="text"],
+        .field input[type="file"],
+        .field select {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-size: 14px;
+            font-family: inherit;
+            backdrop-filter: blur(8px);
+        }
+
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: rgba(255, 215, 0, 0.55);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.12);
+        }
+
+        .field select option { background: #28282B; color: #fff; }
+
+        .photo-preview {
+            margin-top: 10px;
+            max-width: 120px;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 215, 0, 0.35);
+        }
+
+        .row-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            padding: 14px 26px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #e5c100 100%);
+            color: #000;
+            box-shadow: 0 4px 18px rgba(255, 215, 0, 0.35);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+        }
+        .btn-ghost:hover { background: rgba(255, 215, 0, 0.12); color: #FFD700; }
+
+        @media (max-width: 520px) {
+            .glass-card { padding: 28px 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration circle-1"></div>
+    <div class="bg-decoration circle-2"></div>
+
+    <div class="wrap">
+        <div class="glass-card">
+            <h1><i class="fas fa-user-edit"></i> Edit your profile</h1>
+            <p class="sub">Update your photo, contact details, graduation year, and current role. Changes show on your dashboard and timeline.</p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label for="profile_photo">Profile photo</label>
+                    {% if alumni.profile_photo %}
+                    <img src="{{ alumni.profile_photo.url }}" alt="" class="photo-preview">
+                    {% endif %}
+                    <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                    <label class="row-check">
+                        <input type="checkbox" name="clear_photo" value="1">
+                        Remove current photo
+                    </label>
+                </div>
+
+                <div class="field">
+                    <label for="contact_number">Contact number</label>
+                    <input type="text" id="contact_number" name="contact_number" value="{{ alumni.contact_number|default:'' }}" placeholder="09xx-xxx-xxxx">
+                </div>
+
+                <div class="field">
+                    <label for="program">Program / course</label>
+                    <select id="program" name="program">
+                        {% if extra_program %}
+                        <option value="{{ extra_program }}" selected>{{ extra_program }} (current)</option>
+                        {% endif %}
+                        {% for p in programs %}
+                        <option value="{{ p.full_name }}" {% if alumni.program == p.full_name and not extra_program %}selected{% endif %}>{{ p.code }} — {{ p.full_name }}</option>
+                        {% empty %}
+                        {% if not extra_program %}
+                        <option value="{{ alumni.program }}" selected>{{ alumni.program }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="graduation_year">Graduation year</label>
+                    <select id="graduation_year" name="graduation_year">
+                        {% for y in graduation_years %}
+                        <option value="{{ y }}" {% if alumni.graduation_year == y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="current_job_title">Current job title</label>
+                    <input type="text" id="current_job_title" name="current_job_title" value="{{ alumni.current_job_title|default:'' }}" placeholder="e.g. Software Engineer">
+                </div>
+
+                <div class="field">
+                    <label for="current_company">Current company</label>
+                    <input type="text" id="current_company" name="current_company" value="{{ alumni.current_company|default:'' }}" placeholder="Company name">
+                </div>
+
+                <div class="field">
+                    <label for="seniority_level">Seniority level</label>
+                    <select id="seniority_level" name="seniority_level">
+                        {% for value, label in seniority_choices %}
+                        <option value="{{ value }}" {% if alumni.seniority_level == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save profile</button>
+                    <a href="{% url 'account:alumni_dashboard' %}" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Back to dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

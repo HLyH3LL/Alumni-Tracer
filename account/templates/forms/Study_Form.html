@@ -62,10 +62,10 @@
     .form-group textarea {
         width: 100%;
         padding: 12px 15px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 215, 0, 0.3);
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.12);
+        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.95);
         font-family: inherit;
         font-size: 0.95em;
         transition: all 0.3s ease;
@@ -87,19 +87,18 @@
     .form-group select:focus,
     .form-group textarea:focus {
         background: rgba(255, 255, 255, 0.12);
-        border-color: #FFD700;
-        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        border-color: rgba(255, 215, 0, 0.5);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.1);
         outline: none;
     }
 
     .form-group select {
         cursor: pointer;
-        border-color: #FFD700;
         appearance: none;
         background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 12px;
-            color: var(--white);
+        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        color: var(--white);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFD700' d='M1 0l5 8 5-8z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 12px center;
@@ -556,7 +555,7 @@
                 <i class="fas fa-times"></i> Cancel
             </a>
             {% if object %}
-            <a href="{% url 'account:delete_study' object.id %}" class="btn-danger">
+            <a href="#" class="btn-danger" data-delete-url="{% url 'account:delete_study' object.id %}" data-delete-label="{{ object.program|escapejs }}">
                 <i class="fas fa-trash"></i> Delete
             </a>
             {% endif %}

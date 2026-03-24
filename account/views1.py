@@ -49,7 +49,7 @@ def home(request):
         'vision': vision,
         'hero': hero,
         'settings': settings,
-        'slide_count': slides.count(),  # For JavaScript
+        'slide_count': slides.count(),
     }
     
     return render(request, 'account/home.html', context)

@@ -62,6 +62,11 @@ class Alumni(models.Model):
         default="UNKNOWN"
     )
 
+    is_verified = models.BooleanField(
+        default=False,
+        help_text="Set True when alumni information is verified (e.g. by admin).",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -76,37 +81,70 @@ class Alumni(models.Model):
     def __str__(self):
         return f"{self.last_name}, {self.first_name} ({self.student_id})"
  
+    def get_profile_checklist(self):
+        """Goal items for dashboard progress (same basis as completion %)."""
+        items = []
+
+        def add_row(key, label, done, optional=False):
+            items.append(
+                {"key": key, "label": label, "done": bool(done), "optional": optional}
+            )
+
+        add_row("photo", "Upload a profile photo", self.profile_photo)
+        add_row(
+            "contact",
+            "Add your contact number",
+            self.contact_number and str(self.contact_number).strip(),
+        )
+        program_ok = (
+            self.program
+            and str(self.program).strip()
+            and self.program != "Not Specified"
+        )
+        add_row(
+            "program_year",
+            "Set your program and graduation year",
+            program_ok and bool(self.graduation_year),
+        )
+        add_row(
+            "job_title",
+            "Add your current job title",
+            self.current_job_title and str(self.current_job_title).strip(),
+        )
+        add_row(
+            "company",
+            "Add your current company",
+            self.current_company and str(self.current_company).strip(),
+        )
+        add_row(
+            "seniority",
+            "Set your seniority level (not “Unknown”)",
+            self.seniority_level and self.seniority_level != "UNKNOWN",
+        )
+        add_row(
+            "timeline",
+            "Add at least one job to your career timeline",
+            self.employments.exists(),
+        )
+        add_row(
+            "studies",
+            "Record further studies (optional)",
+            self.further_studies.exists(),
+            optional=True,
+        )
+        return items
+
     def get_profile_completion_percentage(self):
-        """Calculate profile completion percentage"""
-        required_fields = [
-            self.first_name,
-            self.last_name,
-            self.email,
-            self.contact_number,
-            self.program,
-            self.graduation_year,
-        ]
-        optional_fields = [
-            self.current_job_title,
-            self.profile_photo,
-        ]
-        
-        required_filled = sum(1 for field in required_fields if field)
-        optional_filled = sum(1 for field in optional_fields if field)
-        
-        total_score = (required_filled / len(required_fields) * 75) + (optional_filled / len(optional_fields) * 25)
-        return int(total_score)
- 
+        """Percent of checklist items completed."""
+        items = self.get_profile_checklist()
+        if not items:
+            return 0
+        done = sum(1 for i in items if i["done"])
+        return int(round(100 * done / len(items)))
+
     def get_missing_profile_fields(self):
-        """Return list of missing important profile fields"""
-        missing = []
-        
-        if not self.current_job_title or not self.current_company:
-            missing.append("Current Job")
-        if not self.profile_photo:
-            missing.append("Profile Photo")
-        
-        return missing
+        """Human-readable labels for incomplete checklist items."""
+        return [i["label"] for i in self.get_profile_checklist() if not i["done"]]
  
     def get_employment_count(self):
         """Get total number of employment records"""
@@ -222,7 +260,10 @@ class Activity(models.Model):
         ("PROFILE_UPDATE", "Profile Updated"),
         ("EMPLOYMENT_ADD", "Employment Added"),
         ("EMPLOYMENT_UPDATE", "Employment Updated"),
+        ("EMPLOYMENT_DELETE", "Employment Deleted"),
         ("STUDY_ADD", "Study Added"),
+        ("STUDY_UPDATE", "Study Updated"),
+        ("STUDY_DELETE", "Study Deleted"),
         ("LOGIN", "Login"),
         ("NETWORK_CONNECT", "Network Connected"),
         ("PROFILE_PHOTO_UPDATE", "Profile Photo Updated"),

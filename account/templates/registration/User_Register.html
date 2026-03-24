@@ -943,7 +943,14 @@
                     <!-- Terms Checkbox -->
                     <label class="terms-checkbox">
                         <input type="checkbox" name="agree_terms" required>
-                        <p><span>I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a></span>.</p>
+                        <p>
+                            <span>
+                                I agree to the
+                                <a href="{% url 'account:terms_and_conditions' %}">Terms and Conditions</a>
+                                and
+                                <a href="{% url 'account:privacy_policy' %}">Privacy Policy</a>.
+                            </span>
+                        </p>
                     </label>
 
                     <!-- Submit Button -->

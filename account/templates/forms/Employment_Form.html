@@ -62,10 +62,10 @@
     .form-group textarea {
         width: 100%;
         padding: 12px 15px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 215, 0, 0.3);
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.12);
+        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.95);
         font-family: inherit;
         font-size: 0.95em;
         transition: all 0.3s ease;
@@ -87,8 +87,8 @@
     .form-group select:focus,
     .form-group textarea:focus {
         background: rgba(255, 255, 255, 0.12);
-        border-color: #FFD700;
-        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        border-color: rgba(255, 215, 0, 0.5);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.1);
         outline: none;
     }
 
@@ -99,6 +99,9 @@
         background-repeat: no-repeat;
         background-position: right 12px center;
         padding-right: 40px;
+        background-color: rgba(255, 255, 255, 0.12);
+        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
     }
 
     .form-group select option {
@@ -515,7 +518,7 @@
                 <i class="fas fa-times"></i> Cancel
             </a>
             {% if object %}
-            <a href="{% url 'account:delete_employment' object.id %}" class="btn-danger">
+            <a href="#" class="btn-danger" data-delete-url="{% url 'account:delete_employment' object.id %}" data-delete-label="{{ object.company_name|escapejs }}">
                 <i class="fas fa-trash"></i> Delete
             </a>
             {% endif %}

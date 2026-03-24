@@ -107,9 +107,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.1em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
             cursor: pointer;
             transition: transform 0.3s ease;
         }
@@ -125,9 +122,14 @@
             display: block;
         }
 
-        .logo span {
-            color: var(--white);
-            letter-spacing: 0.5px;
+        /* Matches User_Dashboard #header .logo-main */
+        .logo .logo-main {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--tip-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .nav-links {
@@ -635,6 +637,10 @@
                 padding: 15px 20px;
             }
 
+            .logo .logo-main {
+                font-size: 1.2em;
+            }
+
             .nav-links {
                 gap: 20px;
                 display: none;
@@ -725,12 +731,12 @@
         <div class="nav-container">
             <div class="logo">
                 <img src="{% static 'images/logo.svg' %}" alt="logo">
-                <span>T.I.P.ians Connect</span>
+                <span class="logo-main">T.I.P.ians Connect</span>
             </div>
             <ul class="nav-links">
                 <li><a href="{% url 'account:home' %}">Home</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="{% url 'account:register' %}">Contact</a></li>
+                <li><a href="#footer">Contact</a></li>
             </ul>
             <div class="cta-buttons">
                 <a href="{% url 'account:login' %}" class="btn-login">Login</a>
@@ -849,7 +855,7 @@
     </section>
 
     <!-- Footer -->
-    <footer>
+    <footer id="footer">
         <p>© {% now "Y" %} {{ config.company_name }}. All rights reserved.</p>
         <p style="font-size: 0.8em; margin-top: 5px;">{{ config.tagline }}</p>
     </footer>

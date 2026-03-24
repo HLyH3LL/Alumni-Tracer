@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from datetime import datetime
+from types import SimpleNamespace
 
 from .auth_forms import LoginForm, AlumniRegistrationForm
 from .models import Alumni, Employment, FurtherStudy, Activity, Program, EmploymentStatus, Feature, RegistrationPageContent
@@ -17,6 +18,38 @@ from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
 # ===============================
 def staff_required(view_func):
     return login_required(user_passes_test(lambda u: u.is_staff)(view_func))
+
+
+def get_or_create_alumni_profile(user):
+    """
+    Ensure logged-in users can use employment/study forms even without
+    a pre-existing alumni profile by creating a minimal fallback profile.
+    """
+    try:
+        return user.alumni_profile
+    except Alumni.DoesNotExist:
+        fallback_student_id = (user.username or f"user{user.id}")[:30]
+        fallback_first_name = (user.first_name or user.username or "User")[:80]
+        fallback_last_name = (user.last_name or "Alumni")[:80]
+
+        # Resolve potential student_id collisions.
+        unique_student_id = fallback_student_id
+        suffix = 1
+        while Alumni.objects.filter(student_id=unique_student_id).exists():
+            suffix_str = str(suffix)
+            unique_student_id = f"{fallback_student_id[:30-len(suffix_str)]}{suffix_str}"
+            suffix += 1
+
+        return Alumni.objects.create(
+            user=user,
+            student_id=unique_student_id,
+            first_name=fallback_first_name,
+            last_name=fallback_last_name,
+            email=user.email or None,
+            program="Not Specified",
+            graduation_year=datetime.now().year,
+            employment_status="UNKNOWN",
+        )
 
 
 # ===============================
@@ -71,7 +104,6 @@ def user_login(request):
             if user is not None:
                 if user.is_active:
 
-                    # ❌ BLOCK ADMINS HERE
                     if user.is_staff:
                         messages.error(request, "Please use the admin login page.")
                         return redirect("account:admin_login")
@@ -146,30 +178,31 @@ def alumni_dashboard(request):
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
-        return redirect('account:account_settings')
+        messages.warning(request, "Profile data is not available yet. Showing an empty dashboard.")
+        context = {
+            "alumni": SimpleNamespace(student_id=None, graduation_year=None, seniority_level="Unknown"),
+            "profile_completion": 0,
+            "missing_fields": ["Profile Information"],
+            "profile_checklist": [],
+            "employment_count": 0,
+            "current_employment": None,
+            "all_employments": [],
+            "further_studies": [],
+            "recent_activities": [],
+            "years_since_graduation": 0,
+            "career_timeline": [],
+            "total_years_employed": 0,
+            "first_job_date": None,
+            "latest_job_date": None,
+            "section": "dashboard",
+        }
+        return render(request, "account/User_Dashboard.html", context)
     
     # ✅ MUST call this to get employment data!
     context = get_alumni_dashboard_context(alumni)
     
     # ✅ MUST pass context to template!
     return render(request, "account/User_Dashboard.html", context)
-
-
-
-@login_required
-def account_settings(request):
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        alumni = None
-
-    return render(request, "account/account_settings.html", {
-        "alumni": alumni
-    })
-
-
-
 
 
 
@@ -225,6 +258,7 @@ def register(request):
     graduation_years = list(range(current_year, 2010, -1))
 
     context = {
+        'form': form,
         'programs': programs,
         'employment_statuses': employment_statuses,
         'features': features,
@@ -240,11 +274,7 @@ def register(request):
 # ===============================
 @login_required
 def employment_list(request):
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     employments = Employment.objects.filter(alumni=alumni).order_by('-date_hired')
     return render(request, 'account/employment_list.html', {'employments': employments})
@@ -253,11 +283,7 @@ def employment_list(request):
 @login_required
 def add_employment(request):
     """Add a new employment record for the logged-in alumni"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found. Please complete your profile.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     if request.method == "POST":
         try:
@@ -307,7 +333,7 @@ def add_employment(request):
                 # Show success message
                 messages.success(
                     request, 
-                    f"✓ Employment at {company_name} added successfully!"
+                    f"Employment at {company_name} added successfully!"
                 )
                 
                 return redirect("account:alumni_dashboard")
@@ -327,11 +353,7 @@ def add_employment(request):
 @login_required
 def edit_employment(request, employment_id):
     """Edit an employment record"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     # Get the employment record
     emp = get_object_or_404(Employment, id=employment_id, alumni=alumni)
@@ -380,7 +402,7 @@ def edit_employment(request, employment_id):
                     description=f"Updated employment at {company_name}"
                 )
 
-                messages.success(request, f"✓ {company_name} updated successfully!")
+                messages.success(request, f"{company_name} updated successfully!")
                 return redirect("account:alumni_dashboard")
 
         except Exception as e:
@@ -396,54 +418,43 @@ def edit_employment(request, employment_id):
     })
 
 
+def _wants_json(request):
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
 @login_required
 def delete_employment(request, employment_id):
-    """Delete an employment record"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found.")
-        return redirect('account:account_settings')
-
+    """Delete an employment record (POST only; use AJAX from dashboard/forms for modal flow)."""
+    alumni = get_or_create_alumni_profile(request.user)
     emp = get_object_or_404(Employment, id=employment_id, alumni=alumni)
-    
-    if request.method == 'POST':
-        try:
-            company_name = emp.company_name
-            
-            # Delete the record
-            emp.delete()
 
-            # Log activity
-            Activity.objects.create(
-                alumni=alumni,
-                activity_type="PROFILE_UPDATE",  # Or create EMPLOYMENT_DELETE type
-                description=f"Deleted employment record: {company_name}"
-            )
+    if request.method != "POST":
+        messages.info(request, "Use the delete button on your dashboard to remove a job.")
+        return redirect("account:alumni_dashboard")
 
-            messages.success(request, f"✓ {company_name} deleted successfully!")
-            return redirect('account:alumni_dashboard')
-
-        except Exception as e:
-            messages.error(request, f"Error deleting employment: {str(e)}")
-            return redirect('account:alumni_dashboard')
-
-    # GET request - show confirmation page
-    return render(request, 'account/confirm_delete_employment.html', {
-        'employment': emp,
-        'title': f'Delete {emp.company_name}?'
-    })
+    try:
+        company_name = emp.company_name
+        emp.delete()
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type="EMPLOYMENT_DELETE",
+            description=f"Deleted employment: {company_name}",
+        )
+        if _wants_json(request):
+            return JsonResponse({"ok": True, "message": f"{company_name} was deleted."})
+        messages.success(request, f"{company_name} deleted successfully!")
+    except Exception as e:
+        if _wants_json(request):
+            return JsonResponse({"ok": False, "message": str(e)}, status=400)
+        messages.error(request, f"Error deleting employment: {str(e)}")
+    return redirect("account:alumni_dashboard")
 
 # ===============================
 # ✅ FURTHER STUDIES CRUD (minimal safe stubs)
 # ===============================
 @login_required
 def studies_list(request):
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.warning(request, "Please complete your alumni profile setup.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     studies = FurtherStudy.objects.filter(alumni=alumni).order_by('-start_year')
     return render(request, 'account/studies_list.html', {'studies': studies})
@@ -452,11 +463,7 @@ def studies_list(request):
 @login_required
 def add_study(request):
     """Add a new further study record for the logged-in alumni"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     if request.method == "POST":
         try:
@@ -505,7 +512,7 @@ def add_study(request):
                 
                 messages.success(
                     request,
-                    f"✓ Further studies ({program}) added successfully!"
+                    f"Further studies ({program}) added successfully!"
                 )
                 
                 return redirect("account:alumni_dashboard")
@@ -528,18 +535,12 @@ def add_study(request):
         "object": None
     })
 
-
-from django.contrib import messages
 from django.db import transaction
 
 @login_required
 def edit_study(request, study_id):
     """Edit a further study record"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found.")
-        return redirect('account:account_settings')
+    alumni = get_or_create_alumni_profile(request.user)
 
     # Get the study record
     study = get_object_or_404(FurtherStudy, id=study_id, alumni=alumni)
@@ -610,7 +611,7 @@ def edit_study(request, study_id):
                     description=f"Updated further studies: {program}"
                 )
 
-                messages.success(request, f"✓ {program} updated successfully!")
+                messages.success(request, f"{program} updated successfully!")
                 return redirect("account:alumni_dashboard")
 
         except Exception as e:
@@ -628,42 +629,100 @@ def edit_study(request, study_id):
 
 @login_required
 def delete_study(request, study_id):
-    """Delete a further study record"""
-    try:
-        alumni = request.user.alumni_profile
-    except Alumni.DoesNotExist:
-        messages.error(request, "Alumni profile not found.")
-        return redirect('account:account_settings')
-
+    """Delete a further study record (POST only; modal + toast from dashboard/forms)."""
+    alumni = get_or_create_alumni_profile(request.user)
     study = get_object_or_404(FurtherStudy, id=study_id, alumni=alumni)
-    
-    if request.method == 'POST':
-        try:
-            program_name = study.program
-            study_school = study.school_name
-            
-            # Delete the record
-            study.delete()
 
-            # Log activity
-            Activity.objects.create(
-                alumni=alumni,
-                activity_type="PROFILE_UPDATE",  # Or create STUDY_DELETE type
-                description=f"Deleted study record: {program_name}"
-            )
+    if request.method != "POST":
+        messages.info(request, "Use the delete button on your dashboard to remove a study record.")
+        return redirect("account:alumni_dashboard")
 
-            messages.success(request, f"✓ {program_name} deleted successfully!")
-            return redirect('account:alumni_dashboard')
+    try:
+        program_name = study.program
+        study.delete()
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type="STUDY_DELETE",
+            description=f"Deleted further study: {program_name}",
+        )
+        if _wants_json(request):
+            return JsonResponse({"ok": True, "message": f"{program_name} was deleted."})
+        messages.success(request, f"{program_name} deleted successfully!")
+    except Exception as e:
+        if _wants_json(request):
+            return JsonResponse({"ok": False, "message": str(e)}, status=400)
+        messages.error(request, f"Error deleting study: {str(e)}")
+    return redirect("account:alumni_dashboard")
 
-        except Exception as e:
-            messages.error(request, f"Error deleting study: {str(e)}")
-            return redirect('account:alumni_dashboard')
 
-    # GET request - show confirmation page
-    return render(request, 'account/confirm_delete_study.html', {
-        'study': study,
-        'title': f'Delete {study.program}?'
-    })
+@login_required
+def edit_alumni_profile(request):
+    """Update alumni profile fields and photo (glass UI)."""
+    alumni = get_or_create_alumni_profile(request.user)
+    programs = Program.objects.filter(is_active=True).order_by("order", "code")
+    current_year = datetime.now().year
+    graduation_years = list(range(current_year, 1950, -1))
+
+    program_names = list(
+        programs.values_list("full_name", flat=True)
+    )
+    extra_program = None
+    if (
+        alumni.program
+        and str(alumni.program).strip()
+        and alumni.program not in program_names
+    ):
+        extra_program = alumni.program
+
+    if request.method == "POST":
+        alumni.contact_number = request.POST.get("contact_number", "").strip() or None
+        prog = request.POST.get("program", "").strip()
+        if prog:
+            alumni.program = prog
+        gy = request.POST.get("graduation_year", "").strip()
+        if gy:
+            try:
+                y = int(gy)
+                if 1950 <= y <= current_year + 8:
+                    alumni.graduation_year = y
+            except ValueError:
+                pass
+        alumni.current_job_title = request.POST.get("current_job_title", "").strip() or None
+        alumni.current_company = request.POST.get("current_company", "").strip() or None
+        sen = request.POST.get("seniority_level", "").strip()
+        if sen in dict(Alumni.SENIORITY_LEVEL):
+            alumni.seniority_level = sen
+
+        if request.POST.get("clear_photo"):
+            if alumni.profile_photo:
+                try:
+                    alumni.profile_photo.delete(save=False)
+                except OSError:
+                    pass
+                alumni.profile_photo = None
+        elif "profile_photo" in request.FILES:
+            alumni.profile_photo = request.FILES["profile_photo"]
+
+        alumni.save()
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type="PROFILE_UPDATE",
+            description="Updated profile from edit page",
+        )
+        messages.success(request, "Profile updated successfully.")
+        return redirect("account:alumni_dashboard")
+
+    return render(
+        request,
+        "account/Edit_Alumni_Profile.html",
+        {
+            "alumni": alumni,
+            "programs": programs,
+            "extra_program": extra_program,
+            "graduation_years": graduation_years,
+            "seniority_choices": Alumni.SENIORITY_LEVEL,
+        },
+    )
 
 @login_required
 def get_alumni_dashboard_context(alumni):
@@ -705,6 +764,7 @@ def get_alumni_dashboard_context(alumni):
         'alumni': alumni,
         'profile_completion': alumni.get_profile_completion_percentage(),
         'missing_fields': alumni.get_missing_profile_fields(),
+        'profile_checklist': alumni.get_profile_checklist(),
         'employment_count': alumni.get_employment_count(),
         'current_employment': current_employment,
         'all_employments': all_employments,
@@ -719,3 +779,20 @@ def get_alumni_dashboard_context(alumni):
     }
     
     return context
+
+
+# ===============================
+# 🧾 LEGAL PAGES
+# ===============================
+def terms_and_conditions(request):
+    """
+    Toast-style Terms & Conditions page (static content).
+    """
+    return render(request, "account/TERMS_AND_CONDITIONS.html", {})
+
+
+def privacy_policy(request):
+    """
+    Toast-style Privacy Policy page (static content).
+    """
+    return render(request, "account/PRIVACY_POLICY.html", {})
