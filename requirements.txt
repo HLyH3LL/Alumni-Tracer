@@ -1,16 +1,10 @@
-asgiref==3.11.1
-Django==6.0.2
+asgiref==3.7.2
+Django==4.2.11
 django-taggit==6.1.0
-pillow==12.1.1
-psycopg2-binary==2.9.11
-sqlparse==0.5.5
-tzdata==2025.3
-
-# Audio Processing - Voice Feature
-openai-whisper==20231117
-torch==2.0.1
-torchaudio==2.0.2
-scipy
-librosa
-python-dateutil
+pillow==10.3.0
+psycopg2-binary==2.9.9
+sqlparse==0.4.4
+tzdata==2024.1
+python-dateutil==2.9.0
 setuptools
+gunicorn
