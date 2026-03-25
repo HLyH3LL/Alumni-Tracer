@@ -13,3 +13,4 @@ torchaudio==2.0.2
 scipy
 librosa
 python-dateutil
+setuptools
