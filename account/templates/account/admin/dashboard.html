@@ -2,92 +2,606 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-  <div class="title">Welcome Back, Admin!</div>
+    <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <!-- Total Alumni -->
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ total_alumni }}</div>
+                        <div class="stat-label">Total Alumni Registered</div>
+                    </div>
+                </div>
 
-  <div class="grid">
-    <!-- Total Alumni -->
-    <div class="card">
-      <div class="muted">Total Alumni Registered</div>
-      <div class="big">{{ total_alumni }}</div>
+                <!-- Alumni by Course Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> Alumni by Course</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="courseChart" height="150"></canvas>
+                    </div>
+                </div>
+
+                <!-- Alumni by Year Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> Alumni by Batch/Year</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="yearChart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alumni Table -->
+            <div class="table-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-clock"></i> Recently Added Alumni Profiles</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> Name</th>
+                                <th><i class="fas fa-graduation-cap"></i> Course</th>
+                                <th><i class="fas fa-calendar"></i> Batch</th>
+                                <th><i class="fas fa-briefcase"></i> Employment Status</th>
+                                <th><i class="fas fa-clock"></i> Last Updated</th>
+                                <th><i class="fas fa-eye"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in recent %}
+                                <tr>
+                                    <td>{{ a.first_name }} {{ a.last_name }}</td>
+                                    <td>{{ a.program }}</td>
+                                    <td>{{ a.graduation_year }}</td>
+                                    <td>
+                                        {% if a.employment_status == "EMPLOYED" %}
+                                            <span class="status-badge status-employed">Employed</span>
+                                        {% elif a.employment_status == "UNEMPLOYED" %}
+                                            <span class="status-badge status-unemployed">Unemployed</span>
+                                        {% elif a.employment_status == "SELF_EMPLOYED" %}
+                                            <span class="status-badge status-self-employed">Self-Employed</span>
+                                        {% elif a.employment_status == "STUDENT" %}
+                                            <span class="status-badge status-student">Further Studies</span>
+                                        {% else %}
+                                            <span class="status-badge status-unknown">Unknown</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ a.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'account:alumni_records' %}" class="btn-action">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="no-data">No alumni records yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <!-- Donut chart -->
-    <div class="card">
-      <div style="font-weight:900;margin-bottom:10px;color:#1b2b44;">Alumni by Course</div>
-      <canvas id="courseChart" height="120"></canvas>
-    </div>
+<!-- Hidden JSON data for charts -->
+{{ by_program|json_script:"by_program_data" }}
+{{ by_year|json_script:"by_year_data" }}
 
-    <!-- Bar chart -->
-    <div class="card">
-      <div style="font-weight:900;margin-bottom:10px;color:#1b2b44;">Alumni by Batch/Year</div>
-      <canvas id="yearChart" height="120"></canvas>
-    </div>
-  </div>
+<script>
+    // Chart.js initialization
+    const programData = JSON.parse(document.getElementById("by_program_data").textContent);
+    const yearData = JSON.parse(document.getElementById("by_year_data").textContent);
 
-  <div class="section-title">Recently Added Alumni Profiles</div>
+    const courseLabels = programData.map(x => x.program);
+    const courseCounts = programData.map(x => x.total);
 
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Course</th>
-        <th>Batch</th>
-        <th>Employment Status</th>
-        <th>Last Updated</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for a in recent %}
-        <tr>
-          <td>{{ a.first_name }} {{ a.last_name }}</td>
-          <td>{{ a.program }}</td>
-          <td>{{ a.graduation_year }}</td>
-          <td>
-            {% if a.employment_status == "EMPLOYED" %}<span class="badge b-emp">Employed</span>{% endif %}
-            {% if a.employment_status == "UNEMPLOYED" %}<span class="badge b-un">Unemployed</span>{% endif %}
-            {% if a.employment_status == "SELF_EMPLOYED" %}<span class="badge b-self">Self-Employed</span>{% endif %}
-            {% if a.employment_status == "STUDENT" %}<span class="badge b-stud">Further Studies</span>{% endif %}
-            {% if a.employment_status == "UNKNOWN" %}<span class="badge b-unk">Unknown</span>{% endif %}
-          </td>
-          <td>{{ a.created_at|date:"M d, Y" }}</td>
-          <td><button class="btn" type="button">View</button></td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="6">No alumni records yet.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    new Chart(document.getElementById("courseChart"), {
+        type: "doughnut",
+        data: {
+            labels: courseLabels,
+            datasets: [{
+                data: courseCounts,
+                backgroundColor: [
+                    '#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#FF4500',
+                    '#DC143C', '#B22222', '#8B0000', '#FF1493', '#FF69B4'
+                ],
+                borderWidth: 2,
+                borderColor: 'rgba(255, 255, 255, 0.3)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
 
-  {{ by_program|json_script:"by_program_data" }}
-  {{ by_year|json_script:"by_year_data" }}
+    const yearLabels = yearData.map(x => String(x.graduation_year));
+    const yearCounts = yearData.map(x => x.total);
 
-
- <script>
-  const programData = JSON.parse(
-    document.getElementById("by_program_data").textContent
-  );
-  const yearData = JSON.parse(
-    document.getElementById("by_year_data").textContent
-  );
-
-  const courseLabels = programData.map(x => x.program);
-  const courseCounts = programData.map(x => x.total);
-
-  new Chart(document.getElementById("courseChart"), {
-    type: "doughnut",
-    data: { labels: courseLabels, datasets: [{ data: courseCounts }] },
-    options: { plugins: { legend: { position: "right" } } }
-  });
-
-  const yearLabels = yearData.map(x => String(x.graduation_year));
-  const yearCounts = yearData.map(x => x.total);
-
-  new Chart(document.getElementById("yearChart"), {
-    type: "bar",
-    data: { labels: yearLabels, datasets: [{ data: yearCounts }] },
-    options: { plugins: { legend: { display: false } } }
-  });
+    new Chart(document.getElementById("yearChart"), {
+        type: "bar",
+        data: {
+            labels: yearLabels,
+            datasets: [{
+                data: yearCounts,
+                backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                borderColor: '#FFD700',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.8)' }
+                },
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.8)' }
+                }
+            }
+        }
+    });
 </script>
 
+<style>
+    :root {
+        --tip-matte-black: #28282B;
+        --tip-pure-black: #000000;
+        --tip-jet-black: #343434;
+        --tip-gold: #FFD700;
+        --tip-gold-dark: #e5c100;
+        --tip-gold-light: #fde910;
+        --white: #ffffff;
+        --gray-light: #f5f5f5;
+        --gray: #666666;
+        --gray-dark: #333333;
+    }
+
+    #content {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 20px;
+        animation: fadeIn 0.5s ease-out;
+        flex: 1;
+        width: 100%;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-container {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, rgba(40, 40, 43, 0.8) 0%, rgba(52, 52, 52, 0.8) 100%);
+        padding: 40px;
+        color: var(--white);
+        border-bottom: 2px solid var(--tip-gold);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .welcome-section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .dashboard-logo {
+        width: 60px;
+        height: 60px;
+        filter: brightness(0) invert(1);
+    }
+
+    .welcome-text h1 {
+        font-size: 2.2em;
+        color: var(--white);
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .welcome-text h1 i {
+        color: var(--tip-gold);
+        margin-right: 12px;
+    }
+
+    .welcome-text p {
+        font-size: 0.95em;
+        opacity: 0.85;
+        letter-spacing: 0.5px;
+    }
+
+    .dashboard-body {
+        padding: 40px;
+    }
+
+    /* Statistics Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tip-gold);
+        font-size: 2em;
+        flex-shrink: 0;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 3em;
+        font-weight: 900;
+        color: var(--white);
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    .chart-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .chart-header h3 {
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.3em;
+        margin-bottom: 20px;
+    }
+
+    .chart-header h3 i {
+        color: var(--tip-gold);
+        margin-right: 10px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 200px;
+    }
+
+    /* Table Section */
+    .table-section {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+    }
+
+    .section-header h2 {
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .section-header h2 i {
+        color: var(--tip-gold);
+        margin-right: 10px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .data-table th {
+        background: rgba(255, 215, 0, 0.1);
+        color: var(--white);
+        padding: 15px;
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .data-table th i {
+        color: var(--tip-gold);
+        margin-right: 8px;
+    }
+
+    .data-table td {
+        padding: 15px;
+        color: rgba(255, 255, 255, 0.9);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .data-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-employed {
+        background: rgba(76, 175, 80, 0.2);
+        color: #81c784;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .status-unemployed {
+        background: rgba(244, 67, 54, 0.2);
+        color: #ef5350;
+        border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .status-self-employed {
+        background: rgba(255, 152, 0, 0.2);
+        color: #ffb74d;
+        border: 1px solid rgba(255, 152, 0, 0.3);
+    }
+
+    .status-student {
+        background: rgba(33, 150, 243, 0.2);
+        color: #64b5f6;
+        border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+
+    .status-unknown {
+        background: rgba(158, 158, 158, 0.2);
+        color: #bdbdbd;
+        border: 1px solid rgba(158, 158, 158, 0.3);
+    }
+
+    .btn-action {
+        background: var(--tip-gold);
+        color: var(--tip-matte-black);
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85em;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        background: var(--tip-gold-dark);
+        transform: translateY(-2px);
+    }
+
+    .no-data {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-style: italic;
+        padding: 40px;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border-left: 3px solid var(--tip-gold);
+        background: rgba(255, 215, 0, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert i {
+        color: var(--tip-gold);
+        font-size: 1.1em;
+    }
+
+    .btn-close {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.3s ease;
+    }
+
+    .btn-close:hover {
+        color: var(--white);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 25px;
+        }
+
+        .dashboard-body {
+            padding: 25px;
+        }
+
+        .logo-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.8em;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+        }
+
+        .chart-card {
+            padding: 20px;
+        }
+
+        .table-section {
+            padding: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 10px;
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #content {
+            padding: 0 10px;
+        }
+
+        .dashboard-header {
+            padding: 15px;
+        }
+
+        .dashboard-body {
+            padding: 15px;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.4em;
+        }
+
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+        }
+    }
+</style>
 {% endblock %}

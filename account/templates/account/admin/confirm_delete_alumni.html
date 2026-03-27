@@ -1,0 +1,15 @@
+{% extends "account/admin/_layout.html" %}
+
+{% block content %}
+<div class="title">Confirm Delete</div>
+
+<div class="card" style="max-width:600px;">
+  <p>Are you sure you want to delete the alumni record for <strong>{{ alumni.first_name }} {{ alumni.last_name }}</strong> ({{ alumni.student_id }})? This action cannot be undone.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn-action" style="background:#ff6b6b; color:#000;">Delete</button>
+    <a href="{% url 'account:alumni_records' %}" class="btn-action" style="background:#222; color:#ffd700; margin-left:10px;">Cancel</a>
+  </form>
+</div>
+{% endblock %}
