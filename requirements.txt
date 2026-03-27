@@ -1,5 +1,5 @@
 asgiref==3.11.1
-Django==6.0.2
+Django==5.2.3
 django-taggit==6.1.0
 pillow==12.1.1
 psycopg2-binary==2.9.11
