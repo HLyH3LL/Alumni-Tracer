@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Alumni Tracer{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-pVh1..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7fb; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 1100px; margin: 36px auto; padding: 16px; }
+        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
+        .alert-success { background: #daf6dc; border: 1px solid #8cd59a; color: #2d6b34; }
+        .alert-error, .alert-danger { background: #fde2e6; border: 1px solid #ea9ba6; color: #8a222b; }
+        .alert-info { background: #e5f0fd; border: 1px solid #7dbaf3; color: #2a4f7f; }
+        h1,h2,h3 { margin: 0 0 14px; }
+        .nav { background: #252d43; padding: 10px 16px; color: #fff; margin-bottom: 20px; border-radius: 6px; }
+        .nav a { color: #fbfbfb; margin-right: 12px; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="{% url 'account:home' %}">Home</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'account:account_settings' %}">Account Settings</a>
+            <form method="post" action="{% url 'account:logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit" style="background:none; border:none; color:#fbfbfb; font-weight:600; cursor:pointer;">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'account:login' %}">Login</a>
+            <a href="{% url 'account:register' %}">Register</a>
+        {% endif %}
+    </nav>
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

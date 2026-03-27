@@ -107,6 +107,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             cursor: pointer;
             transition: transform 0.3s ease;
         }
@@ -122,14 +125,9 @@
             display: block;
         }
 
-        /* Matches User_Dashboard #header .logo-main */
-        .logo .logo-main {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--tip-gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .logo span {
+            color: var(--white);
+            letter-spacing: 0.5px;
         }
 
         .nav-links {
@@ -637,10 +635,6 @@
                 padding: 15px 20px;
             }
 
-            .logo .logo-main {
-                font-size: 1.2em;
-            }
-
             .nav-links {
                 gap: 20px;
                 display: none;
@@ -731,12 +725,12 @@
         <div class="nav-container">
             <div class="logo">
                 <img src="{% static 'images/logo.svg' %}" alt="logo">
-                <span class="logo-main">T.I.P.ians Connect</span>
+                <span>T.I.P.ians Connect</span>
             </div>
             <ul class="nav-links">
                 <li><a href="{% url 'account:home' %}">Home</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#footer">Contact</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="cta-buttons">
                 <a href="{% url 'account:login' %}" class="btn-login">Login</a>
@@ -854,8 +848,21 @@
 
     </section>
 
+    <!-- Contact Section -->
+    <section id="contact" class="about-section" style="margin-top: 40px; padding: 40px 20px;">
+        <div class="section-hero">
+            <h2>Contact <span>Us</span></h2>
+            <p>Need help? Have questions? Reach out and we’ll get back to you shortly.</p>
+        </div>
+        <div class="section max-width-1200" style="text-align: center;">
+            <p style="margin-bottom: 16px;">Email: <a href="mailto:support@tip.edu.ph" style="color: #FFD700;">support@tip.edu.ph</a></p>
+            <p>Phone: +63 917 123 4567</p>
+            <p style="margin-top: 12px;">Or visit the admin office at T.I.P. Manila.</p>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer id="footer">
+    <footer>
         <p>© {% now "Y" %} {{ config.company_name }}. All rights reserved.</p>
         <p style="font-size: 0.8em; margin-top: 5px;">{{ config.tagline }}</p>
     </footer>

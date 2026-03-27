@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .voice_views import voice_update 
 
 app_name = 'account'
 
@@ -9,8 +8,8 @@ urlpatterns = [
     # ===============================
     # 🔐 AUTHENTICATION
     # ===============================
-    path('login/', views.user_login, name='login'),                 # Alumni login
-    path('admin/login/', views.admin_login, name='admin_login'),   # ✅ Admin login (NEW)
+    path('login/', views.user_login, name='login'),
+    path('admin/login/', views.admin_login, name='admin_login'),
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('home/', views.home, name='home'),
@@ -19,8 +18,31 @@ urlpatterns = [
     # 📊 DASHBOARDS
     # ===============================
     path('dashboard/', views.alumni_dashboard, name='alumni_dashboard'),
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # ✅ FIXED PATH
-    path('profile/edit/', views.edit_alumni_profile, name='edit_alumni_profile'),
+    path('dashboard/', views.alumni_dashboard, name='dashboard'),  # backward-compatible alias
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+
+    # ===============================
+    # 🛠️ ADMIN FEATURES (SIDEBAR)
+    # ===============================
+    path('admin/alumni-records/', views.alumni_records, name='alumni_records'),
+    path('admin/alumni-records/add/', views.add_alumni, name='add_alumni'),
+    path('admin/alumni-records/<int:alumni_id>/edit/', views.edit_alumni, name='edit_alumni'),
+    path('admin/alumni-records/<int:alumni_id>/delete/', views.delete_alumni, name='delete_alumni'),
+    path('admin/profile-verification/', views.profile_verification, name='profile_verification'),
+    path('admin/approve-alumni/<int:id>/', views.approve_alumni, name='approve_alumni'),
+    path('admin/reject-alumni/<int:id>/', views.reject_alumni, name='reject_alumni'),
+    path('admin/announcements/', views.announcements, name='announcements'),
+    path('admin/reports/', views.reports, name='reports'),
+    path('admin/user-management/', views.user_management, name='user_management'),
+    path('admin/settings/', views.admin_settings, name='admin_settings'),
+
+    # ===============================
+    # ⚙️ ACCOUNT SETTINGS (USER)
+    # ===============================
+    path('settings/', views.account_settings, name='account_settings'),
+
+    # ✅ 🔥 SAFE FIX (IMPORTANT — prevents NoReverseMatch)
+    path('settings-fallback/', views.account_settings, name='settings'),
 
     # ===============================
     # 💼 EMPLOYMENT MANAGEMENT
@@ -37,9 +59,6 @@ urlpatterns = [
     path('studies/add/', views.add_study, name='add_study'),
     path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
     path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
-
-    # Voice
-    path('voice-update/', voice_update, name='voice_update'),
 
     # ===============================
     # 🔑 PASSWORD MANAGEMENT
@@ -80,10 +99,4 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
-
-    # ===============================
-    # 🧾 LEGAL PAGES
-    # ===============================
-    path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
-    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 ]

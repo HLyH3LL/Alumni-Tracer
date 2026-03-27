@@ -630,6 +630,7 @@
 
                 <form method="POST" action="{% url 'account:login' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
 
                     <!-- Student ID -->
                     <div class="form-group {% if form.username.errors %}has-error{% endif %}">

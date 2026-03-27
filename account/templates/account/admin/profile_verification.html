@@ -1,0 +1,141 @@
+{% extends "account/admin/_layout.html" %}
+
+{% block content %}
+
+<style>
+/* HEADER */
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 20px;
+}
+
+/* CARD */
+.premium-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+/* TABLE */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+}
+
+.table thead {
+  background: rgba(255,215,0,0.1);
+}
+
+.table th {
+  padding: 12px;
+  text-align: left;
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 14px 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ROW HOVER */
+.table tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+  transition: 0.2s;
+}
+
+/* ACTION BUTTONS */
+.btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-right: 6px;
+  transition: 0.2s;
+}
+
+.btn-approve {
+  background: rgba(0, 200, 83, 0.15);
+  color: #00e676;
+}
+
+.btn-reject {
+  background: rgba(255, 82, 82, 0.15);
+  color: #ff5252;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.85;
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #aaa;
+  font-size: 14px;
+}
+</style>
+
+<div class="title">Profile Verification</div>
+
+<div class="premium-card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Program</th>
+        <th>Year</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for alumni in pending_alumni %}
+      <tr>
+        <td>{{ alumni.id }}</td>
+
+        <td>
+          {% if alumni.user %}
+            {{ alumni.user.get_full_name }}
+          {% else %}
+            {{ alumni.first_name }} {{ alumni.last_name }}
+          {% endif %}
+        </td>
+
+        <td>{{ alumni.program }}</td>
+        <td>{{ alumni.graduation_year }}</td>
+        <td>{{ alumni.email }}</td>
+
+        <td>
+          <a href="{% url 'account:approve_alumni' alumni.id %}" class="btn btn-approve">
+            ✔ Approve
+          </a>
+          <a href="{% url 'account:reject_alumni' alumni.id %}" class="btn btn-reject">
+            ✖ Reject
+          </a>
+        </td>
+      </tr>
+
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty">
+          No pending verifications 🎉
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
