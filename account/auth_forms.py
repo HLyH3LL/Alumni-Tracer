@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from datetime import datetime
+from django.db import IntegrityError
 from .models import Alumni, Program, EmploymentStatus
 import re
 
@@ -38,9 +38,20 @@ class AlumniRegistrationForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'e.g., 0917-123-4567'})
     )
-    program = forms.ChoiceField(choices=[('', 'Select Program')], required=True)
-    graduation_year = forms.ChoiceField(choices=[('', 'Select Year')], required=True)
-    employment_status = forms.ChoiceField(choices=[('', 'Select Status')], required=True)
+    program = forms.ModelChoiceField(
+        queryset=Program.objects.filter(is_active=True),
+        required=True,
+        empty_label='Select Program'
+    )
+    graduation_year = forms.ChoiceField(
+        choices=[('', 'Select Year')] + [(str(year), str(year)) for year in range(2024, 2009, -1)],
+        required=True
+    )
+    employment_status = forms.ModelChoiceField(
+        queryset=EmploymentStatus.objects.filter(is_active=True),
+        required=True,
+        empty_label='Select Status'
+    )
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -48,22 +59,6 @@ class AlumniRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Keep form choices aligned with the registration page dropdowns.
-        current_year = datetime.now().year
-        self.fields['graduation_year'].choices = [('', 'Select Year')] + [
-            (str(year), str(year)) for year in range(current_year, 2010, -1)
-        ]
-
-        program_choices = [('', 'Select Program')] + [
-            (p.full_name, p.full_name) for p in Program.objects.filter(is_active=True).order_by('order', 'code')
-        ]
-        self.fields['program'].choices = program_choices
-
-        employment_choices = [('', 'Select Status')] + [
-            (s.value, s.label) for s in EmploymentStatus.objects.filter(is_active=True).order_by('order')
-        ]
-        self.fields['employment_status'].choices = employment_choices
       
         self.fields['password1'].widget.attrs.update({
             'placeholder': 'Create a password',
@@ -85,6 +80,10 @@ class AlumniRegistrationForm(UserCreationForm):
     
         if Alumni.objects.filter(student_id=student_id).exists():
             raise forms.ValidationError('This Student ID is already registered.')
+
+        if User.objects.filter(username=student_id).exists():
+            raise forms.ValidationError('A user with this Student ID already exists.')
+
         return student_id
 
     def clean_email(self):
@@ -96,27 +95,64 @@ class AlumniRegistrationForm(UserCreationForm):
 
     def save(self, commit=True):
         """Save both User and Alumni objects"""
-        user = User.objects.create_user(
-            username=self.cleaned_data['student_id'],
-            password=self.cleaned_data['password1'],
-            email=self.cleaned_data['email'],
-            first_name=self.cleaned_data['first_name'],
-            last_name=self.cleaned_data['last_name']
-        )
-        
+        try:
+            user = User.objects.create_user(
+                username=self.cleaned_data['student_id'],
+                password=self.cleaned_data['password1'],
+                email=self.cleaned_data['email'],
+                first_name=self.cleaned_data['first_name'],
+                last_name=self.cleaned_data['last_name']
+            )
+        except IntegrityError:
+            raise forms.ValidationError('A user with this Student ID already exists.')
+
         if commit:
             user.save()
             
-            alumni = Alumni.objects.create(
-                user=user, 
-                student_id=self.cleaned_data['student_id'],
-                first_name=self.cleaned_data['first_name'],
-                last_name=self.cleaned_data['last_name'],
-                email=self.cleaned_data['email'],
-                contact_number=self.cleaned_data['contact_number'],
-                program=self.cleaned_data['program'],
-                graduation_year=self.cleaned_data['graduation_year'],
-                employment_status=self.cleaned_data['employment_status']
-            )
+            program = self.cleaned_data['program']
+            employment_status = self.cleaned_data['employment_status']
+            try:
+                alumni = Alumni.objects.create(
+                    user=user,
+                    student_id=self.cleaned_data['student_id'],
+                    first_name=self.cleaned_data['first_name'],
+                    last_name=self.cleaned_data['last_name'],
+                    email=self.cleaned_data['email'],
+                    contact_number=self.cleaned_data['contact_number'],
+                    program=program.code if program else '',
+                    graduation_year=self.cleaned_data['graduation_year'],
+                    employment_status=employment_status.value if employment_status else ''
+                )
+            except Exception as e:
+                user.delete()  # Clean up the user if alumni creation fails
+                raise forms.ValidationError(f'Failed to create alumni profile: {str(e)}')
         
         return user
+
+
+class AdminAlumniForm(forms.ModelForm):
+    class Meta:
+        model = Alumni
+        fields = [
+            'student_id',
+            'first_name',
+            'last_name',
+            'email',
+            'contact_number',
+            'program',
+            'graduation_year',
+            'employment_status',
+            'current_job_title',
+            'current_company',
+            'seniority_level',
+            'is_verified'
+        ]
+
+    def clean_student_id(self):
+        student_id = self.cleaned_data.get('student_id')
+        qs = Alumni.objects.filter(student_id=student_id)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError('This Student ID is already in use.')
+        return student_id

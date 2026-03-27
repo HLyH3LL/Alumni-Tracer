@@ -776,6 +776,16 @@
                 <form method="POST" action="{% url 'account:register' %}">
                     {% csrf_token %}
 
+                    <!-- Django Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }}">
+                                <i class="fas fa-{% if 'error' in message.tags %}exclamation-circle{% elif 'success' in message.tags %}check-circle{% else %}info-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
                     <!-- Non-field Errors -->
                     {% if form.non_field_errors %}
                     <div class="alert alert-error">
@@ -857,7 +867,7 @@
                             <select name="program" required>
                                 <option value="">Select Program</option>
                                 {% for program in programs %}
-                                <option value="{{ program.full_name }}">{{ program.code }}</option>
+                                <option value="{{ program.id }}" {% if form.program.value|stringformat:'s' == program.id|stringformat:'s' %}selected{% endif %}>{{ program.code }}</option>
                                 {% endfor %}
                             </select>
                             {% if form.program.errors %}
@@ -886,7 +896,7 @@
                         <select name="employment_status" required>
                             <option value="">Select Status</option>
                             {% for status in employment_statuses %}
-                            <option value="{{ status.value }}">{{ status.label }}</option>
+                            <option value="{{ status.id }}" {% if form.employment_status.value|stringformat:'s' == status.id|stringformat:'s' %}selected{% endif %}>{{ status.label }}</option>
                             {% endfor %}
                         </select>
                         {% if form.employment_status.errors %}

@@ -4,20 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - TipiansConnect</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    <title>Admin Login - T.I.P.ians Connect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
         :root {
             --tip-matte-black: #28282B;
+            --tip-pure-black: #000000;
             --tip-jet-black: #343434;
             --tip-gold: #FFD700;
             --tip-gold-dark: #e5c100;
             --tip-gold-light: #fde910;
             --white: #ffffff;
-            --light-text: #ffffff;
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --error-color: #ff6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -25,13 +29,14 @@
             background: linear-gradient(135deg, #FFD700 0%, #28282B 25%, #343434 50%, #28282B 75%, #FFD700 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
+            background-attachment: fixed;
+            color: var(--white);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
-            color: var(--light-text);
+            overflow-x: hidden;
         }
 
         @keyframes gradientShift {
@@ -40,203 +45,257 @@
             100% { background-position: 0% 50%; }
         }
 
-        .bg-decoration {
+        body::before {
+            content: '';
             position: absolute;
-            opacity: 0.1;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
             pointer-events: none;
-            z-index: 0;
         }
 
-        .circle-1 {
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            top: -100px;
-            left: -100px;
-            animation: float 8s ease-in-out infinite;
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .circle-2 {
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            bottom: -50px;
-            right: -50px;
-            animation: float 10s ease-in-out infinite 2s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(30px); }
-        }
-
-        .container {
-            width: 420px;
-            padding: 42px 36px;
-            border-radius: 24px;
-            background: rgba(40, 40, 43, 0.75);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        .login-container {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
             position: relative;
             z-index: 1;
-            animation: slideIn 0.8s ease-out;
+            animation: slideUp 0.8s ease-out;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
+        .logo-section {
             text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
             margin-bottom: 20px;
-            font-size: 30px;
-            letter-spacing: -0.3px;
-            text-transform: uppercase;
+            filter: brightness(0) invert(1);
         }
 
-        .form-subtitle {
+        .login-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--white);
+            margin-bottom: 10px;
             text-align: center;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.75);
-            letter-spacing: 0.3px;
-            margin-bottom: 26px;
         }
 
-        .form-group { margin-bottom: 18px; }
+        .login-subtitle {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-        .form-label {
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
             display: block;
-            font-size: 13px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 8px;
-            letter-spacing: 0.2px;
-            text-transform: uppercase;
+            font-size: 0.95em;
         }
 
-        .form-input {
+        .form-group label i {
+            color: var(--tip-gold);
+            margin-right: 8px;
+        }
+
+        .form-control {
             width: 100%;
-            padding: 13px 16px;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            padding: 15px 18px;
             border-radius: 12px;
-            font-size: 14px;
-            color: var(--light-text);
+            font-size: 1em;
+            color: var(--white);
             font-family: inherit;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
         }
 
-        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
 
-        .form-input:focus {
+        .form-control:focus {
             outline: none;
             background: rgba(255, 255, 255, 0.18);
             border-color: rgba(255, 215, 0, 0.5);
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+            color: var(--white);
         }
 
-        .btn-login {
+        .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #FFD700 0%, #e5c100 100%);
-            color: #000000;
+            padding: 16px;
+            border-radius: 12px;
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-login::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .btn-login:hover::before { left: 100%; }
-        .btn-login:active { transform: translateY(0); }
-
-        .face-btn {
-            width: 100%;
-            margin-top: 14px;
-            padding: 12px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1.5px solid rgba(255, 255, 255, 0.18);
-            color: rgba(255, 255, 255, 0.85);
-            cursor: pointer;
-            font-weight: 800;
-            letter-spacing: 0.5px;
+            font-weight: 700;
+            font-size: 1em;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--tip-gold) 0%, var(--tip-gold-dark) 100%);
+            color: var(--tip-matte-black);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             backdrop-filter: blur(10px);
         }
 
-        .face-btn:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 215, 0, 0.35);
-            color: var(--white);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 215, 0, 0.3);
             transform: translateY(-2px);
         }
 
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            background: linear-gradient(135deg, #28282B, #343434);
+            padding: 0 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: var(--tip-gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: var(--tip-gold-light);
+        }
+
+        /* Responsive */
         @media (max-width: 480px) {
-            .container { width: 92vw; padding: 36px 22px; border-radius: 18px; }
+            .login-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .login-title {
+                font-size: 2em;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="bg-decoration circle-1"></div>
-    <div class="bg-decoration circle-2"></div>
 
-    <div class="container">
-        <h2>ADMIN LOGIN</h2>
-        <div class="form-subtitle">Manage alumni accounts</div>
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label class="form-label" for="id_username">Username</label>
-                <input class="form-input" id="id_username" type="text" name="username" placeholder="Enter Username" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="id_password">Password</label>
-                <input class="form-input" id="id_password" type="password" name="password" placeholder="Enter Password" required>
-            </div>
-
-            <button type="submit" class="btn-login">LOGIN</button>
-        </form>
-
-        <!-- Future Face Recognition -->
-        <button class="face-btn" type="button" onclick="startFaceLogin()">
-            Login with Face Recognition
-        </button>
+<div class="login-container">
+    <div class="logo-section">
+        <img src="{% static 'images/logo.svg' %}" alt="T.I.P.ians Connect Logo" class="logo">
+        <h1 class="login-title">Admin Login</h1>
+        <p class="login-subtitle">Access the administrative dashboard</p>
     </div>
 
-    <script>
-        function startFaceLogin() {
-            alert("Face Recognition Coming Soon");
-        }
-    </script>
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="username"><i class="fas fa-user"></i> Username</label>
+            <input type="text" class="form-control" id="username" name="username"
+                   placeholder="Enter your admin username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Password</label>
+            <input type="password" class="form-control" id="password" name="password"
+                   placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+        </button>
+    </form>
+
+    <div class="divider">
+        <span>Future Features</span>
+    </div>
+
+    <button class="btn btn-secondary" onclick="startFaceLogin()">
+        <i class="fas fa-camera"></i> Login with Face Recognition
+    </button>
+
+    <div class="back-link">
+        <a href="{% url 'account:home' %}">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<script>
+function startFaceLogin() {
+    alert("Face Recognition Coming Soon 🚀");
+}
+</script>
+
 </body>
 </html>

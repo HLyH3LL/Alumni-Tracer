@@ -44,6 +44,8 @@ class Alumni(models.Model):
     program = models.CharField(max_length=120)
     graduation_year = models.PositiveIntegerField()
 
+    is_verified = models.BooleanField(default=False)
+
     profile_photo = models.ImageField(
         upload_to='alumni_photos/', 
         blank=True, 
@@ -184,14 +186,9 @@ class Employment(models.Model):
     is_job_related = models.BooleanField(default=False)
     salary_range = models.CharField(max_length=100, blank=True, null=True)
     employment_type = models.CharField(max_length=100, blank=True, null=True)
-    date_left = models.DateField(null=True, blank=True, verbose_name="Date Left")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    voice_updated = models.BooleanField(default=False)
-    voice_transcript = models.TextField(blank=True, null=True)
-    created_via_voice = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.alumni} - {self.job_title} @ {self.company_name}"
@@ -214,10 +211,6 @@ class FurtherStudy(models.Model):
     start_year = models.PositiveIntegerField(blank=True, null=True)
     end_year = models.PositiveIntegerField(blank=True, null=True)
     is_ongoing = models.BooleanField(default=True)
-
-    voice_updated = models.BooleanField(default=False)
-    voice_transcript = models.TextField(blank=True, null=True)
-    created_via_voice = models.BooleanField(default=False)
 
     status = models.CharField(
         max_length=20,
@@ -383,3 +376,18 @@ class RegistrationPageContent(models.Model):
     
     def __str__(self):
         return "Registration Page Configuration"
+    
+class Announcement(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

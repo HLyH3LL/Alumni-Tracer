@@ -1,0 +1,184 @@
+{% extends "account/admin/_layout.html" %}
+
+{% block content %}
+
+<style>
+/* HEADER */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+/* BUTTON */
+.btn-add {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #000;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+}
+
+/* CARD */
+.premium-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+/* TABLE */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+}
+
+.table thead {
+  background: rgba(255,215,0,0.1);
+}
+
+.table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.table td {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ROW HOVER */
+.table tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+  transition: 0.2s;
+}
+
+/* BADGES */
+.badge {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-employed {
+  background: rgba(0, 200, 83, 0.2);
+  color: #00e676;
+}
+
+.badge-unemployed {
+  background: rgba(255, 82, 82, 0.2);
+  color: #ff5252;
+}
+
+/* ACTIONS */
+.action-link {
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.edit {
+  color: #ffd700;
+}
+
+.delete {
+  color: #ff6b6b;
+}
+
+.action-link:hover {
+  opacity: 0.7;
+}
+
+/* TOP INFO */
+.top-info {
+  color: #aaa;
+  font-size: 14px;
+}
+</style>
+
+<div class="page-header">
+  <div class="title">Alumni Records</div>
+
+  <div style="display:flex; gap:15px; align-items:center;">
+    <div class="top-info">Total: <strong style="color:#ffd700;">{{ alumni_list.count }}</strong></div>
+    <a href="{% url 'account:add_alumni' %}" class="btn-add">+ Add Alumni</a>
+  </div>
+</div>
+
+<div class="premium-card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Program</th>
+        <th>Status</th>
+        <th>Year</th>
+        <th>Registered</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for alumni in alumni_list %}
+      <tr>
+        <td>{{ alumni.id }}</td>
+
+        <td>
+          {% if alumni.user %}
+            {{ alumni.user.get_full_name }}
+          {% else %}
+            {{ alumni.first_name }} {{ alumni.last_name }}
+          {% endif %}
+        </td>
+
+        <td>{{ alumni.program }}</td>
+
+        <td>
+          {% if alumni.employment_status == "EMPLOYED" %}
+            <span class="badge badge-employed">Employed</span>
+          {% else %}
+            <span class="badge badge-unemployed">Unemployed</span>
+          {% endif %}
+        </td>
+
+        <td>{{ alumni.graduation_year }}</td>
+        <td>{{ alumni.created_at|date:"M d, Y" }}</td>
+
+        <td>
+          <a href="{% url 'account:edit_alumni' alumni.id %}" class="action-link edit">Edit</a>
+          <a href="{% url 'account:delete_alumni' alumni.id %}" class="action-link delete">Delete</a>
+        </td>
+      </tr>
+
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align:center; padding:20px; color:#888;">
+          No alumni records found.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
