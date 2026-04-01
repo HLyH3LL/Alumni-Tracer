@@ -59,7 +59,13 @@ urlpatterns = [
     path('studies/add/', views.add_study, name='add_study'),
     path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
     path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
-
+    
+    # =============================== 
+    # 📜 TERMS AND CONDITIONS & PRIVACY POLICY
+    # ===============================
+    path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
+    
     # ===============================
     # 🔑 PASSWORD MANAGEMENT
     # ===============================
