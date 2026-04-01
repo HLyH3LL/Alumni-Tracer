@@ -525,3 +525,18 @@ def user_management(request):
 @staff_required
 def admin_settings(request):
     return render(request, 'account/admin/settings.html')
+
+
+def terms_conditions(request):
+    config = {
+        'company_name': 'T.I.P.ians Connect',
+        'tagline': 'Connecting TIP alumni',
+    }
+    return render(request, 'account/TERMS_AND_CONDITIONS.html', {'config': config})
+
+def privacy_policy(request):
+    config = {
+        'company_name': 'T.I.P.ians Connect',
+        'tagline': 'Connecting TIP alumni',
+    }
+    return render(request, 'account/PRIVACY_POLICY.html', {'config': config})

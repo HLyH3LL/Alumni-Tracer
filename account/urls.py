@@ -99,4 +99,8 @@ urlpatterns = [
              template_name='registration/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+
+    # Legal pages
+    path('terms/', views.terms_conditions, name='terms_conditions'),
+    path('privacy/', views.privacy_policy, name='privacy_policy'),
 ]
