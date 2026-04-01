@@ -525,3 +525,13 @@ def user_management(request):
 @staff_required
 def admin_settings(request):
     return render(request, 'account/admin/settings.html')
+
+
+# =============================== 
+# 📜 TERMS AND CONDITIONS & PRIVACY POLICY
+# ===============================
+def terms_and_conditions(request):
+    return render(request, 'account/TERMS_AND_CONDITIONS.html')
+
+def privacy_policy(request):
+    return render(request, 'account/PRIVACY_POLICY.html')
