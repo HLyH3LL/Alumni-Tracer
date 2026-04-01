@@ -63,8 +63,8 @@ urlpatterns = [
     # =============================== 
     # 📜 TERMS AND CONDITIONS & PRIVACY POLICY
     # ===============================
-    path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
-    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
+      path('terms/', views.terms_conditions, name='terms_and_conditions'),   # legacy alias
+    path('privacy/', views.privacy_policy, name='privacy_policy'),       
     
     # ===============================
     # 🔑 PASSWORD MANAGEMENT
