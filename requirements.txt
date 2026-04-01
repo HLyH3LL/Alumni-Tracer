@@ -5,3 +5,5 @@ pillow==12.1.1
 psycopg2-binary==2.9.11
 sqlparse==0.5.5
 tzdata==2025.3
+gunicorn==21.2.0
+dj-database-url==2.1.0
