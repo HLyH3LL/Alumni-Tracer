@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Employment History{% endblock %}
+{% block content %}
+<h1>Employment History</h1>
+{% if employments %}
+    <ul>
+        {% for emp in employments %}
+            <li>
+                <strong>{{ emp.company_name }}</strong> - {{ emp.job_title }}
+                {% if emp.date_hired %} (Hired: {{ emp.date_hired }}){% endif %}
+                <a href="{% url 'account:edit_employment' emp.id %}">Edit</a>
+                <a href="{% url 'account:delete_employment' emp.id %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No employment records yet.</p>
+{% endif %}
+<p><a href="{% url 'account:add_employment' %}">Add Employment</a></p>
+{% endblock %}
