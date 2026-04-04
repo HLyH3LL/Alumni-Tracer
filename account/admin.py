@@ -188,16 +188,14 @@ class SiteConfigAdmin(admin.ModelAdmin):
     Admin interface for global site configuration
     Only one instance should exist (singleton)
     """
-    @admin.register(SiteConfig)
-    class SiteConfigAdmin(admin.ModelAdmin):
-        list_display = ('site_name', 'logo_preview')
-        readonly_fields = ('logo_preview',)
+    list_display = ('site_name', 'logo_preview')
+    readonly_fields = ('logo_preview',)
     
-        def logo_preview(self, obj):
-            if obj.logo_main:
-                return format_html('<img src="{}" style="max-height:60px;"/>', obj.logo_main.url)
-            return "(No logo)"
-        logo_preview.short_description = 'Logo preview'
+    def logo_preview(self, obj):
+        if obj.logo_main:
+            return format_html('<img src="{}" style="max-height:60px;"/>', obj.logo_main.url)
+        return "(No logo)"
+    logo_preview.short_description = 'Logo preview'
     # Prevent adding or deleting
     def has_add_permission(self, request):
         return not SiteConfig.objects.exists()
