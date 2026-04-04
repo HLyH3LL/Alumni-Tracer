@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='employment',
-            name='date_left',
-        ),
         migrations.AlterField(
             model_name='activity',
             name='activity_type',
