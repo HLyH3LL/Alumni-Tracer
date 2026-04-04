@@ -182,6 +182,7 @@ class Employment(models.Model):
     company_name = models.CharField(max_length=200)
     job_title = models.CharField(max_length=200)
     date_hired = models.DateField(blank=True, null=True)
+    date_left = models.DateField(blank=True, null=True)
 
     is_job_related = models.BooleanField(default=False)
     salary_range = models.CharField(max_length=100, blank=True, null=True)
