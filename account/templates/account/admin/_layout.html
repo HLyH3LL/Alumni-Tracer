@@ -163,7 +163,7 @@
 
   <div class="topbar">
     <div class="brand">
-      <img class="brand-logo" src="{% static 'images/logo.svg' %}" alt="TIP Alumni Logo" />
+      <img src="{{ config.logo_main.url }}" alt="Site Logo">
       <span>T.I.P.ians Connect</span>
     </div>
     <div class="user-label">{{ request.user.username }}</div>
