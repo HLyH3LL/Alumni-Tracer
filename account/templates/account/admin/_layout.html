@@ -28,23 +28,32 @@
       border-bottom: 3px solid #ffd700;
     }
 
-    .brand{
-      display: flex;
-      align-items:center;
-      gap: 10px;
-      font-weight:800;
-      font-size: 1.1rem;
-      letter-spacing: .35px;
-      color: #ffd700;
-      text-shadow: 0 0 8px rgba(255,215,0,0.4);
-    }
+    .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
 
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
-    }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .logo span {
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
 
     .user-label {
       font-weight:700;
@@ -162,7 +171,7 @@
 <body>
 
   <div class="topbar">
-    <div class="brand">
+    <div class="logo">
       <img src="{{ config.logo_main.url }}" alt="Site Logo">
       <span>T.I.P.ians Connect</span>
     </div>

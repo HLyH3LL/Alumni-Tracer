@@ -81,32 +81,50 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .logo-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
         .logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            filter: brightness(0) invert(1);
-        }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    text-align: center;
+}
+ 
+ 
+.logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+    margin-bottom: 15px;
+}
+ 
+.logo span {
+    color: var(--white);
+    letter-spacing: 0.5px;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-top: 15px;
+}
 
-        .login-title {
-            font-size: 2.5em;
-            font-weight: 900;
-            color: var(--white);
-            margin-bottom: 10px;
-            text-align: center;
-        }
 
-        .login-subtitle {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-            margin-bottom: 30px;
-        }
+.login-title {
+    font-size: 2.5em;
+    font-weight: 900;
+    color: var(--white);
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+}
+ 
+.login-subtitle {
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 10px 0 0 0;
+    padding: 0;
+    line-height: 1.4;
+    max-width: 350px;
+}
+ 
 
         .form-group {
             margin-bottom: 25px;
@@ -250,7 +268,8 @@
 <body>
 
 <div class="login-container">
-    <div class="logo-section">
+
+    <div class="logo">
         <img src="{{ config.logo_main.url }}" alt="Site Logo">
         <h1 class="login-title">Admin Login</h1>
         <p class="login-subtitle">Access the administrative dashboard</p>
