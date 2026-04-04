@@ -174,7 +174,8 @@ class SiteConfig(models.Model):
     Global site configuration - company info, colors, etc.
     Only one instance should exist (singleton pattern)
     """
-    
+    admin_face_image = models.ImageField(upload_to='faces/', blank=True, null=True)  # reference face for admin login
+    # ...existing code...
     # Company Information
     company_name = models.CharField(
         max_length=200,
