@@ -368,6 +368,27 @@
             School Details
         </div>
 
+        <div class="form-row full">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="created_via_voice" {% if object and object.created_via_voice %}checked{% endif %}>
+                    Created via voice
+                </label>
+            </div>
+        </div>
+
+        <div class="form-row full">
+            <div class="form-group">
+                <label for="voice_transcript">Voice Transcript</label>
+                <textarea id="voice_transcript" name="voice_transcript" rows="4">{{ object.voice_transcript|default:'' }}</textarea>
+                <span class="form-help">Optional: paste or record transcript to capture voice input details.</span>
+            </div>
+        </div>
+
+        <div class="section-title">
+            School Details
+        </div>
+
         <div class="form-row">
             <div class="form-group">
                 <label for="school_name">

@@ -280,7 +280,18 @@ def employment_list(request):
         return redirect('account:account_settings')
 
     employments = Employment.objects.filter(alumni=alumni).order_by('-date_hired')
-    return render(request, 'account/employment_list.html', {'employments': employments})
+    studies = FurtherStudy.objects.filter(alumni=alumni).order_by('-start_year')
+
+    return render(request, 'account/User_Dashboard.html', {
+        'alumni': alumni,
+        'all_employments': employments,
+        'further_studies': studies,
+        'employment_count': employments.count(),
+        'recent_activities': Activity.objects.filter(alumni=alumni).order_by('-created_at')[:10],
+        'profile_completion': 75,
+        'missing_fields': [],
+        'section': 'employment'
+    })
 
 
 @login_required
@@ -295,17 +306,22 @@ def add_employment(request):
         company = request.POST.get('company_name', '').strip()
         title = request.POST.get('job_title', '').strip()
         date_hired = request.POST.get('date_hired') or None
+        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         Employment.objects.create(
             alumni=alumni,
             company_name=company,
             job_title=title,
-            date_hired=date_hired
+            date_hired=date_hired,
+            created_via_voice=created_via_voice,
+            voice_transcript=voice_transcript,
+            voice_updated=False,
         )
         messages.success(request, 'Employment record added.')
         return redirect('account:employment_list')
 
-    return render(request, 'account/add_employment.html')
+    return render(request, 'forms/Employment_Form.html')
 
 
 @login_required
@@ -326,7 +342,7 @@ def edit_employment(request, employment_id):
         messages.success(request, 'Employment record updated.')
         return redirect('account:employment_list')
 
-    return render(request, 'account/edit_employment.html', {'employment': employment})
+    return render(request, 'forms/Employment_Form.html', {'employment': employment})
 
 
 @login_required
@@ -357,8 +373,19 @@ def studies_list(request):
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
 
+    employments = Employment.objects.filter(alumni=alumni).order_by('-date_hired')
     studies = FurtherStudy.objects.filter(alumni=alumni).order_by('-start_year')
-    return render(request, 'account/studies_list.html', {'studies': studies})
+
+    return render(request, 'account/User_Dashboard.html', {
+        'alumni': alumni,
+        'all_employments': employments,
+        'further_studies': studies,
+        'employment_count': employments.count(),
+        'recent_activities': Activity.objects.filter(alumni=alumni).order_by('-created_at')[:10],
+        'profile_completion': 75,
+        'missing_fields': [],
+        'section': 'studies'
+    })
 
 
 @login_required
@@ -373,17 +400,22 @@ def add_study(request):
         school = request.POST.get('school_name', '').strip()
         program = request.POST.get('program', '').strip()
         start_year = request.POST.get('start_year') or None
+        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         FurtherStudy.objects.create(
             alumni=alumni,
             school_name=school,
             program=program,
-            start_year=start_year
+            start_year=start_year,
+            created_via_voice=created_via_voice,
+            voice_transcript=voice_transcript,
+            voice_updated=False,
         )
         messages.success(request, 'Study record added.')
         return redirect('account:studies_list')
 
-    return render(request, 'account/add_study.html')
+    return render(request, 'forms/Study_Form.html')
 
 
 @login_required
@@ -406,7 +438,7 @@ def edit_study(request, study_id):
         messages.success(request, 'Study record updated.')
         return redirect('account:studies_list')
 
-    return render(request, 'account/edit_study.html', {'study': study})
+    return render(request, 'forms/Study_Form.html', {'study': study})
 
 
 @login_required

@@ -190,6 +190,9 @@ class Employment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_via_voice = models.BooleanField(default=False)
+    voice_transcript = models.TextField(blank=True, null=True)
+    voice_updated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.alumni} - {self.job_title} @ {self.company_name}"
@@ -228,6 +231,9 @@ class FurtherStudy(models.Model):
     
     description = models.TextField(blank=True, null=True)
     school_website = models.URLField(blank=True, null=True)
+    created_via_voice = models.BooleanField(default=False)
+    voice_transcript = models.TextField(blank=True, null=True)
+    voice_updated = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
