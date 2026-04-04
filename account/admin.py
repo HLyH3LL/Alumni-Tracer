@@ -5,7 +5,7 @@ Provides a user-friendly interface to manage all homepage content
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
+from .models import CarouselSlide, CoreValue, PageContent, SiteConfig
 
 
 @admin.register(CarouselSlide)
@@ -213,7 +213,6 @@ class SiteConfigAdmin(admin.ModelAdmin):
         }),
     )
 
-from django.contrib import admin
 from .models import Program, EmploymentStatus, Feature, RegistrationPageContent
 
 
