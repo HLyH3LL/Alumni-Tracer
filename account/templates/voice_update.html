@@ -258,7 +258,7 @@
 </style>
 
 <!-- Voice Recorder Widget -->
-<div class="voice-recorder-container" data-form-type="employment">
+<div class="voice-recorder-container">
     <div class="voice-recorder-header">
         <i class="fas fa-microphone"></i>
         <h3>Voice Update</h3>
@@ -294,21 +294,25 @@
         <strong>💡 How it works:</strong>
         <ol style="margin: 8px 0; padding-left: 20px;">
             <li>Click <strong>Record Voice</strong></li>
-            <li>Speak naturally about your employment (e.g., "I started a new job as Senior Developer at Google")</li>
+            <li>Speak naturally about your employment/study details</li>
             <li>Click <strong>Stop</strong> when done</li>
             <li>Review and click <strong>Upload Voice</strong></li>
-            <li>Fields will auto-populate, then click Save</li>
+            <li>AI will transcribe and auto-populate form fields</li>
         </ol>
 
         <div class="voice-example">
             <div class="voice-example-item">
-                <strong>✨ Example 1:</strong>
-                "I got hired at Meta as a Software Engineer starting January 2024 as full-time"
+                <strong>💼 Employment Example:</strong>
+                "I started working at Google as a Senior Software Engineer in January 2023 and I'm still there"
             </div>
             <div class="voice-example-item">
-                <strong>✨ Example 2:</strong>
-                "I worked at Microsoft from 2020 to 2023 as a Principal Engineer earning 150k"
+                <strong>🎓 Study Example:</strong>
+                "I studied Computer Science at MIT from 2019 to 2023 and graduated with honors"
             </div>
+        </div>
+
+        <div style="margin-top: 15px; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 6px; border-left: 3px solid #FFD700;">
+            <strong>⚠️ Setup Required:</strong> To use voice processing, add your OpenAI API key to the <code>.env</code> file as <code>OPENAI_API_KEY=your_key_here</code>
         </div>
     </div>
 </div>

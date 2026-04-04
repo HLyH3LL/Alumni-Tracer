@@ -1,3 +1,4 @@
+{% load static %}
 <style>
     .form-header {
         margin-bottom: 40px;
@@ -411,7 +412,7 @@
 </div>
 
 <div class="form-container">
-    <form method="POST" id="employment-form" novalidate>
+    <form method="POST" id="employment-form" novalidate data-form-type="employment">
         {% csrf_token %}
 
         <!-- Company Details Section -->
@@ -557,6 +558,9 @@
             </label>
         </div>
 
+        <!-- Voice Recorder -->
+        {% include 'voice_update.html' %}
+
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="btn-submit">
@@ -674,3 +678,6 @@
         }
     });
 </script>
+
+<!-- Voice Recorder Script -->
+<script src="{% static 'js/voice_recorder.js' %}"></script>

@@ -7,3 +7,7 @@ sqlparse==0.5.5
 tzdata==2025.3
 gunicorn==21.2.0
 dj-database-url==2.1.0
+openai==1.54.0
+python-dotenv==1.0.0
+spacy==3.7.5
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl

@@ -106,6 +106,7 @@ class VoiceRecorder {
                 console.log('Upload success:', data);
                 this.updateStatus((data.message || 'Voice processed successfully'), 'success');
                 if (data.extracted_data) this.populateForm(data.extracted_data);
+                if (data.transcript) this.populateTranscript(data.transcript);
                 setTimeout(() => this.clearRecording(), 2000);
             } else {
                 console.error('Upload failed:', data);
@@ -127,6 +128,14 @@ class VoiceRecorder {
             if (input.type === 'checkbox') input.checked = value === true || value === 'true';
             else input.value = value;
             input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
+    populateTranscript(transcript) {
+        const transcriptInput = document.querySelector('[name="voice_transcript"]');
+        if (transcriptInput) {
+            transcriptInput.value = transcript;
+            transcriptInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
     }
 

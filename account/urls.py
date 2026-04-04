@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, voice_views
 from django.contrib.auth import views as auth_views
 
 app_name = 'account'
@@ -107,5 +107,9 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
 
+    # ===============================
+    # 🎤 VOICE UPDATE
+    # ===============================
+    path('voice-update/', voice_views.voice_update, name='voice_update'),
 
 ]
