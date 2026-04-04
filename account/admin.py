@@ -193,7 +193,7 @@ class SiteConfigAdmin(admin.ModelAdmin):
     
     def logo_preview(self, obj):
         if obj.logo_main:
-            return format_html('<img src="{account/static/images/logo.svg}" style="max-height:60px;"/>', obj.logo_main.url)
+            return format_html('<img src="{}" style="max-height:60px;"/>', obj.logo_main.url)
         return "(No logo)"
     logo_preview.short_description = 'Logo preview'
     # Prevent adding or deleting
@@ -208,7 +208,7 @@ class SiteConfigAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Company Information', {
-            'fields': ('company_name', 'tagline', 'copyright_year')
+            'fields': ('company_name', 'tagline','logo_main', 'copyright_year')
         }),
         ('Branding Colors', {
             'fields': ('primary_color', 'secondary_color'),
