@@ -10,6 +10,7 @@ from datetime import datetime
 from .auth_forms import LoginForm, AlumniRegistrationForm
 from .models import Alumni, Employment, FurtherStudy, Activity, Program, EmploymentStatus, Feature, RegistrationPageContent
 from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
+from django.contrib.auth import logout
 
 
 # ===============================
@@ -45,6 +46,15 @@ def admin_login(request):
             messages.error(request, "Invalid username or password.")
 
     return render(request, "account/admin/admin_login.html")
+
+
+def admin_logout(request):
+    """
+    Logout and send user to the admin login page.
+    Use this from admin templates so admins return to the admin login screen.
+    """
+    logout(request)
+    return redirect('account:admin_login')
 
 
 # ===============================

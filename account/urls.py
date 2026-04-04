@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('home/', views.home, name='home'),
+    path('admin/logout/', views.admin_logout, name='admin_logout'),
 
     # ===============================
     # 📊 DASHBOARDS
