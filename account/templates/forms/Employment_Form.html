@@ -1,586 +1,988 @@
 {% load static %}
-<style>
+<!-- Employment Form HTML - Updated with Base_Form.html Features -->
+<style media="print">
+/* ============================================
+   EMPLOYMENT & STUDY FORMS - PROFESSIONAL STYLING
+   Glassmorphism Design with Gold & Black Theme
+   ============================================ */
+
+/* CSS Variables */
+:root {
+    --tip-matte-black: #28282B;
+    --tip-pure-black: #000000;
+    --tip-jet-black: #343434;
+    --tip-gold: #FFD700;
+    --tip-gold-dark: #e5c100;
+    --tip-gold-light: #fde910;
+    --white: #ffffff;
+    --gray-light: #f5f5f5;
+    --gray: #666666;
+    --gray-dark: #333333;
+    --light-text: #ffffff;
+    --glass-light: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.2);
+    --error-color: #ff6b6b;
+    --success-color: #51cf66;
+    --transition-smooth: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
+}
+
+/* ============================================
+   FORM CONTAINER STYLING
+   ============================================ */
+
+.form-container {
+    background: var(--glass-light);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 30px;
+    overflow: hidden;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   FORM HEADER - CONNECTED TO FORM
+   ============================================ */
+
+.form-header {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.08) 100%);
+    padding: 35px 40px;
+    border-bottom: 2px solid var(--tip-gold);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.form-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: var(--tip-gold-light);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    letter-spacing: -0.5px;
+}
+
+.form-header h1 i {
+    font-size: 1.8rem;
+    color: var(--tip-gold);
+}
+
+.form-header p {
+    font-size: 1rem;
+    opacity: 0.85;
+    letter-spacing: 0.3px;
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.form-header.employment-header {
+    border-bottom-color: var(--tip-gold);
+}
+
+/* ============================================
+   FORM BODY
+   ============================================ */
+
+.form-body {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 100%);
+    padding: 40px;
+    border-top: none;
+    backdrop-filter: blur(12px);
+}
+
+/* ============================================
+   SECTION TITLES
+   ============================================ */
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--tip-gold-light);
+    margin: 35px 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.3px;
+}
+
+.section-title:first-of-type {
+    margin-top: 0;
+}
+
+.section-title i {
+    color: var(--tip-gold);
+    font-size: 1.4rem;
+    min-width: 28px;
+}
+
+/* ============================================
+   FORM GROUPS & ROWS
+   ============================================ */
+
+.form-group {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.form-row.full {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* ============================================
+   LABELS
+   ============================================ */
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+label i {
+    color: var(--tip-gold);
+    margin-right: 6px;
+    min-width: 18px;
+    font-size: 0.85rem;
+}
+
+/* Checkbox/Radio Labels */
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 500;
+    text-transform: none;
+}
+
+/* ============================================
+   FORM INPUTS & FIELDS
+   ============================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="number"],
+input[type="url"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    color: var(--white);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(8px);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Input Focus State */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--tip-gold);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+/* Input Disabled State */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: rgba(0, 0, 0, 0.08);
+    color: rgba(255, 255, 255, 0.4);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Textarea */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Select Dropdown - Custom Styling */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 1.3em;
+    padding-right: 2.8em;
+    cursor: pointer;
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fde910' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+select option {
+    background-color: var(--tip-matte-black);
+    color: var(--white);
+    padding: 10px;
+}
+
+/* ============================================
+   CHECKBOXES & RADIO BUTTONS
+   ============================================ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    margin-right: 10px;
+    accent-color: var(--tip-gold);
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+    outline: 2px solid var(--tip-gold);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   CHECKBOX GROUP
+   ============================================ */
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 15px 20px;
+    background: rgba(255, 215, 0, 0.08);
+    border: 1.5px solid rgba(255, 215, 0, 0.15);
+    border-radius: 10px;
+    transition: var(--transition-smooth);
+}
+
+.checkbox-group:hover {
+    background: rgba(255, 215, 0, 0.12);
+    border-color: rgba(255, 215, 0, 0.25);
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 12px;
+}
+
+.checkbox-group label {
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--white);
+}
+
+.checkbox-group label i {
+    color: var(--tip-gold);
+    margin-right: 8px;
+}
+
+/* ============================================
+   HELPER TEXT & FORM HELP
+   ============================================ */
+
+.form-help {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: -4px;
+    margin-bottom: 16px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.required {
+    color: var(--error-color);
+    font-weight: 700;
+    margin-left: 3px;
+}
+
+.optional {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 0.8rem;
+    margin-left: 6px;
+}
+
+/* ============================================
+   FORM ERROR STYLING
+   ============================================ */
+
+.form-error {
+    background: rgba(255, 107, 107, 0.15);
+    border: 1.5px solid var(--error-color);
+    color: var(--error-color);
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideDown 0.4s ease-out;
+    font-weight: 500;
+}
+
+.form-error i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   INPUT STATE STYLING
+   ============================================ */
+
+input.error,
+select.error,
+textarea.error {
+    border-color: var(--error-color);
+    background-color: rgba(255, 107, 107, 0.08);
+}
+
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+input.success,
+select.success,
+textarea.success {
+    border-color: var(--success-color);
+    background-color: rgba(81, 207, 102, 0.08);
+}
+
+/* ============================================
+   FORM TIP BOX
+   ============================================ */
+
+.form-tip {
+    background: rgba(33, 150, 243, 0.1);
+    border-left: 3px solid #1976d2;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 25px 0;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.form-tip i {
+    color: #1976d2;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ============================================
+   BUTTON GROUP & BUTTONS
+   ============================================ */
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    flex-wrap: wrap;
+}
+
+/* Submit Button */
+button[type="submit"],
+.btn-submit {
+    flex: 1;
+    min-width: 150px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--tip-gold-light) 0%, var(--tip-gold) 100%);
+    color: var(--tip-matte-black);
+    border: 1.5px solid rgba(255, 215, 0, 0.4);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+button[type="submit"]:hover,
+.btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--tip-gold) 0%, var(--tip-gold-dark) 100%);
+}
+
+button[type="submit"]:active,
+.btn-submit:active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+button[type="submit"]:disabled,
+.btn-submit:disabled {
+    background: linear-gradient(135deg, #bfbfbf 0%, #a6a6a6 100%);
+    color: rgba(0, 0, 0, 0.5);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.6;
+}
+
+/* Cancel Button */
+.btn-cancel {
+    flex: 1;
+    min-width: 150px;
+    padding: 14px 24px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(10px);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-cancel:active {
+    transform: translateY(-1px);
+}
+
+/* Delete Button */
+.btn-danger,
+.btn-delete {
+    flex: 1;
+    min-width: 150px;
+    padding: 14px 24px;
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--error-color);
+    border: 1.5px solid rgba(255, 107, 107, 0.3);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-danger:hover,
+.btn-delete:hover {
+    background: var(--error-color);
+    color: var(--white);
+    border-color: var(--error-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger:active,
+.btn-delete:active {
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   SPINNER ANIMATION
+   ============================================ */
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--tip-matte-black);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   COLLAPSIBLE SECTIONS
+   ============================================ */
+
+.collapsible-section {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.collapsible-header {
+    padding: 16px 20px;
+    background: rgba(255, 215, 0, 0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition-smooth);
+    font-weight: 600;
+    color: var(--white);
+}
+
+.collapsible-header:hover {
+    background: rgba(255, 215, 0, 0.12);
+}
+
+.collapsible-header i {
+    color: var(--tip-gold);
+    transition: var(--transition-smooth);
+}
+
+.collapsible-header.active i {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 20px;
+}
+
+.collapsible-content.active {
+    max-height: 1000px;
+    padding: 20px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
     .form-header {
-        margin-bottom: 40px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #FFD700;
+        padding: 25px;
     }
 
     .form-header h1 {
-        color: #FFD700;
-        font-size: 2em;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
+        font-size: 1.4rem;
+        gap: 10px;
     }
 
-    .form-header p {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.95em;
+    .form-header h1 i {
+        font-size: 1.3rem;
     }
 
-    .form-group {
-        margin-bottom: 25px;
+    .form-body {
+        padding: 25px;
     }
 
     .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 25px;
-    }
-
-    .form-row.full {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
 
-    .form-group label {
-        display: block;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 0.95em;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .form-group label i {
-        color: #FFD700;
-        margin-right: 8px;
-    }
-
-    .required {
-        color: #f44336;
-        font-weight: 700;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="date"],
-    .form-group input[type="number"],
-    .form-group input[type="email"],
-    .form-group select,
-    .form-group textarea {
+    button[type="submit"],
+    .btn-submit,
+    .btn-cancel,
+    .btn-danger,
+    .btn-delete {
         width: 100%;
-        padding: 12px 15px;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1.5px solid rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        color: rgba(255, 255, 255, 0.95);
-        font-family: inherit;
-        font-size: 0.95em;
-        transition: all 0.3s ease;
-    }
-
-    .form-group input[type="text"]::placeholder,
-    .form-group input[type="date"]::placeholder,
-    .form-group input[type="number"]::placeholder,
-    .form-group input[type="email"]::placeholder,
-    .form-group select::placeholder,
-    .form-group textarea::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-
-    .form-group input[type="text"]:focus,
-    .form-group input[type="date"]:focus,
-    .form-group input[type="number"]:focus,
-    .form-group input[type="email"]:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 215, 0, 0.5);
-        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.1);
-        outline: none;
-    }
-
-    .form-group select {
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFD700' d='M1 0l5 8 5-8z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        padding-right: 40px;
-        background-color: rgba(255, 255, 255, 0.12);
-        border: 1.5px solid rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-    }
-
-    .form-group select option {
-    background: #28282B;
-    color: #FFD700;
-    padding: 8px;
+        min-width: unset;
     }
 
     .section-title {
-        color: #FFD700;
-        font-size: 1.4em;
-        font-weight: 700;
-        margin-top: 35px;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        font-size: 1.1rem;
+        margin: 25px 0 18px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-header {
+        padding: 20px;
     }
 
-    .section-title i {
-        font-size: 1.2em;
+    .form-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .form-header p {
+        font-size: 0.9rem;
+    }
+
+    .form-body {
+        padding: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    input[type="url"],
+    select,
+    textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    label {
+        font-size: 0.85rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        margin: 20px 0 14px 0;
     }
 
     .form-help {
-        display: block;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.8em;
-        margin-top: 6px;
-        font-style: italic;
+        font-size: 0.75rem;
     }
 
-    /* Checkbox Styling */
-    .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 20px;
-        padding: 15px;
-        background: rgba(255, 215, 0, 0.08);
-        border: 1px solid rgba(255, 215, 0, 0.15);
-        border-radius: 8px;
+    button[type="submit"],
+    .btn-submit,
+    .btn-cancel,
+    .btn-danger,
+    .btn-delete {
+        padding: 12px 16px;
+        font-size: 0.9rem;
     }
+}
 
-    .checkbox-group input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        accent-color: #FFD700;
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+:focus-visible {
+    outline: 2px solid var(--tip-gold);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
+}
 
-    .checkbox-group label {
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.95em;
-        text-transform: none;
-        letter-spacing: normal;
-    }
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
 
-    .checkbox-group label i {
-        margin-right: 0;
-    }
+.text-center {
+    text-align: center;
+}
 
-    /* Form Actions */
-    .form-actions {
-        display: flex;
-        gap: 15px;
-        margin-top: 40px;
-        padding-top: 30px;
-        border-top: 1px solid rgba(255, 215, 0, 0.2);
-    }
+.mt-3 {
+    margin-top: 1rem;
+}
 
-    .form-actions button,
-    .form-actions a {
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.85em;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        border: 2px solid transparent;
-    }
+.mt-4 {
+    margin-top: 1.5rem;
+}
 
-    .form-actions .btn-submit {
-        background: #FFD700;
-        color: #28282B;
-        border-color: #FFD700;
-        flex: 1;
-    }
+.mb-3 {
+    margin-bottom: 1rem;
+}
 
-    .form-actions .btn-submit:hover {
-        background: #e5c100;
-        border-color: #e5c100;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-    }
-
-    .form-actions .btn-submit:active {
-        transform: translateY(0);
-    }
-
-    .form-actions .btn-cancel {
-        background: transparent;
-        color: rgba(255, 255, 255, 0.8);
-        border-color: rgba(255, 215, 0, 0.3);
-    }
-
-    .form-actions .btn-cancel:hover {
-        background: rgba(255, 215, 0, 0.1);
-        border-color: #FFD700;
-        color: #FFD700;
-    }
-
-    .form-actions .btn-danger {
-        background: rgba(244, 67, 54, 0.1);
-        color: #ef5350;
-        border-color: rgba(244, 67, 54, 0.3);
-    }
-
-    .form-actions .btn-danger:hover {
-        background: #f44336;
-        color: var(--white);
-        border-color: #f44336;
-    }
-
-    /* Error Messages */
-    .form-error {
-        background: rgba(244, 67, 54, 0.15);
-        border: 1px solid #f44336;
-        border-radius: 8px;
-        padding: 12px 15px;
-        color: #ef5350;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .form-error i {
-        font-size: 1.2em;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .form-error ul {
-        margin: 0;
-        padding-left: 20px;
-    }
-
-    .form-error li {
-        margin-bottom: 5px;
-    }
-
-    /* Success Messages */
-    .form-success {
-        background: rgba(76, 175, 80, 0.15);
-        border: 1px solid #4caf50;
-        border-radius: 8px;
-        padding: 12px 15px;
-        color: #81c784;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Loading State */
-    .form-loading {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .btn-loading {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .spinner {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: #FFD700;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 25px;
-        }
-
-        .form-header h1 {
-            font-size: 1.5em;
-        }
-
-        .form-row {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .form-actions {
-            flex-direction: column;
-        }
-
-        .form-actions button,
-        .form-actions a {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .form-container {
-            padding: 15px;
-        }
-
-        .form-header h1 {
-            font-size: 1.2em;
-            gap: 10px;
-        }
-
-        .section-title {
-            font-size: 1.1em;
-        }
-
-        .form-group label {
-            font-size: 0.85em;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            font-size: 16px; /* Prevents zoom on iOS */
-        }
-    }
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
 </style>
 
-<!-- Employment Form HTML -->
-<div class="form-container">
-    <div class="form-header employment-header">
-        <div class="form-header-content">
-            <h1><i class="fas fa-briefcase"></i> {% if employment %}Edit Employment{% else %}Add Employment{% endif %}</h1>
-            <p>{% if employment %}Update your existing employment record.{% else %}Add a new employment record.{% endif %}</p>
-        </div>
-    </div>
-    <div class="form-body">
-        <form method="post" novalidate>
+<form method="POST" id="employment-form" novalidate data-form-type="employment">
             {% csrf_token %}
 
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="company_name">Company Name <span class="required">*</span></label>
-                    <input id="company_name" name="company_name" type="text" value="{{ employment.company_name|default:'' }}" required>
-                </div>
+            <!-- Company Details Section -->
+            <div class="section-title">
+                <i class="fas fa-building"></i> Company Details
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="job_title">Job Title <span class="required">*</span></label>
-                    <input id="job_title" name="job_title" type="text" value="{{ employment.job_title|default:'' }}" required>
+                    <label for="company_name">
+                        Company Name
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="company_name"
+                        name="company_name" 
+                        placeholder="e.g., Microsoft Corporation"
+                        value="{{ object.company_name|default:'' }}"
+                        required
+                        minlength="2"
+                        maxlength="200"
+                    >
+                    <span class="form-help">Full name of the company or organization</span>
                 </div>
+
                 <div class="form-group">
-                    <label for="date_hired">Date Hired</label>
-                    <input id="date_hired" name="date_hired" type="date" value="{{ employment.date_hired|date:'Y-m-d'|default:'' }}">
+                    <label for="job_title">
+                        Job Title
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="job_title"
+                        name="job_title" 
+                        placeholder="e.g., Senior Software Engineer"
+                        value="{{ object.job_title|default:'' }}"
+                        required
+                        minlength="2"
+                        maxlength="200"
+                    >
+                    <span class="form-help">Your position or role at the company</span>
                 </div>
             </div>
 
             <div class="form-row full">
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="created_via_voice" {% if employment and employment.created_via_voice %}checked{% endif %}>
-                        Created via voice
+                    <label for="employment_type">
+                        <i class="fas fa-briefcase"></i> Employment Type
+                        <span class="optional">(Optional)</span>
                     </label>
+                    <select id="employment_type" name="employment_type">
+                        <option value="">-- Select Employment Type --</option>
+                        <option value="FULL_TIME" {% if object.employment_type == "FULL_TIME" %}selected{% endif %}>
+                            Full-Time
+                        </option>
+                        <option value="PART_TIME" {% if object.employment_type == "PART_TIME" %}selected{% endif %}>
+                            Part-Time
+                        </option>
+                        <option value="CONTRACT" {% if object.employment_type == "CONTRACT" %}selected{% endif %}>
+                            Contract
+                        </option>
+                        <option value="FREELANCE" {% if object.employment_type == "FREELANCE" %}selected{% endif %}>
+                            Freelance
+                        </option>
+                        <option value="INTERNSHIP" {% if object.employment_type == "INTERNSHIP" %}selected{% endif %}>
+                            Internship
+                        </option>
+                        <option value="TEMPORARY" {% if object.employment_type == "TEMPORARY" %}selected{% endif %}>
+                            Temporary
+                        </option>
+                    </select>
+                    <span class="form-help">Type of employment arrangement</span>
                 </div>
             </div>
+
+            <!-- Employment Period Section -->
+            <div class="section-title">
+                <i class="fas fa-calendar"></i> Employment Period
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date_hired">
+                        <i class="fas fa-clock"></i> Date Started
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="date" 
+                        id="date_hired"
+                        name="date_hired"
+                        value="{% if object.date_hired %}{{ object.date_hired|date:'Y-m-d' }}{% endif %}"
+                        required
+                    >
+                    <span class="form-help">When did you start this job?</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="date_left">
+                        <i class="fas fa-calendar-times"></i> Date Left
+                        <span class="optional">(Optional)</span>
+                    </label>
+                    <input 
+                        type="date" 
+                        id="date_left"
+                        name="date_left"
+                        value="{% if object.date_left %}{{ object.date_left|date:'Y-m-d' }}{% endif %}"
+                    >
+                    <span class="form-help">Leave blank if you're currently employed here</span>
+                </div>
+            </div>
+
+            <!-- Compensation Section -->
+            <div class="section-title">
+                <i class="fas fa-money-bill"></i> Compensation & Benefits
+            </div>
+
             <div class="form-row full">
                 <div class="form-group">
-                    <label for="voice_transcript">Voice Transcript</label>
-                    <textarea id="voice_transcript" name="voice_transcript" rows="4">{{ employment.voice_transcript|default:'' }}</textarea>
-                    <span class="form-help">Optional: paste or record transcript to capture voice input details.</span>
+                    <label for="salary_range">
+                        <i class="fas fa-peso-sign"></i> Salary Range
+                        <span class="optional">(Optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="salary_range"
+                        name="salary_range" 
+                        placeholder="e.g., ₱80,000 - ₱120,000 per month"
+                        value="{{ object.salary_range|default:'' }}"
+                        maxlength="150"
+                    >
+                    <span class="form-help">Your salary or wage range (optional, keep it general if preferred)</span>
                 </div>
             </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">{% if employment %}Update{% else %}Add{% endif %}</button>
-                <a href="{% url 'account:employment_list' %}" class="btn-cancel">Cancel</a>
+
+            <!-- Job Related to Course -->
+            <div class="checkbox-group">
+                <input 
+                    type="checkbox" 
+                    id="is_job_related"
+                    name="is_job_related"
+                    {% if object.is_job_related %}checked{% endif %}
+                >
+                <label for="is_job_related">
+                    <i class="fas fa-check-circle"></i> Job Related to Course
+                </label>
+            </div>
+
+            <!-- Voice Transcript -->
+            <div class="section-title">
+                <i class="fas fa-microphone"></i> Voice Input
+            </div>
+
+            <div class="form-row full">
+                <div class="form-group">
+                    <label for="voice_transcript">
+                        Voice Transcript
+                        <span class="optional">(Optional)</span>
+                    </label>
+                    <textarea id="voice_transcript" name="voice_transcript" rows="4" placeholder="Voice transcript will appear here when you use the voice recorder...">{{ object.voice_transcript|default:'' }}</textarea>
+                    <span class="form-help">This field is auto-populated when you use the voice recorder feature.</span>
+                </div>
+            </div>
+
+            <!-- Voice Created Checkbox -->
+            <div class="checkbox-group">
+                <input 
+                    type="checkbox" 
+                    id="created_via_voice"
+                    name="created_via_voice"
+                    {% if object.created_via_voice %}checked{% endif %}
+                >
+                <label for="created_via_voice">
+                    <i class="fas fa-microphone-alt"></i> Created via Voice Recording
+                </label>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="button-group">
+                <button type="submit" class="btn-submit">
+                    {% if object %}Update Employment{% else %}Add Employment{% endif %}
+                </button>
+                <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                {% if object %}
+                <a href="#" class="btn-delete" data-delete-url="{% url 'account:delete_employment' object.id %}" data-delete-label="{{ object.company_name|escapejs }}">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                {% endif %}
             </div>
         </form>
-    </div>
-</div>
-
-<div class="form-container">
-    <form method="POST" id="employment-form" novalidate data-form-type="employment">
-        {% csrf_token %}
-
-        <!-- Company Details Section -->
-        <div class="section-title">
-           Company Details
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="company_name">
-                    Company Name
-                    <span class="required">*</span>
-                </label>
-                <input 
-                    type="text" 
-                    id="company_name"
-                    name="company_name" 
-                    placeholder="e.g., Microsoft Corporation"
-                    value="{{ object.company_name|default:'' }}"
-                    required
-                    minlength="2"
-                    maxlength="200"
-                >
-                <span class="form-help">Full name of the company or organization</span>
-            </div>
-
-            <div class="form-group">
-                <label for="job_title">
-                    Job Title
-                    <span class="required">*</span>
-                </label>
-                <input 
-                    type="text" 
-                    id="job_title"
-                    name="job_title" 
-                    placeholder="e.g., Senior Software Engineer"
-                    value="{{ object.job_title|default:'' }}"
-                    required
-                    minlength="2"
-                    maxlength="200"
-                >
-                <span class="form-help">Your position or role at the company</span>
-            </div>
-        </div>
-
-        <div class="form-row full">
-            <div class="form-group">
-                <label for="employment_type">
-                    Employment Type
-                </label>
-                <select id="employment_type" name="employment_type">
-                    <option value="">-- Select Employment Type --</option>
-                    <option value="FULL_TIME" {% if object.employment_type == "FULL_TIME" %}selected{% endif %}>
-                        Full-Time
-                    </option>
-                    <option value="PART_TIME" {% if object.employment_type == "PART_TIME" %}selected{% endif %}>
-                        Part-Time
-                    </option>
-                    <option value="CONTRACT" {% if object.employment_type == "CONTRACT" %}selected{% endif %}>
-                        Contract
-                    </option>
-                    <option value="FREELANCE" {% if object.employment_type == "FREELANCE" %}selected{% endif %}>
-                        Freelance
-                    </option>
-                    <option value="INTERNSHIP" {% if object.employment_type == "INTERNSHIP" %}selected{% endif %}>
-                        Internship
-                    </option>
-                    <option value="TEMPORARY" {% if object.employment_type == "TEMPORARY" %}selected{% endif %}>
-                        Temporary
-                    </option>
-                </select>
-                <span class="form-help">Type of employment arrangement</span>
-            </div>
-        </div>
-
-        <!-- Employment Period Section -->
-        <div class="section-title">
-            Employment Period
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="date_hired">
-                    Date Started
-                    <span class="required">*</span>
-                </label>
-                <input 
-                    type="date" 
-                    id="date_hired"
-                    name="date_hired"
-                    value="{% if object.date_hired %}{{ object.date_hired|date:'Y-m-d' }}{% endif %}"
-                    required
-                >
-                <span class="form-help">When did you start this job?</span>
-            </div>
-
-            <div class="form-group">
-                <label for="date_left">
-                    Date Left
-                </label>
-                <input 
-                    type="date" 
-                    id="date_left"
-                    name="date_left"
-                    value="{% if object.date_left %}{{ object.date_left|date:'Y-m-d' }}{% endif %}"
-                >
-                <span class="form-help">Leave blank if you're currently employed here</span>
-            </div>
-        </div>
-
-        <!-- Compensation Section -->
-        <div class="section-title">
-            Compensation & Benefits
-        </div>
-
-        <div class="form-row full">
-            <div class="form-group">
-                <label for="salary_range">
-                    <i class="fas fa-peso-sign"></i>Salary Range
-                </label>
-                <input 
-                    type="text" 
-                    id="salary_range"
-                    name="salary_range" 
-                    placeholder="e.g., ₱80,000 - ₱120,000 per month"
-                    value="{{ object.salary_range|default:'' }}"
-                    maxlength="150"
-                >
-                <span class="form-help">Your salary or wage range (optional, keep it general if preferred)</span>
-            </div>
-        </div>
-
-        <!-- Job Related to Course -->
-        <div class="checkbox-group">
-            <input 
-                type="checkbox" 
-                id="is_job_related"
-                name="is_job_related"
-                {% if object.is_job_related %}checked{% endif %}
-            >
-            <label for="is_job_related">
-                Job Related to Course
-            </label>
-        </div>
-
-        <!-- Voice Recorder -->
-        {% include 'voice_update.html' %}
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <button type="submit" class="btn-submit">
-                {% if object %}
-                    Update Employment
-                {% else %}
-                    Add Employment
-                {% endif %}
-            </button>
-            <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">
-                <i class="fas fa-times"></i> Cancel
-            </a>
-            {% if object %}
-            <a href="#" class="btn-danger" data-delete-url="{% url 'account:delete_employment' object.id %}" data-delete-label="{{ object.company_name|escapejs }}">
-                <i class="fas fa-trash"></i> Delete
-            </a>
-            {% endif %}
-        </div>
-    </form>
-</div>
 
 <!-- JavaScript Validation -->
 <script>
@@ -656,11 +1058,9 @@
                     const dateLeft = new Date(this.value);
                     
                     if (dateHired > dateLeft) {
-                        dateLeftInput.style.borderColor = '#f44336';
-                        dateLeftInput.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
+                        dateLeftInput.classList.add('error');
                     } else {
-                        dateLeftInput.style.borderColor = 'rgba(255, 215, 0, 0.3)';
-                        dateLeftInput.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                        dateLeftInput.classList.remove('error');
                     }
                 }
             });
@@ -678,6 +1078,3 @@
         }
     });
 </script>
-
-<!-- Voice Recorder Script -->
-<script src="{% static 'js/voice_recorder.js' %}"></script>

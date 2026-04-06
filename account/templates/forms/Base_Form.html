@@ -14,14 +14,11 @@
     <script src="{% static 'js/voice_recorder.js' %}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-/* ============================================================================
-   ALUMNI TRACER - BASE FORM STYLES + VOICE UPDATE
-   Consolidated CSS for all form templates
-   Color Scheme: TIP Gold (#FFD700) + Matte Black (#28282B)
-   ============================================================================ */
 
 :root {
     --tip-matte-black: #28282B;
+    --tip-pure-black: #000000;
+    --tip-jet-black: #343434;
     --tip-gold: #FFD700;
     --tip-gold-dark: #e5c100;
     --tip-gold-light: #ffed4e;
@@ -64,6 +61,8 @@ body {
     line-height: 1.6;
     display: flex;
     flex-direction: column;
+    background-attachment: fixed;
+    overflow-x: hidden;
 }
 
 @keyframes gradientShift {
@@ -72,22 +71,55 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+/* Animated Background Elements */
+.bg-decoration {
+    position: fixed;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.circle-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -150px;
+    left: -150px;
+    animation: float 12s ease-in-out infinite;
+}
+
+.circle-2 {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    bottom: -100px;
+    right: -100px;
+    animation: float 15s ease-in-out infinite 3s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(40px); }
+}
+
 /* ============================================================================
    HEADER - STICKY TOP
    ============================================================================ */
 
 header {
     background: rgba(40, 40, 43, 0.95);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     padding: 15px 40px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     position: sticky;
     top: 0;
     z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    border-bottom: 2px solid rgba(255, 215, 0, 0.2);
 }
 
 .header-logo {
@@ -129,10 +161,10 @@ header {
 
 .header-btn {
     background: none;
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    border: 1.5px solid rgba(255, 215, 0, 0.3);
     color: var(--tip-gold);
-    padding: 8px 16px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: 700;
     font-size: 0.85em;
@@ -148,6 +180,8 @@ header {
     background: var(--tip-gold);
     color: var(--tip-matte-black);
     border-color: var(--tip-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.25);
 }
 
 /* ============================================================================
@@ -160,6 +194,8 @@ header {
     align-items: center;
     justify-content: center;
     padding: 30px 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .form-container {
@@ -177,6 +213,42 @@ header {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ============================================================================
+   BREADCRUMB NAVIGATION
+   ============================================================================ */
+
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    backdrop-filter: blur(10px);
+    font-size: 0.9em;
+}
+
+.breadcrumb-nav a {
+    color: var(--tip-gold);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.breadcrumb-nav a:hover {
+    color: var(--tip-gold-light);
+}
+
+.breadcrumb-nav span {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.breadcrumb-nav .current {
+    color: var(--white);
+    font-weight: 600;
 }
 
 /* ============================================================================
@@ -234,11 +306,9 @@ header {
     padding: 0;
 }
 
-/* Color variants based on form type */
 .form-header.employment-header, .form-header.study-header {
     border-bottom-color: var(--tip-gold);
 }
-
 
 .form-body {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
@@ -253,7 +323,360 @@ header {
 }
 
 /* ============================================================================
-   VOICE RECORDER STYLES
+   MESSAGES & ALERTS - ENHANCED
+   ============================================================================ */
+
+.messages {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert {
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    font-size: 0.95em;
+    animation: slideDown 0.4s ease-out;
+}
+
+.alert i {
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 1.1em;
+}
+
+/* Alert Variants */
+.alert-error {
+    background: rgba(211, 47, 47, 0.15);
+    border-color: var(--error-red);
+    color: var(--error-red);
+}
+
+.alert-success {
+    background: rgba(46, 125, 50, 0.15);
+    border-color: var(--success-green);
+    color: var(--success-green);
+}
+
+.alert-warning {
+    background: rgba(255, 152, 0, 0.15);
+    border-color: #ff9800;
+    color: #f57c00;
+}
+
+.alert-info {
+    background: rgba(0, 61, 130, 0.15);
+    border-color: #64c8ff;
+    color: var(--info-blue);
+}
+
+.alert-dismissible {
+    justify-content: space-between;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.2em;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   FORM PROGRESS INDICATOR
+   ============================================================================ */
+
+.form-progress {
+    margin-bottom: 30px;
+    display: none;
+}
+
+.form-progress.active {
+    display: block;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--tip-gold-light) 0%, var(--tip-gold) 100%);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.progress-text {
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 8px;
+    text-align: right;
+}
+
+/* ============================================================================
+   FORM SECTIONS & ORGANIZATION
+   ============================================================================ */
+
+.form-section {
+    margin-bottom: 35px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0 0 20px 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.2px;
+}
+
+.section-title:first-of-type {
+    margin-top: 0;
+}
+
+.section-title i {
+    color: var(--tip-gold);
+    font-size: 1.2em;
+    min-width: 24px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row.full {
+    grid-template-columns: 1fr;
+}
+
+.form-row > * {
+    margin-bottom: 0;
+}
+
+/* ============================================================================
+   FORM LABELS - ENHANCED
+   ============================================================================ */
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 0.95em;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
+label i {
+    color: var(--tip-gold);
+    margin-right: 6px;
+    min-width: 18px;
+}
+
+/* Checkbox/Radio Labels */
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+/* ============================================================================
+   FORM INPUTS & FIELDS - ENHANCED
+   ============================================================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="number"],
+input[type="url"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: inherit;
+    font-size: 0.95em;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(8px);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Input Focus State */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--tip-gold);
+    box-shadow: 
+        0 0 0 3px rgba(255, 215, 0, 0.1),
+        inset 0 0 0 1px rgba(255, 215, 0, 0.3);
+}
+
+/* Input Disabled State */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.5);
+    cursor: not-allowed;
+}
+
+/* Select Dropdown - Custom Styling */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2328282B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 1.3em;
+    padding-right: 2.8em;
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* ============================================================================
+   CHECKBOXES & RADIO BUTTONS
+   ============================================================================ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    margin-right: 10px;
+    accent-color: var(--tip-gold);
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+    outline: 2px solid var(--tip-gold);
+    outline-offset: 2px;
+}
+
+/* ============================================================================
+   CHECKBOX GROUP (used in employment/study forms)
+   ============================================================================ */
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 15px 20px;
+    background: rgba(255, 215, 0, 0.08);
+    border: 1.5px solid rgba(255, 215, 0, 0.15);
+    border-radius: 10px;
+}
+
+.checkbox-group input[type="checkbox"],
+.checkbox-group input[type="radio"] {
+    margin-right: 0; /* spacing is handled by the flex gap */
+}
+
+.checkbox-group label {
+    margin: 0;
+    text-transform: none; /* prevent ALL CAPS */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-group label i {
+    margin-right: 0;
+    min-width: 18px;
+}
+
+/* ============================================================================
+   HELPER TEXT
+   ============================================================================ */
+
+.form-help {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: -4px;
+    margin-bottom: 16px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.required {
+    color: var(--error-red);
+    font-weight: 700;
+    margin-left: 3px;
+}
+
+.optional {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 0.8em;
+    margin-left: 6px;
+}
+
+/* ============================================================================
+   VOICE RECORDER STYLES - ENHANCED
    ============================================================================ */
 
 .voice-recorder-container {
@@ -370,7 +793,6 @@ header {
 }
 
 #voice-upload-btn {
-    grid-column: 1 / -1;
     border-color: #FFD700;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
 }
@@ -457,272 +879,52 @@ header {
     margin-bottom: 5px;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Spinner animation */
-.spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #FFD700;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
 /* ============================================================================
-   MESSAGES & ALERTS
+   FORM VALIDATION STATES
    ============================================================================ */
 
-.messages {
-    margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+input.error,
+select.error,
+textarea.error {
+    border-color: var(--error-red);
+    background-color: rgba(211, 47, 47, 0.08);
 }
 
-.alert {
-    padding: 14px 16px;
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+    box-shadow: 
+        0 0 0 3px rgba(211, 47, 47, 0.1),
+        inset 0 0 0 1px rgba(211, 47, 47, 0.3);
+}
+
+input.success,
+select.success,
+textarea.success {
+    border-color: var(--success-green);
+    background-color: rgba(46, 125, 50, 0.08);
+}
+
+.form-error {
+    background: rgba(211, 47, 47, 0.15);
+    border: 1.5px solid var(--error-red);
+    color: var(--error-red);
+    padding: 12px 16px;
     border-radius: 10px;
-    border-left: 4px solid;
+    margin-bottom: 20px;
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    backdrop-filter: blur(10px);
+    align-items: center;
+    gap: 10px;
     font-size: 0.95em;
     animation: slideDown 0.4s ease-out;
 }
 
-.alert i {
-    margin-top: 2px;
-    flex-shrink: 0;
-    font-size: 1.1em;
-}
-
-/* Alert Variants */
-.alert-error {
-    background: rgba(211, 47, 47, 0.15);
-    border-color: var(--error-red);
-    color: var(--error-red);
-}
-
-.alert-success {
-    background: rgba(46, 125, 50, 0.15);
-    border-color: var(--success-green);
-    color: var(--success-green);
-}
-
-.alert-warning {
-    background: rgba(255, 152, 0, 0.15);
-    border-color: #ff9800;
-    color: #f57c00;
-}
-
-.alert-info {
-    background: rgba(0, 61, 130, 0.15);
-    border-color: #64c8ff;
-    color: var(--info-blue);
-}
-
-/* ============================================================================
-   FORM LABELS
-   ============================================================================ */
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-    font-size: 0.95em;
-    letter-spacing: 0.2px;
-    text-transform: uppercase;
-}
-
-label i {
-    color: var(--tip-gold);
-    margin-right: 6px;
-    min-width: 18px;
-}
-
-/* Checkbox/Radio Labels */
-label:has(> input[type="checkbox"]),
-label:has(> input[type="radio"]) {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    font-weight: 500;
-}
-
-/* ============================================================================
-   FORM INPUTS & FIELDS
-   ============================================================================ */
-
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="number"],
-input[type="url"],
-input[type="password"],
-select,
-textarea {
-    width: 100%;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.95);
-    font-family: inherit;
-    font-size: 0.95em;
-    transition: var(--transition-smooth);
-    backdrop-filter: blur(8px);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-/* Input Focus State */
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.18);
-    border-color: var(--tip-gold);
-    box-shadow: 
-        0 0 0 3px rgba(255, 215, 0, 0.1),
-        inset 0 0 0 1px rgba(255, 215, 0, 0.3);
-}
-
-/* Input Disabled State */
-input:disabled,
-select:disabled,
-textarea:disabled {
-    background: rgba(0, 0, 0, 0.08);
-    color: rgba(0, 0, 0, 0.5);
-    cursor: not-allowed;
-}
-
-/* Select Dropdown - Custom Styling */
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2328282B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 1.3em;
-    padding-right: 2.8em;
-}
-
-select:focus {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-}
-
-/* ============================================================================
-   CHECKBOXES & RADIO BUTTONS
-   ============================================================================ */
-
-input[type="checkbox"],
-input[type="radio"] {
-    margin-right: 10px;
-    accent-color: var(--tip-gold);
-    cursor: pointer;
-    width: 18px;
-    height: 18px;
+.form-error i {
     flex-shrink: 0;
 }
 
-input[type="checkbox"]:focus,
-input[type="radio"]:focus {
-    outline: 2px solid var(--tip-gold);
-    outline-offset: 2px;
-}
-
 /* ============================================================================
-   FORM SECTIONS & ORGANIZATION
-   ============================================================================ */
-
-.section-title {
-    font-size: 1.15em;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.95);
-    margin: 30px 0 18px 0;
-    padding-bottom: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    letter-spacing: 0.2px;
-}
-
-.section-title:first-of-type {
-    margin-top: 0;
-}
-
-.section-title i {
-    color: var(--tip-gold);
-    font-size: 1.2em;
-    min-width: 24px;
-}
-
-.form-group {
-    margin-bottom: 24px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.form-row.full {
-    grid-template-columns: 1fr;
-}
-
-.form-row > * {
-    margin-bottom: 0;
-}
-
-/* ============================================================================
-   HELPER TEXT
-   ============================================================================ */
-
-.form-help {
-    display: block;
-    font-size: 0.8em;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: -4px;
-    margin-bottom: 16px;
-    font-style: italic;
-    font-weight: 400;
-}
-
-.required {
-    color: var(--error-red);
-    font-weight: 700;
-    margin-left: 3px;
-}
-
-/* ============================================================================
-   BUTTON GROUP & BUTTONS
+   BUTTON GROUP & BUTTONS - ENHANCED
    ============================================================================ */
 
 .button-group {
@@ -842,50 +1044,122 @@ button[type="submit"]:disabled,
 }
 
 /* ============================================================================
-   INPUT STATE STYLING
+   SPINNER ANIMATION
    ============================================================================ */
 
-input.error,
-select.error,
-textarea.error {
-    border-color: var(--error-red);
-    background-color: rgba(211, 47, 47, 0.08);
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #FFD700;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
-input.error:focus,
-select.error:focus,
-textarea.error:focus {
-    box-shadow: 
-        0 0 0 3px rgba(211, 47, 47, 0.1),
-        inset 0 0 0 1px rgba(211, 47, 47, 0.3);
-}
-
-input.success,
-select.success,
-textarea.success {
-    border-color: var(--success-green);
-    background-color: rgba(46, 125, 50, 0.08);
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 /* ============================================================================
-   ACCESSIBILITY
+   COLLAPSIBLE SECTIONS
    ============================================================================ */
 
-:focus-visible {
-    outline: 2px solid var(--tip-gold);
-    outline-offset: 2px;
+.collapsible-section {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-    
-    body {
-        animation: none;
-    }
+.collapsible-header {
+    padding: 16px 20px;
+    background: rgba(255, 215, 0, 0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition-smooth);
+    font-weight: 600;
+    color: var(--white);
+}
+
+.collapsible-header:hover {
+    background: rgba(255, 215, 0, 0.12);
+}
+
+.collapsible-header i {
+    color: var(--tip-gold);
+    transition: var(--transition-smooth);
+}
+
+.collapsible-header.active i {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 20px;
+}
+
+.collapsible-content.active {
+    max-height: 1000px;
+    padding: 20px;
+}
+
+/* ============================================================================
+   FORM TIPS & TOOLTIPS
+   ============================================================================ */
+
+.form-tip {
+    background: rgba(33, 150, 243, 0.1);
+    border-left: 3px solid var(--info-blue-light);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.form-tip i {
+    color: var(--info-blue-light);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    color: var(--tip-gold);
+    border-bottom: 1px dotted rgba(255, 215, 0, 0.5);
+}
+
+.tooltip:hover::after {
+    display: block;
+}
+
+.tooltip::after {
+    display: none;
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: var(--white);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    white-space: nowrap;
+    z-index: 1000;
+    border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 /* ============================================================================
@@ -948,10 +1222,6 @@ textarea.success {
         grid-template-columns: 1fr 1fr;
     }
 
-    #voice-upload-btn {
-        grid-column: 1 / -1;
-    }
-
     .voice-example {
         flex-direction: column;
     }
@@ -1012,9 +1282,66 @@ textarea.success {
         font-size: 0.8em;
     }
 }
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+:focus-visible {
+    outline: 2px solid var(--tip-gold);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    body {
+        animation: none;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
     </style>
 </head>
 <body>
+
+<!-- Animated Background Decorations -->
+<div class="bg-decoration circle-1"></div>
+<div class="bg-decoration circle-2"></div>
 
 <!-- Header -->
 <header>
@@ -1038,13 +1365,28 @@ textarea.success {
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-                    {{ message }}
+                <div class="alert alert-{{ message.tags }} alert-dismissible">
+                    <div>
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                    <button type="button" class="alert-close" onclick="this.parentElement.style.display='none';">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             {% endfor %}
         </div>
         {% endif %}
+
+        <!-- Form Progress Indicator -->
+        <div class="form-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressPercentage">0%</span> Complete
+            </div>
+        </div>
 
         <!-- Form Header -->
         <div class="form-header {% if type == 'employment' %}employment-header{% elif type == 'study' %}study-header{% endif %}">
@@ -1059,7 +1401,7 @@ textarea.success {
                     </h2>
                     <p>
                         {% if object %}
-                            Update your employment history
+                            Update your employment history and career progression
                         {% else %}
                             Add a new job to your career timeline
                         {% endif %}
@@ -1085,6 +1427,14 @@ textarea.success {
 
         <!-- Form Body with Voice Integration -->
         <div class="form-body">
+            <!-- Form Tip -->
+            <div class="form-tip">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>Tip:</strong> Use the Voice Update feature below to quickly fill in your information by speaking naturally. All fields are automatically organized for you!
+                </div>
+            </div>
+
             <!-- Voice Recorder Widget -->
             <div class="voice-recorder-container" data-form-type="{{ type }}">
                 <div class="voice-recorder-header">
@@ -1151,27 +1501,105 @@ textarea.success {
                 </div>
             </div>
 
-            <!-- Form -->
-            <form method="POST" novalidate>
-                {% csrf_token %}
-
-                <!-- Dynamic Fields -->
+            <!-- Dynamic Forms Section -->
+            <div id="dynamic-form-container">
                 {% if type == "employment" %}
                     {% include "forms/Employment_Form.html" %}
                 {% elif type == "study" %}
                     {% include "forms/Study_Form.html" %}
                 {% endif %}
-
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Scripts -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Initialize Voice Recorder
         const recorder = new VoiceRecorder();
+        
+        // Form Progress Tracker
+        initializeFormProgress();
+        
+        // Auto-save Draft
+        initializeAutoSave();
     });
+
+    // Form Progress Tracking
+    function initializeFormProgress() {
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        const inputs = form.querySelectorAll('input, select, textarea');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentage = document.getElementById('progressPercentage');
+
+        function updateProgress() {
+            let filled = 0;
+            inputs.forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) filled++;
+                } else if (input.value.trim()) {
+                    filled++;
+                }
+            });
+
+            const percentage = Math.round((filled / inputs.length) * 100);
+            progressFill.style.width = percentage + '%';
+            progressPercentage.textContent = percentage;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('change', updateProgress);
+            input.addEventListener('input', updateProgress);
+        });
+
+        updateProgress();
+    }
+
+    // Auto-save Draft Functionality
+    function initializeAutoSave() {
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        const inputs = form.querySelectorAll('input, select, textarea');
+        const formType = form.getAttribute('data-form-type') || 'unknown';
+        const storageKey = `form_draft_${formType}`;
+
+        // Load saved draft
+        const savedDraft = localStorage.getItem(storageKey);
+        if (savedDraft) {
+            const draft = JSON.parse(savedDraft);
+            Object.keys(draft).forEach(fieldName => {
+                const input = form.elements[fieldName];
+                if (input) {
+                    input.value = draft[fieldName];
+                }
+            });
+        }
+
+        // Save draft on change
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const draft = {};
+                inputs.forEach(field => {
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        draft[field.name] = field.checked;
+                    } else {
+                        draft[field.name] = field.value;
+                    }
+                });
+                localStorage.setItem(storageKey, JSON.stringify(draft));
+                console.log('Draft saved automatically');
+            });
+        });
+    }
+
+    // CSRF Token for API calls
+    window.__csrfToken = "{{ csrf_token }}";
 </script>
-<script>window.__csrfToken = "{{ csrf_token }}";</script>
+<script src="{% static 'js/voice_recorder.js' %}"></script>
 {% include "account/Delete_Confirm.html" %}
 </body>
 </html>
