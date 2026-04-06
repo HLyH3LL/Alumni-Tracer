@@ -57,25 +57,40 @@
             border-bottom: 1px solid rgba(255, 215, 0, 0.2);
         }
 
-        #header .logo {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--tip-gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-decoration: none;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+    margin-left: 20px;
+}
 
-        .logo-tagline {
-            font-size: 0.45em;
-            display: block;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 1.5px;
-            margin-top: 2px;
-            font-weight: 500;
-        }
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.header-logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+.header-logo-text {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--tip-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-logo-text span {
+    color: var(--white);
+}
 
         .nav-wrapper {
             display: flex;
@@ -716,6 +731,47 @@
             opacity: 0.9;
         }
 
+        .profile-photo-welcome {
+    width: 100px;
+    height: 100px;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 3px solid var(--tip-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.profile-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255, 215, 0, 0.4);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .profile-photo-welcome {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .profile-photo-placeholder {
+        font-size: 2.5rem;
+    }
+}
+
         /* Responsive */
         @media (max-width: 1200px) {
             #header {
@@ -854,11 +910,12 @@
 </head>
 <body>
     <header id="header">
-        <a href="{% url 'account:home' %}" class="logo">
-            <img src="{{ config.logo_main.url }}" alt="Site Logo">
-            TIPIANS<span style="color: white;">CONNECT</span>
-            <span class="logo-tagline">ALUMNI DASHBOARD</span>
-        </a>
+    <a href="{% url 'account:home' %}" class="header-logo">
+        <img src="{{ config.logo_main.url }}" alt="Site Logo">
+        <span class="header-logo-text">
+            T.I.P.IANS<span>CONNECT</span>
+        </span>
+    </a>
 
         <div class="user-menu">
             <span class="user-name">{{ user.first_name|default:user.username }}</span>
@@ -891,16 +948,27 @@
         <div class="dashboard-container">
             <div class="dashboard-header">
                 <div class="welcome-section">
-                    <div class="welcome-text">
-                        <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
-                        <p>Your alumni dashboard • Last login: {{ user.last_login|date:"F j, Y" }}</p>
-                    </div>
-                    <div class="profile-summary">
-                        <div class="profile-summary-item">
-                            <span>Student ID:</span> {{ alumni.student_id|default:"Not set" }}
-                        </div>
-                    </div>
-                </div>
+    <!-- Profile Photo -->
+    <div class="profile-photo-welcome">
+        {% if alumni.profile_photo %}
+            <img src="{{ alumni.profile_photo.url }}" alt="Profile Photo" class="profile-photo-img">
+        {% else %}
+            <div class="profile-photo-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="welcome-text">
+        <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+        <p>Your alumni dashboard • Last login: {{ user.last_login|date:"F j, Y" }}</p>
+    </div>
+    <div class="profile-summary">
+        <div class="profile-summary-item">
+            <span>Student ID:</span> {{ alumni.student_id|default:"Not set" }}
+        </div>
+    </div>
+</div>
             </div>
 
             <div class="dashboard-body">

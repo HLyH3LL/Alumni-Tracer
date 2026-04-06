@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Account Settings - Alumni Dashboard{% endblock %}
+{% block title %}Account Settings - T.I.P.IANSCONNECT{% endblock %}
 
 {% block content %}
 <div id="content">
@@ -10,7 +10,7 @@
             <div class="welcome-section">
                 <div class="welcome-text">
                     <h1>Account Settings</h1>
-                    <p>Manage your profile information and preferences</p>
+                    <p>Manage your profile information and preferences.</p>
                 </div>
             </div>
         </div>
@@ -256,6 +256,9 @@
     --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.2);
     --error-color: #ff6b6b;
     --success-color: #51cf66;
+
+    --transition-smooth: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
 }
 
 
@@ -549,6 +552,7 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
+    margin-bottom: 2%;
 }
 
 .form-group label {
@@ -559,6 +563,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    text-transform: uppercase;
 }
 
 .form-group label i {
@@ -744,44 +749,72 @@ textarea.form-control {
     font-size: 0.95rem;
 }
 
-/* Primary Button */
 .btn-primary {
-    background: linear-gradient(135deg, var(--tip-gold-light), var(--tip-gold));
+    flex: 1;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--tip-gold) 0%, var(--tip-gold-dark) 100%);
     color: var(--tip-matte-black);
-    border: 1px solid var(--tip-gold);
-    box-shadow: var(--shadow-md);
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--tip-gold), var(--tip-gold-dark));
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    color: var(--tip-matte-black);
-    text-decoration: none;
+    transform: translateY(-3px);
+    box-shadow: 
+        0 12px 40px rgba(255, 215, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, var(--tip-gold-light) 0%, var(--tip-gold) 100%);
 }
 
 .btn-primary:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 8px 24px rgba(255, 215, 0, 0.25),
+        inset 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Secondary Button */
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+    flex: 1;
+    padding: 14px 24px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-    color: var(--white);
-    text-decoration: none;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Outline Primary Button */
+.btn-secondary:active {
+    transform: translateY(-1px);
+}
+
 .btn-outline-primary {
     background: transparent;
     color: var(--tip-gold-light);
@@ -1006,7 +1039,6 @@ textarea.form-control {
     }
 }
 
-/* Focus visible for keyboard navigation */
 .btn:focus-visible, .form-control:focus-visible {
     outline: 2px solid var(--tip-gold);
     outline-offset: 2px;

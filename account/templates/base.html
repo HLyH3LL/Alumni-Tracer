@@ -4,41 +4,742 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Alumni Tracer{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-pVh1..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% load static %}
+    <script src="{% static 'js/voice_recorder.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7fb; color: #333; margin: 0; padding: 0; }
-        .container { max-width: 1100px; margin: 36px auto; padding: 16px; }
-        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
-        .alert-success { background: #daf6dc; border: 1px solid #8cd59a; color: #2d6b34; }
-        .alert-error, .alert-danger { background: #fde2e6; border: 1px solid #ea9ba6; color: #8a222b; }
-        .alert-info { background: #e5f0fd; border: 1px solid #7dbaf3; color: #2a4f7f; }
-        h1,h2,h3 { margin: 0 0 14px; }
-        .nav { background: #252d43; padding: 10px 16px; color: #fff; margin-bottom: 20px; border-radius: 6px; }
-        .nav a { color: #fbfbfb; margin-right: 12px; text-decoration: none; font-weight: 600; }
+
+:root {
+    --tip-matte-black: #28282B;
+    --tip-pure-black: #000000;
+    --tip-jet-black: #343434;
+    --tip-gold: #FFD700;
+    --tip-gold-dark: #e5c100;
+    --tip-gold-light: #ffed4e;
+    --white: #ffffff;
+    --gray-light: #f5f5f5;
+    --gray: #666666;
+    --gray-dark: #333333;
+    --error-red: #d32f2f;
+    --success-green: #2e7d32;
+    --info-blue: #003d82;
+    --info-blue-light: #1976d2;
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================================
+   BODY & BACKGROUND
+   ============================================================================ */
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    background: linear-gradient(135deg, #FFD700 0%, #28282B 25%, #343434 50%, #28282B 75%, #FFD700 100%);
+    background-size: 800% 800%;
+    animation: gradientShift 15s ease infinite;
+    min-height: 100vh;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Animated Background Elements */
+.bg-decoration {
+    position: fixed;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.circle-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -150px;
+    left: -150px;
+    animation: float 12s ease-in-out infinite;
+}
+
+.circle-2 {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    bottom: -100px;
+    right: -100px;
+    animation: float 15s ease-in-out infinite 3s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(40px); }
+}
+
+/* ============================================================================
+   HEADER - STICKY TOP
+   ============================================================================ */
+
+header {
+    background: rgba(40, 40, 43, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 15px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+    margin-left: 20px;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.header-logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+.header-logo-text {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--tip-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-logo-text span {
+    color: var(--white);
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+}
+
+.header-btn {
+    background: none;
+    border: 1.5px solid rgba(255, 215, 0, 0.3);
+    color: var(--tip-gold);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-btn:hover {
+    background: var(--tip-gold);
+    color: var(--tip-matte-black);
+    border-color: var(--tip-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.25);
+}
+
+/* ============================================================================
+   FORM WRAPPER & CONTAINER
+   ============================================================================ */
+
+.form-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.form-container {
+    max-width: 900px;
+    width: 100%;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   BREADCRUMB NAVIGATION
+   ============================================================================ */
+
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    backdrop-filter: blur(10px);
+    font-size: 0.9em;
+}
+
+.breadcrumb-nav a {
+    color: var(--tip-gold);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.breadcrumb-nav a:hover {
+    color: var(--tip-gold-light);
+}
+
+.breadcrumb-nav span {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.breadcrumb-nav .current {
+    color: var(--white);
+    font-weight: 600;
+}
+
+/* ============================================================================
+   FORM HEADER - CONNECTED TO FORM
+   ============================================================================ */
+
+.form-header {
+    background: linear-gradient(135deg, rgba(40, 40, 43, 0.95) 0%, rgba(52, 52, 52, 0.95) 100%);
+    padding: 40px;
+    color: var(--white);
+    border-bottom: 3px solid var(--tip-gold);
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.form-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.form-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.form-header h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    letter-spacing: -0.5px;
+}
+
+.form-header h2 i {
+    color: var(--white);
+    font-size: 1.2em;
+}
+
+.form-header p {
+    font-size: 0.95em;
+    opacity: 0.85;
+    letter-spacing: 0.5px;
+    margin: 0;
+    padding: 0;
+}
+
+.form-header.employment-header, .form-header.study-header {
+    border-bottom-color: var(--tip-gold);
+}
+
+.form-body {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-radius: 0 0 16px 16px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-top: none;
+    backdrop-filter: blur(12px);
+    box-shadow: 
+        0 8px 32px rgba(31, 38, 135, 0.37),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================================
+   MESSAGES & ALERTS - ENHANCED
+   ============================================================================ */
+
+.messages {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert {
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    font-size: 0.95em;
+    animation: slideDown 0.4s ease-out;
+}
+
+.alert i {
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 1.1em;
+}
+
+/* Alert Variants */
+.alert-error {
+    background: rgba(211, 47, 47, 0.15);
+    border-color: var(--error-red);
+    color: var(--error-red);
+}
+
+.alert-success {
+    background: rgba(46, 125, 50, 0.15);
+    border-color: var(--success-green);
+    color: var(--success-green);
+}
+
+.alert-warning {
+    background: rgba(255, 152, 0, 0.15);
+    border-color: #ff9800;
+    color: #f57c00;
+}
+
+.alert-info {
+    background: rgba(0, 61, 130, 0.15);
+    border-color: #64c8ff;
+    color: var(--info-blue);
+}
+
+.alert-dismissible {
+    justify-content: space-between;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.2em;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   FORM PROGRESS INDICATOR
+   ============================================================================ */
+
+.form-progress {
+    margin-bottom: 30px;
+    display: none;
+}
+
+.form-progress.active {
+    display: block;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--tip-gold-light) 0%, var(--tip-gold) 100%);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.progress-text {
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 8px;
+    text-align: right;
+}
+
+/* ============================================================================
+   FORM SECTIONS & ORGANIZATION
+   ============================================================================ */
+
+.form-section {
+    margin-bottom: 35px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0 0 20px 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.2px;
+}
+
+.section-title:first-of-type {
+    margin-top: 0;
+}
+
+.section-title i {
+    color: var(--tip-gold);
+    font-size: 1.2em;
+    min-width: 24px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-error {
+    background: rgba(211, 47, 47, 0.15);
+    border: 1.5px solid var(--error-red);
+    color: var(--error-red);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95em;
+    animation: slideDown 0.4s ease-out;
+}
+
+.form-error i {
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   SPINNER ANIMATION
+   ============================================================================ */
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #FFD700;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   COLLAPSIBLE SECTIONS
+   ============================================================================ */
+
+.collapsible-section {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.collapsible-header {
+    padding: 16px 20px;
+    background: rgba(255, 215, 0, 0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition-smooth);
+    font-weight: 600;
+    color: var(--white);
+}
+
+.collapsible-header:hover {
+    background: rgba(255, 215, 0, 0.12);
+}
+
+.collapsible-header i {
+    color: var(--tip-gold);
+    transition: var(--transition-smooth);
+}
+
+.collapsible-header.active i {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 20px;
+}
+
+.collapsible-content.active {
+    max-height: 1000px;
+    padding: 20px;
+}
+
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    header {
+        flex-wrap: wrap;
+        padding: 12px 20px;
+        gap: 15px;
+    }
+
+    .header-logo-text {
+        font-size: 1.2em;
+    }
+
+    .header-nav {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .form-wrapper {
+        padding: 20px 10px;
+    }
+
+    .form-header {
+        padding: 25px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .form-header h2 {
+        font-size: 1.6em;
+    }
+
+    .form-body {
+        padding: 25px;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    button[type="submit"],
+    .btn-submit,
+    .btn-cancel,
+    .btn-delete {
+        width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .voice-recorder-buttons {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .voice-example {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    .header-logo-text {
+        font-size: 1em;
+    }
+
+    .form-header {
+        padding: 20px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .form-header h2 {
+        font-size: 1.3em;
+        gap: 10px;
+    }
+
+    .form-body {
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    input[type="url"],
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    label {
+        font-size: 0.9em;
+    }
+
+    .section-title {
+        font-size: 1em;
+        margin: 24px 0 14px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    body {
+        animation: none;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <a href="{% url 'account:home' %}">Home</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'account:account_settings' %}">Account Settings</a>
-            <form method="post" action="{% url 'account:logout' %}" style="display:inline; margin:0;">
-                {% csrf_token %}
-                <button type="submit" style="background:none; border:none; color:#fbfbfb; font-weight:600; cursor:pointer;">Logout</button>
-            </form>
-        {% else %}
-            <a href="{% url 'account:login' %}">Login</a>
-            <a href="{% url 'account:register' %}">Register</a>
-        {% endif %}
+
+<!-- Animated Background Decorations -->
+<div class="bg-decoration circle-1"></div>
+<div class="bg-decoration circle-2"></div>
+
+<!-- Header -->
+<header>
+    <a href="{% url 'account:home' %}" class="header-logo">
+        <img src="{{ config.logo_main.url }}" alt="Site Logo">
+        <span class="header-logo-text">
+            T.I.P.IANS<span>CONNECT</span>
+        </span>
+    </a>
+    <nav class="header-nav">
+        <a href="{% url 'account:alumni_dashboard' %}" class="header-btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
     </nav>
+</header>
     <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
         {% block content %}{% endblock %}
     </div>
 </body>

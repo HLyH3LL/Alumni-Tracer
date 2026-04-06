@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% if object %}
-            Edit {{ type|title }} - TipiansConnect
+            Edit {{ type|title }} - T.I.P.IANSCONNECT
         {% else %}
-            Add {{ type|title }} - TipiansConnect
+            Add {{ type|title }} - T.I.P.IANSCONNECT
         {% endif %}
     </title>
     {% load static %}
@@ -125,8 +125,33 @@ header {
 .header-logo {
     display: flex;
     align-items: center;
-    gap: 15px;
     text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+    margin-left: 20px;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.header-logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
 }
 
 .header-logo-text {
@@ -141,15 +166,6 @@ header {
 
 .header-logo-text span {
     color: var(--white);
-}
-
-.logo-tagline {
-    font-size: 0.4em;
-    display: block;
-    color: rgba(255, 255, 255, 0.7);
-    letter-spacing: 1.5px;
-    margin-top: 2px;
-    font-weight: 500;
 }
 
 .header-nav {
@@ -563,12 +579,11 @@ textarea::placeholder {
 input:focus,
 select:focus,
 textarea:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.12);
     border-color: var(--tip-gold);
-    box-shadow: 
-        0 0 0 3px rgba(255, 215, 0, 0.1),
-        inset 0 0 0 1px rgba(255, 215, 0, 0.3);
+    color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
 }
 
 /* Input Disabled State */
@@ -578,20 +593,6 @@ textarea:disabled {
     background: rgba(0, 0, 0, 0.08);
     color: rgba(0, 0, 0, 0.5);
     cursor: not-allowed;
-}
-
-/* Select Dropdown - Custom Styling */
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2328282B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 1.3em;
-    padding-right: 2.8em;
-}
-
-select:focus {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 /* ============================================================================
@@ -877,6 +878,37 @@ input[type="radio"]:focus {
     color: #FFD700;
     display: block;
     margin-bottom: 5px;
+}
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    border: 1.5px solid rgba(255, 215, 0, 0.2);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+select:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--tip-gold);
+    color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+select option {
+    background-color: var(--tip-matte-black);
+    color: var(--white);
+    padding: 10px;
 }
 
 /* ============================================================================
@@ -1287,7 +1319,12 @@ button[type="submit"]:disabled,
    ACCESSIBILITY
    ============================================================================ */
 
-:focus-visible {
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+.voice-btn:focus-visible {
     outline: 2px solid var(--tip-gold);
     outline-offset: 2px;
 }
@@ -1335,7 +1372,7 @@ button[type="submit"]:disabled,
 .visible {
     display: block !important;
 }
-    </style>
+</style>
 </head>
 <body>
 
@@ -1346,11 +1383,12 @@ button[type="submit"]:disabled,
 <!-- Header -->
 <header>
     <a href="{% url 'account:home' %}" class="header-logo">
+        <img src="{{ config.logo_main.url }}" alt="Site Logo">
         <span class="header-logo-text">
-            TIPIANS<span>CONNECT</span>
-            <span class="logo-tagline">ALUMNI DASHBOARD</span>
+            T.I.P.IANS<span>CONNECT</span>
         </span>
     </a>
+
     <nav class="header-nav">
         <a href="{% url 'account:alumni_dashboard' %}" class="header-btn">
             <i class="fas fa-arrow-left"></i> Back
@@ -1401,9 +1439,9 @@ button[type="submit"]:disabled,
                     </h2>
                     <p>
                         {% if object %}
-                            Update your employment history and career progression
+                            Update your employment history and career progression.
                         {% else %}
-                            Add a new job to your career timeline
+                            Add a new job to your career timeline.
                         {% endif %}
                     </p>
                 {% elif type == 'study' %}
@@ -1416,9 +1454,9 @@ button[type="submit"]:disabled,
                     </h2>
                     <p>
                         {% if object %}
-                            Update your further education record
+                            Update your further education record.
                         {% else %}
-                            Add a new study program to your education timeline
+                            Add a new study program to your education timeline.
                         {% endif %}
                     </p>
                 {% endif %}
@@ -1427,14 +1465,6 @@ button[type="submit"]:disabled,
 
         <!-- Form Body with Voice Integration -->
         <div class="form-body">
-            <!-- Form Tip -->
-            <div class="form-tip">
-                <i class="fas fa-lightbulb"></i>
-                <div>
-                    <strong>Tip:</strong> Use the Voice Update feature below to quickly fill in your information by speaking naturally. All fields are automatically organized for you!
-                </div>
-            </div>
-
             <!-- Voice Recorder Widget -->
             <div class="voice-recorder-container" data-form-type="{{ type }}">
                 <div class="voice-recorder-header">

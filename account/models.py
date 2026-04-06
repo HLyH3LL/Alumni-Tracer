@@ -1,7 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
+
+def validate_image_file(image):
+    """
+    Validate image file size.
+    Maximum file size: 5MB
+    """
+    file_size = image.size
+    limit_mb = 5
+    if file_size > limit_mb * 1024 * 1024:
+        raise ValidationError(f'Max file size is {limit_mb}MB')
 
 class Alumni(models.Model):
     EMPLOYMENT_STATUS = [
@@ -50,8 +61,22 @@ class Alumni(models.Model):
     profile_photo = models.ImageField(
         upload_to='alumni_photos/', 
         blank=True, 
-        null=True
+        null=True,
+        validators=[validate_image_file],
+        help_text="Square image, at least 200x200px (JPG, PNG). Max 5MB"
     )
+
+    bio = models.TextField(
+    blank=True,
+    null=True,
+    max_length=500,
+    help_text="Brief biography (max 500 characters)"
+    )
+
+    linkedin_url = models.URLField(blank=True, null=True)
+    facebook_url = models.URLField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
 
     employment_status = models.CharField(
         max_length=20, choices=EMPLOYMENT_STATUS, default="UNKNOWN"
