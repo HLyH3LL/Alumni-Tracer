@@ -19,7 +19,6 @@ urlpatterns = [
     # 📊 DASHBOARDS
     # ===============================
     path('dashboard/', views.alumni_dashboard, name='alumni_dashboard'),
-    path('dashboard/', views.alumni_dashboard, name='dashboard'),  # backward-compatible alias
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
     # ===============================

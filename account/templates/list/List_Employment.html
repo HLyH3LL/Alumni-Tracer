@@ -1,0 +1,40 @@
+{% if employments %}
+    <div class="timeline">
+        {% for job in employments %}
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <div class="timeline-dot"><i class="fas fa-briefcase"></i></div>
+                    {% if not forloop.last %}<div class="timeline-line"></div>{% endif %}
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-card-header">
+                        <div>
+                            <div class="timeline-job-title">{{ job.job_title }}</div>
+                            <div class="timeline-company"><i class="fas fa-building"></i> {{ job.company_name }}</div>
+                        </div>
+                        <div class="timeline-card-meta">
+                            <span class="timeline-badge badge-type">{{ job.get_employment_type_display|default:"Employment" }}</span>
+                            {% if job.is_job_related %}
+                                <span class="timeline-badge badge-related">Related to course</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="timeline-details">
+                        <span class="timeline-date"><i class="far fa-calendar-alt"></i> {{ job.date_hired|date:"M Y" }} – {{ job.date_left|date:"M Y"|default:"Present" }}</span>
+                        {% if job.salary_range %}
+                            <span class="timeline-salary"><i class="fas fa-money-bill-wave"></i> {{ job.salary_range }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="timeline-card-actions">
+                        <a href="{% url 'account:edit_employment' job.id %}" class="btn-timeline-edit"><i class="fas fa-edit"></i> Edit</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="fas fa-briefcase"></i>
+        <p>No employment records yet. <a href="{% url 'account:add_employment' %}">Add your first job</a></p>
+    </div>
+{% endif %}
