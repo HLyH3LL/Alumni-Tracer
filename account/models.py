@@ -399,3 +399,8 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class AdminFace(models.Model):
+    name = models.CharField(max_length=50)
+    descriptor = models.TextField()

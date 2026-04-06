@@ -14,6 +14,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('home/', views.home, name='home'),
     path('admin/logout/', views.admin_logout, name='admin_logout'),
+    path('save-face/', views.save_face, name='save_face'),
+    path('face-login/', views.face_login, name='face_login'),
 
     # ===============================
     # 📊 DASHBOARDS

@@ -11,7 +11,12 @@ from .auth_forms import LoginForm, AlumniRegistrationForm
 from .models import Alumni, Employment, FurtherStudy, Activity, Program, EmploymentStatus, Feature, RegistrationPageContent
 from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
 from django.contrib.auth import logout
-
+import json
+from django.http import JsonResponse
+from .models import AdminFace
+import numpy as np
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 
 # ===============================
 # ✅ STAFF DECORATOR
@@ -56,6 +61,44 @@ def admin_logout(request):
     logout(request)
     return redirect('account:admin_login')
 
+
+def save_face(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid"}, status=400)
+
+    data = json.loads(request.body)
+    descriptor = data.get("face")
+
+    AdminFace.objects.all().delete()  # keep only 1 admin
+    AdminFace.objects.create(
+        name="admin",
+        descriptor=json.dumps(descriptor)
+    )
+
+    return JsonResponse({"status": "saved"})
+
+def face_login(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid"}, status=400)
+
+    data = json.loads(request.body)
+    incoming = np.array(data.get("face"))
+
+    admin = AdminFace.objects.first()
+
+    if not admin:
+        return JsonResponse({"success": False})
+
+    saved = np.array(json.loads(admin.descriptor))
+
+    distance = np.linalg.norm(saved - incoming)
+
+    if distance < 0.55:
+        user = User.objects.get(username="admin")
+        login(request, user)
+        return JsonResponse({"success": True})
+    else:
+        return JsonResponse({"success": False})
 
 # ===============================
 # ✅ USER LOGIN (UPDATED)
