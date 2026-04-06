@@ -288,13 +288,35 @@ body {
         }
 
         .dashboard-container {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(51, 0, 105, 0.37);
-            overflow: hidden;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+
+          .dashboard-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            var(--tip-matte-black) 20%, 
+            var(--tip-gold) 50%, 
+            var(--tip-matte-black) 80%, 
+            transparent 100%);
+    } 
         .dashboard-header {
             background: linear-gradient(135deg, rgba(40, 40, 43, 0.8) 0%, rgba(52, 52, 52, 0.8) 100%);
             padding: 40px;
@@ -808,6 +830,7 @@ body {
         .activity-description {
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.9em;
+            text-align: center;
         }
         .activity-time {
             color: var(--tip-gold);
@@ -888,7 +911,7 @@ body {
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="{% url 'account:account_settings' %}"><i class="fas fa-user-edit"></i> Edit profile</a>
+                    <a href="{% url 'account:account_settings' %}"><i class="fas fa-user-edit"></i> Edit Profile</a>
                     <a href="{% url 'account:add_employment' %}"><i class="fas fa-building"></i> Add Employment</a>
                     <a href="{% url 'account:add_study' %}"><i class="fas fa-book"></i> Further Studies</a>
                     <a href="{% url 'account:alumni_dashboard' %}"><i class="fas fa-chart-line"></i> Dashboard</a>

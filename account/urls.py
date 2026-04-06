@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views, voice_views
 from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 
 app_name = 'account'
 
@@ -65,7 +66,7 @@ urlpatterns = [
     # =============================== 
     # 📜 TERMS AND CONDITIONS & PRIVACY POLICY
     # ===============================
-      path('terms/', views.terms_conditions, name='terms_and_conditions'),   # legacy alias
+    path('terms/', views.terms_conditions, name='terms_and_conditions'),   # legacy alias
     path('privacy/', views.privacy_policy, name='privacy_policy'),       
     
     # ===============================
@@ -73,7 +74,8 @@ urlpatterns = [
     # ===============================
     path('password_change/',
          auth_views.PasswordChangeView.as_view(
-             template_name='registration/password_change_form.html'
+             template_name='registration/password_change_form.html',
+             success_url='/account/password_change/done/'   # absolute path
          ),
          name='password_change'),
 
