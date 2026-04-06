@@ -1,289 +1,196 @@
-{% load static %}  
+{% load static %}
 <form method="POST" id="employment-form" novalidate data-form-type="employment">
-            {% csrf_token %}
+    {% csrf_token %}
 
-            <!-- Company Details Section -->
-            <div class="section-title">
-                Company Details
-            </div>
+    <!-- Company Details Section -->
+    <div class="section-title">Company Details</div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="company_name">
-                        Company Name
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="company_name"
-                        name="company_name" 
-                        placeholder="e.g., Microsoft Corporation"
-                        value="{{ object.company_name|default:'' }}"
-                        required
-                        minlength="2"
-                        maxlength="200"
-                    >
-                    <span class="form-help">Full name of the company or organization</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="job_title">
-                        Job Title
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="job_title"
-                        name="job_title" 
-                        placeholder="e.g., Senior Software Engineer"
-                        value="{{ object.job_title|default:'' }}"
-                        required
-                        minlength="2"
-                        maxlength="200"
-                    >
-                    <span class="form-help">Your position or role at the company</span>
-                </div>
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="employment_type">
-                        Employment Type
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <select id="employment_type" name="employment_type">
-                        <option value="">-- Select Employment Type --</option>
-                        <option value="FULL_TIME" {% if object.employment_type == "FULL_TIME" %}selected{% endif %}>
-                            Full-Time
-                        </option>
-                        <option value="PART_TIME" {% if object.employment_type == "PART_TIME" %}selected{% endif %}>
-                            Part-Time
-                        </option>
-                        <option value="CONTRACT" {% if object.employment_type == "CONTRACT" %}selected{% endif %}>
-                            Contract
-                        </option>
-                        <option value="FREELANCE" {% if object.employment_type == "FREELANCE" %}selected{% endif %}>
-                            Freelance
-                        </option>
-                        <option value="INTERNSHIP" {% if object.employment_type == "INTERNSHIP" %}selected{% endif %}>
-                            Internship
-                        </option>
-                        <option value="TEMPORARY" {% if object.employment_type == "TEMPORARY" %}selected{% endif %}>
-                            Temporary
-                        </option>
-                    </select>
-                    <span class="form-help">Type of employment arrangement</span>
-                </div>
-            </div>
-
-            <!-- Employment Period Section -->
-            <div class="section-title">
-                Employment Period
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="date_hired">
-                        Date Started
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="date" 
-                        id="date_hired"
-                        name="date_hired"
-                        value="{% if object.date_hired %}{{ object.date_hired|date:'Y-m-d' }}{% endif %}"
-                        required
-                    >
-                    <span class="form-help">When did you start this job?</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="date_left">
-                        Date Left
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <input 
-                        type="date" 
-                        id="date_left"
-                        name="date_left"
-                        value="{% if object.date_left %}{{ object.date_left|date:'Y-m-d' }}{% endif %}"
-                    >
-                    <span class="form-help">Leave blank if you're currently employed here</span>
-                </div>
-            </div>
-
-            <!-- Compensation Section -->
-            <div class="section-title">
-                Compensation & Benefits
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="salary_range">
-                        Salary Range
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="salary_range"
-                        name="salary_range" 
-                        placeholder="e.g., ₱80,000 - ₱120,000 per month"
-                        value="{{ object.salary_range|default:'' }}"
-                        maxlength="150"
-                    >
-                    <span class="form-help">Your salary or wage range (optional, keep it general if preferred)</span>
-                </div>
-            </div>
-
-            <!-- Job Related to Course -->
-            <div class="checkbox-group">
-                <input 
-                    type="checkbox" 
-                    id="is_job_related"
-                    name="is_job_related"
-                    {% if object.is_job_related %}checked{% endif %}
-                >
-                <label for="is_job_related">
-                    Job Related to Course
-                </label>
-            </div>
-
-            <!-- Voice Transcript -->
-            <div class="section-title">
-                Voice Input
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="voice_transcript">
-                        Voice Transcript
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <textarea id="voice_transcript" name="voice_transcript" rows="4" placeholder="Voice transcript will appear here when you use the voice recorder...">{{ object.voice_transcript|default:'' }}</textarea>
-                    <span class="form-help">This field is auto-populated when you use the voice recorder feature.</span>
-                </div>
-            </div>
-
-            <!-- Voice Created Checkbox -->
-            <div class="checkbox-group">
-                <input 
-                    type="checkbox" 
-                    id="created_via_voice"
-                    name="created_via_voice"
-                    {% if object.created_via_voice %}checked{% endif %}
-                >
-                <label for="created_via_voice">
-                    Created via Voice Recording
-                </label>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="button-group">
-                <button type="submit" class="btn-submit">
-                    {% if object %}Update Employment{% else %}Add Employment{% endif %}
+    <div class="form-row">
+        <div class="form-group">
+            <label for="company_name">Company Name <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="company_name" name="company_name"
+                    placeholder="e.g., Microsoft Corporation"
+                    value="{{ object.company_name|default:'' }}"
+                    required minlength="2" maxlength="200">
+                <button type="button" class="voice-field-btn" data-target="company_name">
+                    <i class="fas fa-microphone"></i>
                 </button>
-                <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">
-                    Cancel
-                </a>
-                {% if object %}
-                <a href="#" class="btn-delete" data-delete-url="{% url 'account:delete_employment' object.id %}" data-delete-label="{{ object.company_name|escapejs }}">
-                    Delete
-                </a>
-                {% endif %}
             </div>
-        </form>
+            <span class="form-help">Full name of the company or organization</span>
+        </div>
 
-<!-- JavaScript Validation -->
+        <div class="form-group">
+            <label for="job_title">Job Title <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="job_title" name="job_title"
+                    placeholder="e.g., Senior Software Engineer"
+                    value="{{ object.job_title|default:'' }}"
+                    required minlength="2" maxlength="200">
+                <button type="button" class="voice-field-btn" data-target="job_title">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Your position or role at the company</span>
+        </div>
+    </div>
+
+    <div class="form-row full">
+        <div class="form-group">
+            <label for="employment_type">Employment Type <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <select id="employment_type" name="employment_type">
+                    <option value="">-- Select Employment Type --</option>
+                    <option value="FULL_TIME"   {% if object.employment_type == "FULL_TIME"   %}selected{% endif %}>Full-Time</option>
+                    <option value="PART_TIME"   {% if object.employment_type == "PART_TIME"   %}selected{% endif %}>Part-Time</option>
+                    <option value="CONTRACT"    {% if object.employment_type == "CONTRACT"    %}selected{% endif %}>Contract</option>
+                    <option value="FREELANCE"   {% if object.employment_type == "FREELANCE"   %}selected{% endif %}>Freelance</option>
+                    <option value="INTERNSHIP"  {% if object.employment_type == "INTERNSHIP"  %}selected{% endif %}>Internship</option>
+                    <option value="TEMPORARY"   {% if object.employment_type == "TEMPORARY"   %}selected{% endif %}>Temporary</option>
+                </select>
+                <button type="button" class="voice-field-btn" data-target="employment_type">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Type of employment arrangement</span>
+        </div>
+    </div>
+
+    <!-- Employment Period Section -->
+    <div class="section-title">Employment Period</div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="date_hired">Date Started <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="date" id="date_hired" name="date_hired"
+                    value="{% if object.date_hired %}{{ object.date_hired|date:'Y-m-d' }}{% endif %}"
+                    required>
+                <button type="button" class="voice-field-btn" data-target="date_hired">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">When did you start this job?</span>
+        </div>
+
+        <div class="form-group">
+            <label for="date_left">Date Left <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <input type="date" id="date_left" name="date_left"
+                    value="{% if object.date_left %}{{ object.date_left|date:'Y-m-d' }}{% endif %}">
+                <button type="button" class="voice-field-btn" data-target="date_left">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Leave blank if you're currently employed here</span>
+        </div>
+    </div>
+
+    <!-- Compensation Section -->
+    <div class="section-title">Compensation &amp; Benefits</div>
+
+    <div class="form-row full">
+        <div class="form-group">
+            <label for="salary_range">Salary Range <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="salary_range" name="salary_range"
+                    placeholder="e.g., ₱80,000 – ₱120,000 per month"
+                    value="{{ object.salary_range|default:'' }}" maxlength="150">
+                <button type="button" class="voice-field-btn" data-target="salary_range">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Your salary or wage range (keep it general if preferred)</span>
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="is_job_related" name="is_job_related" {% if object.is_job_related %}checked{% endif %}>
+        <label for="is_job_related">Job Related to Course</label>
+    </div>
+
+    <!-- Voice Input Section -->
+    <div class="section-title">Voice Input</div>
+
+    <div class="form-row full">
+        <div class="form-group">
+            <label for="voice_transcript">Voice Transcript <span class="optional">(Optional)</span></label>
+            <textarea id="voice_transcript" name="voice_transcript" rows="4"
+                placeholder="Voice transcript will appear here when you use the voice recorder...">{{ object.voice_transcript|default:'' }}</textarea>
+            <span class="form-help">Auto-populated when you use the voice recorder feature.</span>
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="created_via_voice" name="created_via_voice" {% if object.created_via_voice %}checked{% endif %}>
+        <label for="created_via_voice">Created via Voice Recording</label>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="button-group">
+        <button type="submit" class="btn-submit">
+            {% if object %}Update Employment{% else %}Add Employment{% endif %}
+        </button>
+        <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">Cancel</a>
+        {% if object %}
+        <a href="#" class="btn-delete"
+            data-delete-url="{% url 'account:delete_employment' object.id %}"
+            data-delete-label="{{ object.company_name|escapejs }}">Delete</a>
+        {% endif %}
+    </div>
+</form>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('employment-form');
-        const dateHiredInput = document.getElementById('date_hired');
-        const dateLeftInput = document.getElementById('date_left');
+document.addEventListener('DOMContentLoaded', function () {
+    const form          = document.getElementById('employment-form');
+    const dateHiredInput = document.getElementById('date_hired');
+    const dateLeftInput  = document.getElementById('date_left');
 
-        if (form) {
-            // Form Submission Handler
-            form.addEventListener('submit', function(e) {
-                // Clear previous errors
-                const errorElements = document.querySelectorAll('.form-error');
-                errorElements.forEach(el => el.remove());
+    if (!form) return;
 
-                // Validate company name
-                const companyName = document.getElementById('company_name').value.trim();
-                if (!companyName) {
-                    showError('Company name is required');
-                    e.preventDefault();
-                    return false;
-                }
+    form.addEventListener('submit', function (e) {
+        clearErrors();
 
-                // Validate job title
-                const jobTitle = document.getElementById('job_title').value.trim();
-                if (!jobTitle) {
-                    showError('Job title is required');
-                    e.preventDefault();
-                    return false;
-                }
+        const companyName = document.getElementById('company_name').value.trim();
+        if (!companyName) { showError('Company name is required.'); e.preventDefault(); return; }
 
-                // Validate date range
-                if (dateHiredInput.value && dateLeftInput.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    const dateLeft = new Date(dateLeftInput.value);
-                    
-                    if (dateHired > dateLeft) {
-                        showError('Date started must be before date left');
-                        e.preventDefault();
-                        return false;
-                    }
+        const jobTitle = document.getElementById('job_title').value.trim();
+        if (!jobTitle) { showError('Job title is required.'); e.preventDefault(); return; }
 
-                    // Check if date left is in the future
-                    if (dateLeft > new Date()) {
-                        showError('Date left cannot be in the future');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
+        if (!dateHiredInput.value) { showError('Date started is required.'); e.preventDefault(); return; }
 
-                // Check if date hired is in the future
-                if (dateHiredInput.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    if (dateHired > new Date()) {
-                        showError('Date started cannot be in the future');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
+        const dateHired = new Date(dateHiredInput.value);
+        if (dateHired > new Date()) { showError('Date started cannot be in the future.'); e.preventDefault(); return; }
 
-                // If all validations pass, show loading state
-                const submitBtn = form.querySelector('.btn-submit');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
-                }
-            });
+        if (dateHiredInput.value && dateLeftInput.value) {
+            const dateLeft = new Date(dateLeftInput.value);
+            if (dateHired > dateLeft) { showError('Date started must be before date left.'); e.preventDefault(); return; }
+            if (dateLeft > new Date())  { showError('Date left cannot be in the future.'); e.preventDefault(); return; }
+        }
 
-            // Real-time date validation
-            dateLeftInput.addEventListener('change', function() {
-                if (dateHiredInput.value && this.value) {
-                    const dateHired = new Date(dateHiredInput.value);
-                    const dateLeft = new Date(this.value);
-                    
-                    if (dateHired > dateLeft) {
-                        dateLeftInput.classList.add('error');
-                    } else {
-                        dateLeftInput.classList.remove('error');
-                    }
-                }
-            });
+        const submitBtn = form.querySelector('.btn-submit');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner"></span> Saving...'; }
+    });
 
-            // Show error message
-            function showError(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'form-error';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
-                form.insertBefore(errorDiv, form.firstChild);
-                
-                // Scroll to error
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+    dateLeftInput.addEventListener('change', function () {
+        if (dateHiredInput.value && this.value) {
+            const valid = new Date(this.value) >= new Date(dateHiredInput.value);
+            dateLeftInput.classList.toggle('error', !valid);
+            dateLeftInput.classList.toggle('success', valid);
         }
     });
+
+    function clearErrors() {
+        document.querySelectorAll('.form-error-banner').forEach(el => el.remove());
+        document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    }
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error-banner';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message}</span><button type="button" class="form-error-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+        form.insertBefore(errorDiv, form.firstChild);
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+});
 </script>

@@ -400,7 +400,7 @@ def add_employment(request):
         company = request.POST.get('company_name', '').strip()
         title = request.POST.get('job_title', '').strip()
         date_hired = request.POST.get('date_hired') or None
-        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         Employment.objects.create(
@@ -517,7 +517,7 @@ def add_study(request):
         school = request.POST.get('school_name', '').strip()
         program = request.POST.get('program', '').strip()
         start_year = request.POST.get('start_year') or None
-        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         FurtherStudy.objects.create(

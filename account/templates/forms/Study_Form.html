@@ -1,343 +1,228 @@
 {% load static %}
 <form method="POST" id="study-form" novalidate data-form-type="study">
-            {% csrf_token %}
+    {% csrf_token %}
 
-            <!-- School Details Section -->
-            <div class="section-title">
-                School Details
-            </div>
+    <!-- School Details Section -->
+    <div class="section-title">School Details</div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="school_name">
-                        School/Institution Name
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="school_name"
-                        name="school_name" 
-                        placeholder="e.g., University of the Philippines"
-                        value="{{ object.school_name|default:'' }}"
-                        required
-                        minlength="2"
-                        maxlength="200"
-                    >
-                    <span class="form-help">Full name of the school or institution</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="school_website">
-                        School Website
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <input 
-                        type="url" 
-                        id="school_website"
-                        name="school_website" 
-                        placeholder="https://www.example.com"
-                        value="{{ object.school_website|default:'' }}"
-                        maxlength="250"
-                    >
-                    <span class="form-help">Official website of the school</span>
-                </div>
-            </div>
-
-            <!-- Program Details Section -->
-            <div class="section-title">
-                Program Details
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="program">
-                        Program/Course
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="program"
-                        name="program" 
-                        placeholder="e.g., Master of Science in Computer Science"
-                        value="{{ object.program|default:'' }}"
-                        required
-                        minlength="2"
-                        maxlength="200"
-                    >
-                    <span class="form-help">Name of the program or degree</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="field_of_study">
-                        Field of Study
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="field_of_study"
-                        name="field_of_study" 
-                        placeholder="e.g., Computer Science, Business Administration"
-                        value="{{ object.field_of_study|default:'' }}"
-                        maxlength="150"
-                    >
-                    <span class="form-help">Specialization or major field</span>
-                </div>
-            </div>
-
-            <!-- Study Period Section -->
-            <div class="section-title">
-                Study Period
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="start_year">
-                        Start Year
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="number" 
-                        id="start_year"
-                        name="start_year" 
-                        placeholder="e.g., 2020"
-                        value="{{ object.start_year|default:'' }}"
-                        min="1950"
-                        max="2100"
-                        required
-                    >
-                    <span class="form-help">Year you started the program</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="end_year">
-                        End Year
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <input 
-                        type="number" 
-                        id="end_year"
-                        name="end_year" 
-                        placeholder="e.g., 2022"
-                        value="{{ object.end_year|default:'' }}"
-                        min="1950"
-                        max="2100"
-                    >
-                    <span class="form-help">Leave blank if still studying</span>
-                </div>
-            </div>
-
-            <!-- Status & Notes Section -->
-            <div class="section-title">
-                Status & Notes
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="status">
-                        Status
-                        <span class="required">*</span>
-                    </label>
-                    <select id="status" name="status" required>
-                        <option value="">-- Select Study Status --</option>
-                        <option value="ONGOING" {% if object.status == "ONGOING" %}selected{% endif %}>
-                            Ongoing
-                        </option>
-                        <option value="COMPLETED" {% if object.status == "COMPLETED" %}selected{% endif %}>
-                            Completed
-                        </option>
-                        <option value="DROPPED" {% if object.status == "DROPPED" %}selected{% endif %}>
-                            Dropped
-                        </option>
-                        <option value="INTERRUPTED" {% if object.status == "INTERRUPTED" %}selected{% endif %}>
-                            Interrupted
-                        </option>
-                    </select>
-                    <span class="form-help">Current status of your studies</span>
-                </div>
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="description">
-                        Additional Notes
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <textarea 
-                        id="description"
-                        name="description" 
-                        placeholder="Add any additional information about your studies (thesis topic, achievements, etc.)"
-                        maxlength="500"
-                    >{{ object.description|default:'' }}</textarea>
-                    <span class="form-help">Optional notes about your studies (max 500 characters)</span>
-                </div>
-            </div>
-
-            <!-- Currently Studying -->
-            <div class="checkbox-group">
-                <input 
-                    type="checkbox" 
-                    id="is_ongoing"
-                    name="is_ongoing"
-                    {% if object.is_ongoing %}checked{% endif %}
-                >
-                <label for="is_ongoing">
-                    I'm Currently Studying This Program
-                </label>
-            </div>
-
-            <!-- Voice Input Section -->
-            <div class="section-title">
-                Voice Input
-            </div>
-
-            <div class="form-row full">
-                <div class="form-group">
-                    <label for="voice_transcript">
-                        Voice Transcript
-                        <span class="optional">(Optional)</span>
-                    </label>
-                    <textarea id="voice_transcript" name="voice_transcript" rows="4" placeholder="Voice transcript will appear here when you use the voice recorder...">{{ object.voice_transcript|default:'' }}</textarea>
-                    <span class="form-help">This field is auto-populated when you use the voice recorder feature.</span>
-                </div>
-            </div>
-
-            <!-- Voice Created Checkbox -->
-            <div class="checkbox-group">
-                <input 
-                    type="checkbox" 
-                    id="created_via_voice"
-                    name="created_via_voice"
-                    {% if object.created_via_voice %}checked{% endif %}
-                >
-                <label for="created_via_voice">
-                    Created via Voice Recording
-                </label>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="button-group">
-                <button type="submit" class="btn-submit">
-                    {% if object %}Update Studies{% else %}Add Studies{% endif %}
+    <div class="form-row">
+        <div class="form-group">
+            <label for="school_name">School/Institution Name <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="school_name" name="school_name"
+                    placeholder="e.g., University of the Philippines"
+                    value="{{ object.school_name|default:'' }}"
+                    required minlength="2" maxlength="200">
+                <button type="button" class="voice-field-btn" data-target="school_name" title="Record school name">
+                    <i class="fas fa-microphone"></i>
                 </button>
-                <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">
-                    Cancel
-                </a>
-                {% if object %}
-                <a href="#" class="btn-delete" data-delete-url="{% url 'account:delete_study' object.id %}" data-delete-label="{{ object.program|escapejs }}">
-                    Delete
-                </a>
-                {% endif %}
             </div>
-        </form>
+            <span class="form-help">Full name of the school or institution</span>
+        </div>
 
-<!-- JavaScript Validation -->
+        <div class="form-group">
+            <label for="school_website">School Website <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <input type="url" id="school_website" name="school_website"
+                    placeholder="https://www.example.com"
+                    value="{{ object.school_website|default:'' }}" maxlength="250">
+                <button type="button" class="voice-field-btn" data-target="school_website" title="Record school website">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Official website of the school</span>
+        </div>
+    </div>
+
+    <!-- Program Details Section -->
+    <div class="section-title">Program Details</div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="program">Program/Course <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="program" name="program"
+                    placeholder="e.g., Master of Science in Computer Science"
+                    value="{{ object.program|default:'' }}"
+                    required minlength="2" maxlength="200">
+                <button type="button" class="voice-field-btn" data-target="program" title="Record program name">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Name of the program or degree</span>
+        </div>
+
+        <div class="form-group">
+            <label for="field_of_study">Field of Study <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <input type="text" id="field_of_study" name="field_of_study"
+                    placeholder="e.g., Computer Science, Business Administration"
+                    value="{{ object.field_of_study|default:'' }}" maxlength="150">
+                <button type="button" class="voice-field-btn" data-target="field_of_study" title="Record field of study">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Specialization or major field</span>
+        </div>
+    </div>
+
+    <!-- Study Period Section -->
+    <div class="section-title">Study Period</div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="start_year">Start Year <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <input type="number" id="start_year" name="start_year"
+                    placeholder="e.g., 2020"
+                    value="{{ object.start_year|default:'' }}"
+                    min="1950" max="2100" required>
+                <button type="button" class="voice-field-btn" data-target="start_year" title="Record start year">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Year you started the program</span>
+        </div>
+
+        <div class="form-group">
+            <label for="end_year">End Year <span class="optional">(Optional)</span></label>
+            <div class="input-with-voice">
+                <input type="number" id="end_year" name="end_year"
+                    placeholder="e.g., 2024"
+                    value="{{ object.end_year|default:'' }}"
+                    min="1950" max="2100">
+                <button type="button" class="voice-field-btn" data-target="end_year" title="Record end year">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Year you completed or stopped the program</span>
+        </div>
+    </div>
+
+    <!-- Status & Notes Section -->
+    <div class="section-title">Status &amp; Notes</div>
+
+    <div class="form-row full">
+        <div class="form-group">
+            <label for="status">Status <span class="required">*</span></label>
+            <div class="input-with-voice">
+                <select id="status" name="status" required>
+                    <option value="">-- Select Study Status --</option>
+                    <option value="ONGOING"      {% if object.status == "ONGOING"      %}selected{% endif %}>Ongoing</option>
+                    <option value="COMPLETED"    {% if object.status == "COMPLETED"    %}selected{% endif %}>Completed</option>
+                    <option value="DROPPED"      {% if object.status == "DROPPED"      %}selected{% endif %}>Dropped</option>
+                    <option value="INTERRUPTED"  {% if object.status == "INTERRUPTED"  %}selected{% endif %}>Interrupted</option>
+                </select>
+                <button type="button" class="voice-field-btn" data-target="status" title="Record study status">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <span class="form-help">Current status of your studies</span>
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="is_ongoing" name="is_ongoing" {% if object.is_ongoing %}checked{% endif %}>
+        <label for="is_ongoing">I'm Currently Studying This Program</label>
+    </div>
+
+    <!-- Voice Input Section -->
+    <div class="section-title">Voice Input</div>
+
+    <div class="form-row full">
+        <div class="form-group">
+            <label for="voice_transcript">Voice Transcript <span class="optional">(Optional)</span></label>
+            <textarea id="voice_transcript" name="voice_transcript" rows="4"
+                placeholder="Voice transcript will appear here when you use the voice recorder...">{{ object.voice_transcript|default:'' }}</textarea>
+            <span class="form-help">Auto-populated when you use the voice recorder feature.</span>
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="created_via_voice" name="created_via_voice" {% if object.created_via_voice %}checked{% endif %}>
+        <label for="created_via_voice">Created via Voice Recording</label>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="button-group">
+        <button type="submit" class="btn-submit">
+            {% if object %}Update Studies{% else %}Add Studies{% endif %}
+        </button>
+        <a href="{% url 'account:alumni_dashboard' %}" class="btn-cancel">Cancel</a>
+        {% if object %}
+        <a href="#" class="btn-delete"
+            data-delete-url="{% url 'account:delete_study' object.id %}"
+            data-delete-label="{{ object.program|escapejs }}">Delete</a>
+        {% endif %}
+    </div>
+</form>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('study-form');
-        const startYearInput = document.getElementById('start_year');
-        const endYearInput = document.getElementById('end_year');
-        const statusSelect = document.getElementById('status');
-        const isOngoingCheckbox = document.getElementById('is_ongoing');
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('study-form');
+    const startYearInput = document.getElementById('start_year');
+    const endYearInput   = document.getElementById('end_year');
+    const statusSelect   = document.getElementById('status');
+    const isOngoingCb    = document.getElementById('is_ongoing');
 
-        if (form) {
-            // Form Submission Handler
-            form.addEventListener('submit', function(e) {
-                // Clear previous errors
-                const errorElements = document.querySelectorAll('.form-error');
-                errorElements.forEach(el => el.remove());
+    if (!form) return;
 
-                // Validate school name
-                const schoolName = document.getElementById('school_name').value.trim();
-                if (!schoolName) {
-                    showError('School/Institution name is required');
-                    e.preventDefault();
-                    return false;
-                }
+    form.addEventListener('submit', function (e) {
+        clearErrors();
 
-                // Validate program
-                const program = document.getElementById('program').value.trim();
-                if (!program) {
-                    showError('Program/Course name is required');
-                    e.preventDefault();
-                    return false;
-                }
+        const schoolName = document.getElementById('school_name').value.trim();
+        if (!schoolName) { showError('School/Institution name is required.'); e.preventDefault(); return; }
 
-                // Validate start year
-                const startYear = parseInt(startYearInput.value);
-                if (!startYear || startYear < 1950 || startYear > new Date().getFullYear()) {
-                    showError('Start year must be between 1950 and current year');
-                    e.preventDefault();
-                    return false;
-                }
+        const program = document.getElementById('program').value.trim();
+        if (!program) { showError('Program/Course name is required.'); e.preventDefault(); return; }
 
-                // Validate end year if provided
-                if (endYearInput.value) {
-                    const endYear = parseInt(endYearInput.value);
-                    if (endYear < startYear) {
-                        showError('End year must be after start year');
-                        e.preventDefault();
-                        return false;
-                    }
-                    if (endYear > new Date().getFullYear()) {
-                        showError('End year cannot be in the future');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
+        const startYear = parseInt(startYearInput.value);
+        const thisYear  = new Date().getFullYear();
+        if (!startYear || startYear < 1950 || startYear > thisYear) {
+            showError('Start year must be between 1950 and the current year.');
+            e.preventDefault(); return;
+        }
 
-                // Validate status selection
-                if (!statusSelect.value) {
-                    showError('Please select a study status');
-                    e.preventDefault();
-                    return false;
-                }
+        if (endYearInput.value) {
+            const endYear = parseInt(endYearInput.value);
+            if (endYear < startYear) { showError('End year must be after start year.'); e.preventDefault(); return; }
+            if (endYear > thisYear)  { showError('End year cannot be in the future.'); e.preventDefault(); return; }
+        }
 
-                // Validate ongoing checkbox logic
-                if (statusSelect.value === 'COMPLETED' && isOngoingCheckbox.checked) {
-                    showError('Cannot mark as completed and ongoing at the same time');
-                    e.preventDefault();
-                    return false;
-                }
+        if (!statusSelect.value) { showError('Please select a study status.'); e.preventDefault(); return; }
 
-                // If all validations pass, show loading state
-                const submitBtn = form.querySelector('.btn-submit');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
-                }
-            });
+        if (statusSelect.value === 'COMPLETED' && isOngoingCb.checked) {
+            showError('Cannot mark as completed and ongoing at the same time.');
+            e.preventDefault(); return;
+        }
 
-            // Real-time year validation
-            endYearInput.addEventListener('change', function() {
-                if (startYearInput.value && this.value) {
-                    const startYear = parseInt(startYearInput.value);
-                    const endYear = parseInt(this.value);
-                    
-                    if (endYear < startYear) {
-                        endYearInput.classList.add('error');
-                    } else {
-                        endYearInput.classList.remove('error');
-                    }
-                }
-            });
+        const submitBtn = form.querySelector('.btn-submit');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner"></span> Saving...'; }
+    });
 
-            // Update ongoing status when status changes
-            statusSelect.addEventListener('change', function() {
-                if (this.value === 'COMPLETED' || this.value === 'DROPPED') {
-                    isOngoingCheckbox.checked = false;
-                }
-            });
-
-            // Show error message
-            function showError(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'form-error';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
-                form.insertBefore(errorDiv, form.firstChild);
-                
-                // Scroll to error
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+    endYearInput.addEventListener('change', function () {
+        if (startYearInput.value && this.value) {
+            const valid = parseInt(this.value) >= parseInt(startYearInput.value);
+            endYearInput.classList.toggle('error', !valid);
+            endYearInput.classList.toggle('success', valid);
         }
     });
+
+    statusSelect.addEventListener('change', function () {
+        if (this.value === 'COMPLETED' || this.value === 'DROPPED') isOngoingCb.checked = false;
+    });
+
+    function clearErrors() {
+        document.querySelectorAll('.form-error-banner').forEach(el => el.remove());
+        document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    }
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error-banner';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message}</span><button type="button" class="form-error-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+        form.insertBefore(errorDiv, form.firstChild);
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+});
 </script>
