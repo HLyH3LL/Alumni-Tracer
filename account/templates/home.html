@@ -82,6 +82,40 @@
             50% { transform: translateY(40px); }
         }
 
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.header-logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+.header-logo-text {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--tip-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-logo-text span {
+    color: var(--white);
+}
+
         /* Navigation */
         nav {
             position: fixed;
@@ -101,33 +135,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.1em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .logo img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .logo span {
-            color: var(--white);
-            letter-spacing: 0.5px;
         }
 
         .nav-links {
@@ -723,10 +730,13 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="logo">
+            <a href="{% url 'account:home' %}" class="header-logo">
                 <img src="{{ config.logo_main.url }}" alt="Site Logo">
-                <span>T.I.P.ians Connect</span>
-            </div>
+                <span class="header-logo-text">
+                    T.I.P.IANS<span>CONNECT</span>
+                </span>
+            </a>
+
             <ul class="nav-links">
                 <li><a href="{% url 'account:home' %}">Home</a></li>
                 <li><a href="#about">About</a></li>

@@ -6,11 +6,16 @@ from django.db.models import Count
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from datetime import datetime
+from django.http import JsonResponse
 
 from .auth_forms import LoginForm, AlumniRegistrationForm
 from .models import Alumni, Employment, FurtherStudy, Activity, Program, EmploymentStatus, Feature, RegistrationPageContent
 from .models1 import CarouselSlide, CoreValue, PageContent, SiteConfig
 from django.contrib.auth import logout
+
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 import json
 from django.http import JsonResponse
 from .models import AdminFace
@@ -201,7 +206,6 @@ def alumni_dashboard(request):
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        # Create basic Alumni profile if it doesn't exist
         alumni = Alumni.objects.create(
             user=request.user,
             student_id=request.user.username,
@@ -214,9 +218,32 @@ def alumni_dashboard(request):
         )
         messages.info(request, "Please complete your alumni profile information.")
 
+    employments = alumni.employments.all().order_by('-date_hired')
+    studies = alumni.further_studies.all().order_by('-start_year')
+    employment_count = employments.count()
+    profile_completion = alumni.get_profile_completion_percentage()
+    missing_fields = alumni.get_missing_profile_fields()
+    recent_activities = Activity.objects.filter(alumni=alumni).order_by('-created_at')[:10]
+
+    profile_fields = [
+        alumni.first_name,
+        alumni.last_name,
+        alumni.bio,
+        alumni.profile_photo,
+        alumni.linkedin_url,
+    ]
+    completed_fields = sum(1 for field in profile_fields if field)
+    completion_percent = int((completed_fields / len(profile_fields)) * 100)
+
     context = {
         'alumni': alumni,
         'section': 'dashboard',
+        'profile_completion': profile_completion,
+        'missing_fields': missing_fields,
+        'recent_activities': recent_activities,
+        'all_employments': employments,     
+        'further_studies': studies,   
+        'employment_count': employment_count,    
     }
     return render(request, "account/User_Dashboard.html", context)
 
@@ -227,7 +254,6 @@ def account_settings(request):
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
-        # Create basic Alumni profile if it doesn't exist
         alumni = Alumni.objects.create(
             user=request.user,
             student_id=request.user.username,
@@ -240,13 +266,71 @@ def account_settings(request):
         )
         messages.info(request, "Please complete your alumni profile information.")
 
-    return render(request, "account/account_settings.html", {
+    if request.method == 'POST':
+        try:
+            alumni.first_name = request.POST.get('first_name', alumni.first_name)
+            alumni.last_name = request.POST.get('last_name', alumni.last_name)
+            alumni.email = request.POST.get('email', alumni.email)
+            alumni.contact_number = request.POST.get('contact_number', alumni.contact_number)
+            alumni.bio = request.POST.get('bio', getattr(alumni, 'bio', ''))
+            
+            # Update professional information
+            alumni.current_job_title = request.POST.get('current_job_title', alumni.current_job_title)
+            alumni.current_company = request.POST.get('current_company', alumni.current_company)
+            alumni.seniority_level = request.POST.get('seniority_level', alumni.seniority_level)
+            
+            # Update social networks
+            alumni.linkedin_url = request.POST.get('linkedin_url', getattr(alumni, 'linkedin_url', ''))
+            alumni.facebook_url = request.POST.get('facebook_url', getattr(alumni, 'facebook_url', ''))
+            alumni.instagram_url = request.POST.get('instagram_url', getattr(alumni, 'instagram_url', ''))
+            alumni.github_url = request.POST.get('github_url', getattr(alumni, 'github_url', ''))
+            
+            if 'profile_photo' in request.FILES:
+                uploaded_file = request.FILES['profile_photo']
+                
+                try:
+                    image = Image.open(uploaded_file)
+                    
+                    if image.mode in ('RGBA', 'LA', 'P'):
+                        rgb_image = Image.new('RGB', image.size, (255, 255, 255))
+                        rgb_image.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                        image = rgb_image
+                    
+                    if image.width > 300 or image.height > 300:
+                        image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                    
+                    img_io = BytesIO()
+                    image.save(img_io, format='JPEG', quality=85)
+                    img_io.seek(0)
+
+                    alumni.profile_photo.save(
+                        f'alumni_{alumni.id}.jpg',
+                        ContentFile(img_io.getvalue()),
+                        save=False
+                    )
+                    
+                    Activity.objects.create(
+                        alumni=alumni,
+                        activity_type='PROFILE_PHOTO_UPDATE',
+                        description='Uploaded a new profile photo.'
+                    )
+                    
+                except Exception as e:
+                    messages.error(request, f'Error processing image: {str(e)}')
+                    return render(request, "account/Account_Settings.html", {"alumni": alumni})
+            
+            alumni.save()
+            messages.success(request, 'Your settings have been saved successfully!')
+            return redirect('account:account_settings')
+            
+        except Exception as e:
+            messages.error(request, f'Error saving settings: {str(e)}')
+            return render(request, "account/Account_Settings.html", {"alumni": alumni})
+
+    context = {
         "alumni": alumni
-    })
-
-
-
-
+    }
+    return render(request, "account/Account_Settings.html", context)
 
 
 # ===============================
@@ -359,7 +443,7 @@ def add_employment(request):
         company = request.POST.get('company_name', '').strip()
         title = request.POST.get('job_title', '').strip()
         date_hired = request.POST.get('date_hired') or None
-        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         Employment.objects.create(
@@ -372,9 +456,12 @@ def add_employment(request):
             voice_updated=False,
         )
         messages.success(request, 'Employment record added.')
-        return redirect('account:employment_list')
+        return redirect('account:alumni_dashboard')
 
-    return render(request, 'forms/Employment_Form.html')
+    return render(request, 'forms/Base_Form.html', {
+    'type': 'employment',
+    'object': None,
+})
 
 
 @login_required
@@ -393,9 +480,12 @@ def edit_employment(request, employment_id):
         employment.date_hired = request.POST.get('date_hired') or employment.date_hired
         employment.save()
         messages.success(request, 'Employment record updated.')
-        return redirect('account:employment_list')
+        return redirect('account:alumni_dashboard')
 
-    return render(request, 'forms/Employment_Form.html', {'employment': employment})
+    return render(request, 'forms/Base_Form.html', {
+    'type': 'employment',
+    'object': employment,
+})
 
 
 @login_required
@@ -403,20 +493,37 @@ def delete_employment(request, employment_id):
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'message': 'Profile not found.'}, status=404)
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
 
     employment = get_object_or_404(Employment, pk=employment_id, alumni=alumni)
+
+    # AJAX request
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if request.method == 'POST':
+            employment.delete()
+            Activity.objects.create(
+                alumni=alumni,
+                activity_type='EMPLOYMENT_DELETE',
+                description=f'Deleted employment at {employment.company_name}'
+            )
+            return JsonResponse({'ok': True, 'message': 'Employment record deleted.'})
+        else:
+            return JsonResponse({'ok': False, 'message': 'Invalid request method.'}, status=405)
+
     if request.method == 'POST':
         employment.delete()
         messages.success(request, 'Employment record deleted.')
-        return redirect('account:employment_list')
+        return redirect('account:alumni_dashboard') 
 
-    return render(request, 'account/confirm_delete_employment.html', {'employment': employment})
+    # GET request – show confirmation page (optional, but keep for compatibility)
+    return render(request, 'account/Delete_Confirm.html', {'employment': employment})
 
 
 # ===============================
-# ✅ FURTHER STUDIES CRUD (minimal safe stubs)
+# ✅ FURTHER STUDIES CRUD
 # ===============================
 @login_required
 def studies_list(request):
@@ -453,7 +560,7 @@ def add_study(request):
         school = request.POST.get('school_name', '').strip()
         program = request.POST.get('program', '').strip()
         start_year = request.POST.get('start_year') or None
-        created_via_voice = request.POST.get('created_via_voice') == 'on'
+        created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
 
         FurtherStudy.objects.create(
@@ -466,9 +573,12 @@ def add_study(request):
             voice_updated=False,
         )
         messages.success(request, 'Study record added.')
-        return redirect('account:studies_list')
+        return redirect('account:alumni_dashboard')
 
-    return render(request, 'forms/Study_Form.html')
+    return render(request, 'forms/Base_Form.html', {
+        'type': 'study',
+        'object': None
+    })
 
 
 @login_required
@@ -489,9 +599,12 @@ def edit_study(request, study_id):
         study.is_ongoing = bool(request.POST.get('is_ongoing', study.is_ongoing))
         study.save()
         messages.success(request, 'Study record updated.')
-        return redirect('account:studies_list')
+        return redirect('account:alumni_dashboard')
 
-    return render(request, 'forms/Study_Form.html', {'study': study})
+    return render(request, 'forms/Base_Form.html', {
+        'type': 'study',
+        'object': study
+    })
 
 
 @login_required
@@ -499,16 +612,32 @@ def delete_study(request, study_id):
     try:
         alumni = request.user.alumni_profile
     except Alumni.DoesNotExist:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'message': 'Profile not found.'}, status=404)
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
 
     study = get_object_or_404(FurtherStudy, pk=study_id, alumni=alumni)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if request.method == 'POST':
+            study.delete()
+            Activity.objects.create(
+                alumni=alumni,
+                activity_type='STUDY_DELETE',
+                description=f'Deleted study: {study.program} at {study.school_name}'
+            )
+            return JsonResponse({'ok': True, 'message': 'Study record deleted.'})
+        else:
+            return JsonResponse({'ok': False, 'message': 'Invalid request method.'}, status=405)
+
     if request.method == 'POST':
         study.delete()
         messages.success(request, 'Study record deleted.')
-        return redirect('account:studies_list')
+        return redirect('account:alumni_dashboard')
 
-    return render(request, 'account/confirm_delete_study.html', {'study': study})
+    return render(request, 'account/Delete_Confirm.html', {'study': study})
+
 # ===============================
 # 🛠️ ADMIN FEATURES (SIDEBAR)
 # ===============================
