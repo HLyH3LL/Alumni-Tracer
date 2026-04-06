@@ -1,6 +1,6 @@
 asgiref==3.11.1
 dj-database-url==3.1.2
-Django==6.0.2
+Django==5.2.12
 django-taggit==6.1.0
 numpy==2.4.4
 pillow==12.1.1
