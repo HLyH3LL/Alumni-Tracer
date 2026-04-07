@@ -1,9 +1,398 @@
 {% extends "account/admin/_layout.html" %}
 
 {% block content %}
-<div class="title">Reports</div>
+<div class="title">Reports Overview</div>
 
-<div class="card">
-  <p>Analytics and reports will be displayed here.</p>
+<!-- 🔥 KEY METRICS ROW -->
+<div class="metrics-grid">
+  <div class="metric-card highlight">
+    <h3>Total Alumni</h3>
+    <p class="big-number">{{ total_alumni }}</p>
+  </div>
+
+  <div class="metric-card">
+    <h3>Employment Status</h3>
+    <div class="mini-list">
+      {% for item in status_breakdown %}
+        <div class="mini-item">
+          <span>{{ item.employment_status }}</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      {% empty %}
+        <p>No data available</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <h3>Top Programs</h3>
+    <div class="mini-list">
+      {% for item in by_program|slice:":3" %}
+        <div class="mini-item">
+          <span>{{ item.program }}</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      {% empty %}
+        <p>No data available</p>
+      {% endfor %}
+    </div>
+  </div>
 </div>
+
+<!-- 🔥 CHARTS ROW -->
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Employment Distribution</h3>
+    <canvas id="employmentChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Programs Overview</h3>
+    <canvas id="programChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Graduation Trends</h3>
+    <canvas id="yearChart"></canvas>
+  </div>
+</div>
+
+<!-- 🔥 AI INSIGHTS SECTION -->
+<div class="ai-section">
+  <div class="ai-card">
+    <div class="ai-header">
+       AI Insights
+      <span class="ai-badge">Auto Analysis</span>
+    </div>
+    <div class="ai-content">
+      <p id="ai-summary">{{ ai_summary }}</p>
+      <button onclick="playAI()" class="ai-btn">
+         Listen to Report
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ===================== */
+/* 🔥 KEY METRICS ROW */
+/* ===================== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.metric-card {
+  background: #111;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 14px;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.12);
+}
+
+.metric-card h3 {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #bbb;
+  font-weight: 600;
+}
+
+.highlight {
+  text-align: center;
+  background: linear-gradient(145deg, #111, #1a1a1a);
+}
+
+.big-number {
+  font-size: 42px;
+  font-weight: bold;
+  color: #ffd700;
+  margin: 0;
+}
+
+/* ===================== */
+/* MINI LIST */
+/* ===================== */
+.mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.mini-item:last-child {
+  border-bottom: none;
+}
+
+.mini-item span {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.mini-item strong {
+  font-size: 16px;
+  color: #ffd700;
+  font-weight: 700;
+}
+
+/* ===================== */
+/* 🔥 CHARTS ROW (3 COL) */
+/* ===================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+/* ===================== */
+/* 🔥 CHART CARD */
+/* ===================== */
+.chart-card {
+  background: #111;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 14px;
+  padding: 20px;
+  min-height: 280px;
+  transition: 0.3s;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.12);
+}
+
+.chart-card h3 {
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #bbb;
+  font-weight: 600;
+}
+
+/* ===================== */
+/* 🤖 AI SECTION */
+/* ===================== */
+.ai-section {
+  margin-top: 30px;
+}
+
+.ai-card {
+  width: 100%;
+  padding: 28px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+}
+
+.ai-header {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffd700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.ai-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  font-weight: 500;
+}
+
+.ai-content p {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 14px;
+  margin: 0 0 15px 0;
+}
+
+.ai-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #ffd700, #ffae00);
+  color: #111;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.ai-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.ai-btn:active {
+  transform: scale(0.98);
+}
+
+/* ===================== */
+/* RESPONSIVE */
+/* ===================== */
+@media (max-width: 1200px) {
+  .metrics-grid,
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid,
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<!-- 🔥 CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function playAI() {
+    const text = document.getElementById("ai-summary").innerText;
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.95;
+    speech.pitch = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(speech);
+}
+
+// Parse data
+const statusLabels = JSON.parse('{{ status_labels|escapejs }}');
+const statusData = JSON.parse('{{ status_data|escapejs }}');
+const programLabels = JSON.parse('{{ program_labels|escapejs }}');
+const programData = JSON.parse('{{ program_data|escapejs }}');
+const yearLabels = JSON.parse('{{ year_labels|escapejs }}');
+const yearData = JSON.parse('{{ year_data|escapejs }}');
+
+// Global Chart Settings
+Chart.defaults.color = "#ccc";
+Chart.defaults.borderColor = "#333";
+
+// PIE CHART - Employment Distribution
+new Chart(document.getElementById('employmentChart'), {
+  type: 'pie',
+  data: {
+    labels: statusLabels,
+    datasets: [{
+      data: statusData,
+      backgroundColor: [
+        "#ffd700",
+        "#ffae00",
+        "#ffaa33",
+        "#ffcc00"
+      ],
+      borderColor: "#111",
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: "#ccc",
+          padding: 15,
+          font: { size: 12 }
+        }
+      }
+    }
+  }
+});
+
+// BAR CHART - Programs
+new Chart(document.getElementById('programChart'), {
+  type: 'bar',
+  data: {
+    labels: programLabels,
+    datasets: [{
+      label: 'Count',
+      data: programData,
+      backgroundColor: "#ffd700",
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      x: {
+        ticks: { color: "#ccc", font: { size: 11 } },
+        grid: { color: "#222", drawBorder: false }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { color: "#ccc" },
+        grid: { color: "#222", drawBorder: false }
+      }
+    },
+    plugins: {
+      legend: { display: false }
+    }
+  }
+});
+
+// LINE CHART - Graduation Trends
+new Chart(document.getElementById('yearChart'), {
+  type: 'line',
+  data: {
+    labels: yearLabels,
+    datasets: [{
+      label: 'Graduates',
+      data: yearData,
+      borderColor: "#ffd700",
+      backgroundColor: "rgba(255,215,0,0.1)",
+      fill: true,
+      tension: 0.4,
+      pointRadius: 4,
+      pointBackgroundColor: "#ffd700",
+      pointBorderColor: "#111",
+      pointBorderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      x: {
+        ticks: { color: "#ccc" },
+        grid: { color: "#222", drawBorder: false }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { color: "#ccc" },
+        grid: { color: "#222", drawBorder: false }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: { color: "#ccc" }
+      }
+    }
+  }
+});
+</script>
+
 {% endblock %}

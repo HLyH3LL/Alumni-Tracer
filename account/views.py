@@ -725,11 +725,127 @@ def reject_alumni(request, id):
 def announcements(request):
     return render(request, 'account/admin/announcements.html')
 
+# ================================
+# 🤖 AI FUNCTION (PLACE THIS ABOVE reports)
+# ================================
+def generate_report_summary(data):
+    total = data.get("total_alumni", 0)
+    employed = data.get("employed", 0)
+    unemployed = data.get("unemployed", 0)
+
+    if total == 0:
+        return "There is currently no alumni data available."
+
+    rate = (employed / total) * 100
+
+    # 🔥 AI INSIGHT LOGIC - Consider 50% as balanced (within 5% threshold)
+    if abs(rate - 50) < 5:
+        insight = "Employment and unemployment rates are currently balanced."
+    elif rate > 50:
+        insight = "This indicates that the majority of alumni are successfully employed."
+    else:
+        insight = "This suggests a need to improve employability among graduates."
+
+    # 🔥 COMBINED OUTPUT
+    return f"""
+    Out of {total} alumni, {employed} are currently employed while {unemployed} are unemployed.
+    This corresponds to an employment rate of approximately {rate:.1f}%.
+
+    {insight}
+    """.strip()
+
 
 @staff_required
 def reports(request):
-    return render(request, 'account/admin/reports.html')
+    total_alumni = Alumni.objects.count()
 
+    # 🔥 EMPLOYMENT
+    status_breakdown = list(
+        Alumni.objects
+        .values('employment_status')
+        .annotate(total=Count('id'))
+    )
+
+    max_status = max([item['total'] for item in status_breakdown], default=1)
+
+    for item in status_breakdown:
+        item['percent'] = (item['total'] / max_status) * 100
+
+    # 🔥 PROGRAM
+    by_program = list(
+        Alumni.objects
+        .values('program')
+        .annotate(total=Count('id'))
+    )
+
+    max_program = max([item['total'] for item in by_program], default=1)
+
+    for item in by_program:
+        item['percent'] = (item['total'] / max_program) * 100
+
+    # 🔥 YEAR
+    by_year = list(
+        Alumni.objects
+        .values('graduation_year')
+        .annotate(total=Count('id'))
+    )
+
+    max_year = max([item['total'] for item in by_year], default=1)
+
+    for item in by_year:
+        item['percent'] = (item['total'] / max_year) * 100
+
+    # DEBUG (optional)
+    print(status_breakdown)
+    print(by_program)
+    print(by_year)
+
+    # ================================
+    # 🤖 AI COMPONENT: Report Intelligence Engine
+    # ================================
+    employed = 0
+    unemployed = 0
+
+    for i in status_breakdown:
+        status = str(i['employment_status']).strip().lower()
+        # Exact match for employed/unemployed to avoid partial matches
+        if status == 'employed':
+            employed += i['total']
+        elif status == 'unemployed':
+            unemployed += i['total']
+    
+    data = {
+        "total_alumni": total_alumni,
+        "employed": employed,
+        "unemployed": unemployed,
+    }
+
+    ai_summary = generate_report_summary(data)
+
+    # ================================
+    # 🎯 CONTEXT (NO CHANGES TO CHARTS)
+    # ================================
+    context = {
+        'total_alumni': total_alumni,
+        'status_breakdown': status_breakdown,
+        'by_program': by_program,
+        'by_year': by_year,
+
+        # 🔥 charts (UNCHANGED)
+        'status_labels': json.dumps([i['employment_status'] for i in status_breakdown]),
+        'status_data': json.dumps([i['total'] for i in status_breakdown]),
+
+        'program_labels': json.dumps([i['program'] for i in by_program]),
+        'program_data': json.dumps([i['total'] for i in by_program]),
+
+        'year_labels': json.dumps([i['graduation_year'] for i in by_year]),
+        'year_data': json.dumps([i['total'] for i in by_year]),
+
+        # 🤖 AI OUTPUT (NEW)
+        'ai_summary': ai_summary,
+    }
+
+    return render(request, 'account/admin/reports.html', context)
 
 @staff_required
 def user_management(request):
