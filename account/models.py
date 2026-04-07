@@ -56,8 +56,6 @@ class Alumni(models.Model):
     program = models.CharField(max_length=120)
     graduation_year = models.PositiveIntegerField()
 
-    is_verified = models.BooleanField(default=False)
-
     profile_photo = models.ImageField(
         upload_to='alumni_photos/', 
         blank=True, 
