@@ -726,7 +726,10 @@ def announcements(request):
     return render(request, 'account/admin/announcements.html')
 
 # ================================
-# 🤖 AI FUNCTION (PLACE THIS ABOVE reports)
+# AI FUNCTION (PLACE THIS ABOVE reports)
+# ================================
+# ================================
+#  AI FUNCTION (ENHANCED)
 # ================================
 def generate_report_summary(data):
     total = data.get("total_alumni", 0)
@@ -737,31 +740,63 @@ def generate_report_summary(data):
         return "There is currently no alumni data available."
 
     rate = (employed / total) * 100
+    unemployment_rate = (unemployed / total) * 100
 
-    # 🔥 AI INSIGHT LOGIC - Consider 50% as balanced (within 5% threshold)
+    # 🔥 Insight logic
     if abs(rate - 50) < 5:
-        insight = "Employment and unemployment rates are currently balanced."
+        insight = "The employment distribution is balanced, indicating an equal proportion of employed and unemployed graduates."
     elif rate > 50:
-        insight = "This indicates that the majority of alumni are successfully employed."
+        insight = "A strong majority of alumni are employed, suggesting that the institution is effectively preparing students for the workforce."
     else:
-        insight = "This suggests a need to improve employability among graduates."
+        insight = "A significant portion of alumni remain unemployed, indicating a potential gap between academic preparation and industry demands."
 
-    # 🔥 COMBINED OUTPUT
+    # 🔥 Additional insights
+    if rate >= 75:
+        trend = "This is considered a high employment rate and reflects positively on graduate outcomes."
+    elif rate >= 60:
+        trend = "This reflects a moderately strong employment outcome among graduates."
+    elif rate >= 40:
+        trend = "Employment outcomes are average and may require strategic improvements."
+    else:
+        trend = "Employment outcomes are low and may require urgent intervention such as career support programs."
+
+    # 🔥 Recommendations
+    if rate < 60:
+        recommendation = "It is recommended to strengthen internship programs, industry partnerships, and career guidance services."
+    else:
+        recommendation = "Maintaining strong industry linkages and continuously updating the curriculum can help sustain positive outcomes."
+
     return f"""
-    Out of {total} alumni, {employed} are currently employed while {unemployed} are unemployed.
-    This corresponds to an employment rate of approximately {rate:.1f}%.
+Out of {total} alumni, {employed} are currently employed while {unemployed} are unemployed.
+This corresponds to an employment rate of approximately {rate:.1f}% and an unemployment rate of {unemployment_rate:.1f}%.
 
-    {insight}
-    """.strip()
+{insight}
+
+{trend}
+
+Recommendation:
+{recommendation}
+""".strip()
 
 
 @staff_required
 def reports(request):
-    total_alumni = Alumni.objects.count()
+
+    # ================================
+    # 🔽 YEAR FILTER (NEW)
+    # ================================
+    selected_year = request.GET.get('year')
+
+    alumni_qs = Alumni.objects.all()
+
+    if selected_year:
+        alumni_qs = alumni_qs.filter(graduation_year=selected_year)
+
+    total_alumni = alumni_qs.count()
 
     # 🔥 EMPLOYMENT
     status_breakdown = list(
-        Alumni.objects
+        alumni_qs
         .values('employment_status')
         .annotate(total=Count('id'))
     )
@@ -773,7 +808,7 @@ def reports(request):
 
     # 🔥 PROGRAM
     by_program = list(
-        Alumni.objects
+        alumni_qs
         .values('program')
         .annotate(total=Count('id'))
     )
@@ -785,7 +820,7 @@ def reports(request):
 
     # 🔥 YEAR
     by_year = list(
-        Alumni.objects
+        alumni_qs
         .values('graduation_year')
         .annotate(total=Count('id'))
     )
@@ -795,25 +830,24 @@ def reports(request):
     for item in by_year:
         item['percent'] = (item['total'] / max_year) * 100
 
-    # DEBUG (optional)
+    # DEBUG
     print(status_breakdown)
     print(by_program)
     print(by_year)
 
     # ================================
-    # 🤖 AI COMPONENT: Report Intelligence Engine
+    # 🤖 AI COMPONENT
     # ================================
     employed = 0
     unemployed = 0
 
     for i in status_breakdown:
         status = str(i['employment_status']).strip().lower()
-        # Exact match for employed/unemployed to avoid partial matches
         if status == 'employed':
             employed += i['total']
         elif status == 'unemployed':
             unemployed += i['total']
-    
+
     data = {
         "total_alumni": total_alumni,
         "employed": employed,
@@ -823,7 +857,14 @@ def reports(request):
     ai_summary = generate_report_summary(data)
 
     # ================================
-    # 🎯 CONTEXT (NO CHANGES TO CHARTS)
+    # 🔽 AVAILABLE YEARS (NEW)
+    # ================================
+    available_years = Alumni.objects.values_list(
+        'graduation_year', flat=True
+    ).distinct().order_by('-graduation_year')
+
+    # ================================
+    # 🎯 CONTEXT
     # ================================
     context = {
         'total_alumni': total_alumni,
@@ -831,7 +872,7 @@ def reports(request):
         'by_program': by_program,
         'by_year': by_year,
 
-        # 🔥 charts (UNCHANGED)
+        # charts
         'status_labels': json.dumps([i['employment_status'] for i in status_breakdown]),
         'status_data': json.dumps([i['total'] for i in status_breakdown]),
 
@@ -841,8 +882,12 @@ def reports(request):
         'year_labels': json.dumps([i['graduation_year'] for i in by_year]),
         'year_data': json.dumps([i['total'] for i in by_year]),
 
-        # 🤖 AI OUTPUT (NEW)
+        # 🤖 AI OUTPUT
         'ai_summary': ai_summary,
+
+        # 🔽 NEW
+        'available_years': available_years,
+        'selected_year': selected_year,
     }
 
     return render(request, 'account/admin/reports.html', context)

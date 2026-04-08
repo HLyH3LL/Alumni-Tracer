@@ -57,6 +57,18 @@
   </div>
 </div>
 
+<form method="GET">
+    <label for="year">Filter by Year:</label>
+    <select name="year" onchange="this.form.submit()">
+        <option value="">All Years</option>
+        {% for year in available_years %}
+            <option value="{{ year }}" {% if year|stringformat:"s" == selected_year %}selected{% endif %}>
+                {{ year }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
 <!-- 🔥 AI INSIGHTS SECTION -->
 <div class="ai-section">
   <div class="ai-card">
