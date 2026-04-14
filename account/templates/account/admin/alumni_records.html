@@ -89,6 +89,22 @@
   color: #ff5252;
 }
 
+.badge-self-employed {
+  background: rgba(33, 150, 243, 0.2);
+  color: #42a5f5;
+}
+
+.badge-further-studies {
+  background: rgba(156, 39, 176, 0.2);
+  color: #ce93d8;
+}
+
+.badge-unknown {
+  background: rgba(158, 158, 158, 0.2);
+  color: #bdbdbd;
+}
+
+
 /* ACTIONS */
 .action-link {
   text-decoration: none;
@@ -154,11 +170,19 @@
         <td>{{ alumni.program }}</td>
 
         <td>
-          {% if alumni.employment_status == "EMPLOYED" %}
-            <span class="badge badge-employed">Employed</span>
-          {% else %}
-            <span class="badge badge-unemployed">Unemployed</span>
-          {% endif %}
+          {% with status=alumni.employment_status|upper %}
+            {% if status == "EMPLOYED" %}
+              <span class="badge badge-employed">Employed</span>
+            {% elif status == "UNEMPLOYED" %}
+              <span class="badge badge-unemployed">Unemployed</span>
+            {% elif status == "SELF_EMPLOYED" %}
+              <span class="badge badge-self-employed">Self‑Employed</span>
+            {% elif status == "STUDENT" %}
+              <span class="badge badge-further-studies">Further Studies</span>
+            {% else %}
+              <span class="badge badge-unknown">Unknown</span>
+            {% endif %}
+          {% endwith %}
         </td>
 
         <td>{{ alumni.graduation_year }}</td>
