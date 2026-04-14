@@ -16,6 +16,10 @@
       color:#ffffff;
     }
 
+  :root {
+    --tip-gold: #FFD700;
+    --white: #ffffff;
+}
     .topbar{
       height:64px;
       background: #000;
@@ -28,31 +32,31 @@
       border-bottom: 3px solid #ffd700;
     }
 
-    .logo {
+    .header-logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.1em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
+            text-decoration: none;
             transition: transform 0.3s ease;
         }
-
-        .logo:hover {
+        .header-logo:hover {
             transform: scale(1.05);
         }
-
-        .logo img {
+        .header-logo img {
             width: 50px;
             height: 50px;
             object-fit: contain;
-            display: block;
         }
-
-        .logo span {
+        .header-logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--tip-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header-logo-text span {
             color: var(--white);
-            letter-spacing: 0.5px;
         }
 
     .user-label {
@@ -171,10 +175,11 @@
 <body>
 
   <div class="topbar">
-    <div class="logo">
-      <img src="{{ config.logo_main.url }}" alt="Site Logo">
-      <span>T.I.P.ians Connect</span>
-    </div>
+        <a href="{% url 'account:home' %}" class="header-logo">
+            <img src="{% if config.logo_main %}{{ config.logo_main.url }}{% else %}https://via.placeholder.com/50?text=TIP{% endif %}" alt="Site Logo">
+            <span class="header-logo-text">T.I.P.IANS<span>CONNECT</span></span>
+        </a>
+        
     <div class="user-label">{{ request.user.username }}</div>
   </div>
 

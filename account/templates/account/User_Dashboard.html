@@ -793,50 +793,70 @@ body {
             opacity: 0.5;
         }
 
-        .activity-timeline {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .activity-item {
-            background: rgba(255, 215, 0, 0.08);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            border-left: 3px solid var(--tip-gold);
-            border-radius: 8px;
-            padding: 15px 20px;
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-            transition: all 0.3s ease;
-        }
-        .activity-item:hover {
-            background: rgba(255, 215, 0, 0.12);
-            transform: translateX(5px);
-        }
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--tip-gold);
-        }
-        .activity-title {
-            color: var(--white);
-            font-weight: 600;
-        }
-        .activity-description {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9em;
-            text-align: center;
-        }
-        .activity-time {
-            color: var(--tip-gold);
-            font-size: 0.8em;
-            font-weight: 600;
-        }
+ .activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    background: rgba(255, 215, 0, 0.08);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-left: 3px solid var(--tip-gold);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 215, 0, 0.12);
+    transform: translateX(5px);
+}
+
+.activity-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tip-gold);
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.activity-title {
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.activity-description {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.activity-time {
+    color: var(--tip-gold);
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-left: auto;
+    padding-left: 16px;
+}
 
         footer {
             background: rgba(0, 0, 0, 0.5);
@@ -1165,26 +1185,26 @@ body {
                 <!-- Recent Activity -->
                 <h2 class="section-title"><span>Recent Activity</span></h2>
                 {% if recent_activities %}
-                <div class="activity-timeline">
-                    {% for activity in recent_activities %}
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-{% if 'profile' in activity.get_activity_type_display|lower %}edit{% elif 'employment' in activity.get_activity_type_display|lower %}briefcase{% elif 'study' in activity.get_activity_type_display|lower %}book{% else %}star{% endif %}"></i>
-                        </div>
-                        <div class="activity-content">
+                    <div class="activity-timeline">
+                        {% for activity in recent_activities %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-{% if 'profile' in activity.get_activity_type_display|lower %}edit{% elif 'employment' in activity.get_activity_type_display|lower %}briefcase{% elif 'study' in activity.get_activity_type_display|lower %}book{% else %}star{% endif %}"></i>
+                            </div>
+                            <div class="activity-content">
                             <div class="activity-title">{{ activity.get_activity_type_display }}</div>
-                            <div class="activity-description">{{ activity.description|default:"Action completed" }}</div>
+                            <div class="activity-description">{{ activity.description }}</div>
                             <div class="activity-time">{{ activity.created_at|date:"M d, Y \a\t H:i" }}</div>
                         </div>
                     </div>
                     {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <p>No recent activity yet. Start by updating your profile or adding employment history.</p>
-                </div>
-                {% endif %}
+            </div>
+{% else %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No recent activity yet. Start by updating your profile or adding employment history.</p>
+    </div>
+{% endif %}
             </div>
         </div>
     </div>

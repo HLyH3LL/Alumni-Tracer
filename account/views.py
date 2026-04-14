@@ -247,8 +247,6 @@ def alumni_dashboard(request):
     }
     return render(request, "account/User_Dashboard.html", context)
 
-
-
 @login_required
 def account_settings(request):
     try:
@@ -265,9 +263,18 @@ def account_settings(request):
             employment_status='UNKNOWN'
         )
         messages.info(request, "Please complete your alumni profile information.")
-
+ 
     if request.method == 'POST':
         try:
+            changes = []
+            
+            old_first_name = alumni.first_name
+            old_last_name = alumni.last_name
+            old_bio = getattr(alumni, 'bio', '')
+            old_job_title = alumni.current_job_title
+            old_company = alumni.current_company
+            old_linkedin = getattr(alumni, 'linkedin_url', '')
+            
             alumni.first_name = request.POST.get('first_name', alumni.first_name)
             alumni.last_name = request.POST.get('last_name', alumni.last_name)
             alumni.email = request.POST.get('email', alumni.email)
@@ -285,6 +292,18 @@ def account_settings(request):
             alumni.instagram_url = request.POST.get('instagram_url', getattr(alumni, 'instagram_url', ''))
             alumni.github_url = request.POST.get('github_url', getattr(alumni, 'github_url', ''))
             
+            if alumni.first_name != old_first_name or alumni.last_name != old_last_name:
+                changes.append('name')
+            if alumni.bio != old_bio:
+                changes.append('bio')
+            if alumni.current_job_title != old_job_title:
+                changes.append('job title')
+            if alumni.current_company != old_company:
+                changes.append('company')
+            if alumni.linkedin_url != old_linkedin:
+                changes.append('LinkedIn profile')
+            
+            # Handle profile photo
             if 'profile_photo' in request.FILES:
                 uploaded_file = request.FILES['profile_photo']
                 
@@ -302,31 +321,34 @@ def account_settings(request):
                     img_io = BytesIO()
                     image.save(img_io, format='JPEG', quality=85)
                     img_io.seek(0)
-
+ 
                     alumni.profile_photo.save(
                         f'alumni_{alumni.id}.jpg',
                         ContentFile(img_io.getvalue()),
                         save=False
                     )
-                    
-                    Activity.objects.create(
-                        alumni=alumni,
-                        activity_type='PROFILE_PHOTO_UPDATE',
-                        description='Uploaded a new profile photo.'
-                    )
+                    changes.append('profile photo')
                     
                 except Exception as e:
                     messages.error(request, f'Error processing image: {str(e)}')
                     return render(request, "account/Account_Settings.html", {"alumni": alumni})
             
             alumni.save()
+            
+            if changes:
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type='PROFILE_UPDATE',
+                    description=f'Updated profile: {", ".join(changes)}'
+                )
+            
             messages.success(request, 'Your settings have been saved successfully!')
             return redirect('account:account_settings')
             
         except Exception as e:
             messages.error(request, f'Error saving settings: {str(e)}')
             return render(request, "account/Account_Settings.html", {"alumni": alumni})
-
+ 
     context = {
         "alumni": alumni
     }
@@ -438,15 +460,15 @@ def add_employment(request):
     except Alumni.DoesNotExist:
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
-
+ 
     if request.method == 'POST':
         company = request.POST.get('company_name', '').strip()
         title = request.POST.get('job_title', '').strip()
         date_hired = request.POST.get('date_hired') or None
         created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
-
-        Employment.objects.create(
+ 
+        employment = Employment.objects.create(
             alumni=alumni,
             company_name=company,
             job_title=title,
@@ -455,13 +477,20 @@ def add_employment(request):
             voice_transcript=voice_transcript,
             voice_updated=False,
         )
+
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type='EMPLOYMENT_CREATE',
+            description=f'Added employment: {title} at {company}'
+        )
+        
         messages.success(request, 'Employment record added.')
         return redirect('account:alumni_dashboard')
-
+ 
     return render(request, 'forms/Base_Form.html', {
-    'type': 'employment',
-    'object': None,
-})
+        'type': 'employment',
+        'object': None,
+    })
 
 
 @login_required
@@ -471,21 +500,31 @@ def edit_employment(request, employment_id):
     except Alumni.DoesNotExist:
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
-
+ 
     employment = get_object_or_404(Employment, pk=employment_id, alumni=alumni)
-
+ 
     if request.method == 'POST':
+        old_title = employment.job_title
+        old_company = employment.company_name
+        
         employment.company_name = request.POST.get('company_name', employment.company_name)
         employment.job_title = request.POST.get('job_title', employment.job_title)
         employment.date_hired = request.POST.get('date_hired') or employment.date_hired
         employment.save()
+
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type='EMPLOYMENT_UPDATE',
+            description=f'Updated employment: {employment.job_title} at {employment.company_name}'
+        )
+        
         messages.success(request, 'Employment record updated.')
         return redirect('account:alumni_dashboard')
-
+ 
     return render(request, 'forms/Base_Form.html', {
-    'type': 'employment',
-    'object': employment,
-})
+        'type': 'employment',
+        'object': employment,
+    })
 
 
 @login_required
@@ -555,15 +594,15 @@ def add_study(request):
     except Alumni.DoesNotExist:
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
-
+ 
     if request.method == 'POST':
         school = request.POST.get('school_name', '').strip()
         program = request.POST.get('program', '').strip()
         start_year = request.POST.get('start_year') or None
         created_via_voice = request.POST.get('created_via_voice') == 'true'
         voice_transcript = request.POST.get('voice_transcript', '').strip() or None
-
-        FurtherStudy.objects.create(
+ 
+        study = FurtherStudy.objects.create(
             alumni=alumni,
             school_name=school,
             program=program,
@@ -572,15 +611,22 @@ def add_study(request):
             voice_transcript=voice_transcript,
             voice_updated=False,
         )
+
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type='STUDY_CREATE',
+            description=f'Added study: {program} at {school}'
+        )
+        
         messages.success(request, 'Study record added.')
         return redirect('account:alumni_dashboard')
-
+ 
     return render(request, 'forms/Base_Form.html', {
         'type': 'study',
         'object': None
     })
-
-
+ 
+ 
 @login_required
 def edit_study(request, study_id):
     try:
@@ -588,9 +634,9 @@ def edit_study(request, study_id):
     except Alumni.DoesNotExist:
         messages.warning(request, "Please complete your alumni profile setup.")
         return redirect('account:account_settings')
-
+ 
     study = get_object_or_404(FurtherStudy, pk=study_id, alumni=alumni)
-
+ 
     if request.method == 'POST':
         study.school_name = request.POST.get('school_name', study.school_name)
         study.program = request.POST.get('program', study.program)
@@ -598,9 +644,16 @@ def edit_study(request, study_id):
         study.end_year = request.POST.get('end_year') or study.end_year
         study.is_ongoing = bool(request.POST.get('is_ongoing', study.is_ongoing))
         study.save()
+
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type='STUDY_UPDATE',
+            description=f'Updated study: {study.program} at {study.school_name}'
+        )
+        
         messages.success(request, 'Study record updated.')
         return redirect('account:alumni_dashboard')
-
+ 
     return render(request, 'forms/Base_Form.html', {
         'type': 'study',
         'object': study
@@ -704,18 +757,33 @@ def profile_verification(request):
     return render(request, 'account/admin/profile_verification.html', {
         'pending_alumni': pending_alumni
     })
+
 @staff_required
 def approve_alumni(request, id):
     alumni = get_object_or_404(Alumni, id=id)
     alumni.is_verified = True
     alumni.save()
+
+    Activity.objects.create(
+        alumni=alumni,
+        activity_type='PROFILE_APPROVED',
+        description='Your profile has been approved by the administrator.'
+    )
+    
     messages.success(request, "Alumni approved successfully.")
     return redirect('account:profile_verification')
-
-
+ 
+ 
 @staff_required
 def reject_alumni(request, id):
     alumni = get_object_or_404(Alumni, id=id)
+
+    Activity.objects.create(
+        alumni=alumni,
+        activity_type='PROFILE_REJECTED',
+        description='Your profile has been rejected by the administrator.'
+    )
+    
     alumni.delete()
     messages.warning(request, "Alumni rejected and removed.")
     return redirect('account:profile_verification')

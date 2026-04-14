@@ -284,10 +284,10 @@ class FurtherStudy(models.Model):
 class Activity(models.Model):
     ACTIVITY_TYPE = [
         ("PROFILE_UPDATE", "Profile Updated"),
-        ("EMPLOYMENT_ADD", "Employment Added"),
+        ("EMPLOYMENT_CREATE", "Employment Added"),
         ("EMPLOYMENT_UPDATE", "Employment Updated"),
         ("EMPLOYMENT_DELETE", "Employment Deleted"),
-        ("STUDY_ADD", "Study Added"),
+        ("STUDY_CREATE", "Study Added"),
         ("STUDY_UPDATE", "Study Updated"),
         ("STUDY_DELETE", "Study Deleted"),
         ("LOGIN", "Login"),
