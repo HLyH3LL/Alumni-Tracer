@@ -405,7 +405,6 @@ def register(request):
     else:
         form = AlumniRegistrationForm()
 
-        # ✅ ADD ALSO HERE (IMPORTANT)
         form.fields['program'].queryset = Program.objects.all()
         form.fields['employment_status'].queryset = EmploymentStatus.objects.all()
 
@@ -868,6 +867,19 @@ def reports(request):
         .values('employment_status')
         .annotate(total=Count('id'))
     )
+
+    status_breakdown_raw = list(
+        alumni_qs.values('employment_status').annotate(total=Count('id'))
+    )
+
+    status_choices = dict(Alumni.EMPLOYMENT_STATUS)
+
+    status_breakdown = []
+    for item in status_breakdown_raw:
+        raw_value = item['employment_status']
+        item['employment_status_label'] = status_choices.get(raw_value, raw_value)
+        # Keep total and compute percent later
+        status_breakdown.append(item)
 
     max_status = max([item['total'] for item in status_breakdown], default=1)
 

@@ -314,9 +314,6 @@ class Activity(models.Model):
     def __str__(self):
         return f"{self.alumni} - {self.get_activity_type_display()}"
 
-from django.db import models
-from django.contrib.auth.models import User
-
 class Program(models.Model):
     """Store all academic programs - replaces hardcoded dropdown"""
     code = models.CharField(max_length=20, unique=True) 
