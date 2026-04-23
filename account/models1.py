@@ -231,4 +231,3 @@ class SiteConfig(models.Model):
     logo_main = models.ImageField(upload_to='logos/', blank=True, null=True)     # header logo
     logo_footer = models.ImageField(upload_to='logos/', blank=True, null=True)   # footer logo
     favicon = models.ImageField(upload_to='logos/', blank=True, null=True)       # favicon
-    # ...existing code...
