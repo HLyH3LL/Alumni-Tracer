@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'bookmarks.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(
-        'postgresql://tipians_admin:7Qf8JMCBPIvs49PpcjBXZl0hYhFPA5Xz@dpg-d70db0aa214c73e7v47g-a.oregon-postgres.render.com/tipiansconnect',
+        'postgresql://tipiansconnect_oj79_user:7WJTQcpX2qQME4PSVQsV8dGx950pnlk8@dpg-d7kp200js32c7383isbg-a.oregon-postgres.render.com/tipiansconnect_oj79',
         conn_max_age=600,
         ssl_require=True  # 🔥 REQUIRED for Render
     )
