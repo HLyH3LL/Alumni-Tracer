@@ -37,10 +37,9 @@ A comprehensive web application for tracking and managing alumni records, employ
 ### Advanced Features
 - **Voice Recording**: Voice-based data entry for employment and study information
 - **Face Detection**: Admin facial authentication system using TensorFlow.js
-- **Search & Filtering**: Advanced filtering by program, graduation year, employment status
+- **Search & Filtering**: Advanced filtering by program, graduation year, and employment status
 - **Multi-Program Support**: Track students from various engineering and business programs
 - **Image Handling**: Automatic profile photo validation and optimization
-- **Email Integration**: Password recovery and account notifications
 - **Responsive Design**: Mobile-friendly interface
 
 ## Technology Stack
@@ -216,10 +215,6 @@ Alumni-Tracer/
 - `POST /account/alumni/<id>/delete/` - Delete alumni record
 - `GET /account/profile-verification/` - Alumni verification queue
 
-### Face Recognition
-- `POST /account/save-face/` - Save admin facial data
-- `POST /account/face-login/` - Authenticate via facial recognition
-
 ### Voice Features
 - `POST /account/employment/voice/` - Add employment via voice
 - `POST /account/study/voice/` - Add study via voice
@@ -271,11 +266,6 @@ The project is configured for deployment on Render.com:
 ### Static Files Not Loading
 - Run `python manage.py collectstatic`
 - Ensure STATIC_ROOT and STATIC_URL are configured correctly
-
-### Email Not Sending
-- Verify SMTP credentials in environment variables
-- Check the inbox spam folder
-- For development, use console email backend
 
 ### Face Recognition Not Working
 - Ensure face-api models are loaded (check browser console)
