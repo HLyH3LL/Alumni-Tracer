@@ -134,8 +134,10 @@
 <div class="page-header">
   <div class="title">Alumni Records</div>
 
-  <div style="display:flex; gap:15px; align-items:center;">
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
     <div class="top-info">Total: <strong style="color:#ffd700;">{{ alumni_list.count }}</strong></div>
+    <a href="{% url 'account:import_alumni' %}" class="btn-add" style="background: linear-gradient(135deg, #42a5f5, #1e88e5);">📤 Import Excel</a>
+    <a href="{% url 'account:bulk_verify_imported' %}" class="btn-add" style="background: linear-gradient(135deg, #00e676, #00c853);">✓ Bulk Verify</a>
     <a href="{% url 'account:add_alumni' %}" class="btn-add">+ Add Alumni</a>
   </div>
 </div>

@@ -1,0 +1,341 @@
+{% extends "account/admin/_layout.html" %}
+
+{% block content %}
+
+<style>
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.premium-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 16px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ffd700;
+  font-weight: 600;
+}
+
+input[type="file"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  font-size: 14px;
+}
+
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255,215,0,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,215,0,0.2);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  margin: 0;
+  color: #fff;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #000;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #ffd700;
+  border: 1px solid #ffd700;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,215,0,0.1);
+}
+
+.template-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.template-link a {
+  color: #42a5f5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.template-link a:hover {
+  text-decoration: underline;
+}
+
+/* Results Section */
+.results-section {
+  margin-top: 40px;
+}
+
+.results-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.result-card .number {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.result-card .label {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.created .number { color: #00e676; }
+.skipped .number { color: #ffc400; }
+.error .number { color: #ff5252; }
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table thead {
+  background: rgba(255,215,0,0.1);
+}
+
+.table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.table td {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.table tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-created {
+  background: rgba(0, 200, 83, 0.2);
+  color: #00e676;
+}
+
+.badge-skipped {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc400;
+}
+
+.badge-error {
+  background: rgba(255, 82, 82, 0.2);
+  color: #ff5252;
+}
+
+.badge-verified {
+  background: rgba(0, 200, 83, 0.3);
+  color: #00e676;
+  font-weight: bold;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+</style>
+
+<div class="page-header">
+  <div class="title">Import Alumni Records</div>
+</div>
+
+<div class="premium-card">
+  <h3 style="color: #ffd700; margin-bottom: 20px;">Upload Excel File</h3>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="excel_file">Select Excel File (.xlsx or .xls)</label>
+      <input 
+        type="file" 
+        name="excel_file" 
+        id="excel_file" 
+        accept=".xlsx,.xls" 
+        required
+      >
+      <div class="help-text">Required. Download the template below to see the correct format.</div>
+    </div>
+
+    <div class="checkbox-group">
+      <input 
+        type="checkbox" 
+        name="verify_on_import" 
+        id="verify_on_import"
+      >
+      <label for="verify_on_import">
+        ✓ Verify alumni on import (mark all as verified)
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">📤 Import Alumni</button>
+
+    <div class="template-link">
+      📋 <a href="{% url 'account:import_alumni_template' %}">Download Import Template</a>
+    </div>
+  </form>
+</div>
+
+<!-- Results Display -->
+{% if row_results %}
+<div class="results-section">
+  <h3 style="color: #ffd700; margin-bottom: 20px;">Import Results</h3>
+
+  <div class="results-summary">
+    {% if created_count > 0 %}
+    <div class="result-card created">
+      <div class="number">{{ created_count }}</div>
+      <div class="label">Created</div>
+    </div>
+    {% endif %}
+
+    {% if skipped_count > 0 %}
+    <div class="result-card skipped">
+      <div class="number">{{ skipped_count }}</div>
+      <div class="label">Skipped</div>
+    </div>
+    {% endif %}
+
+    {% if error_count > 0 %}
+    <div class="result-card error">
+      <div class="number">{{ error_count }}</div>
+      <div class="label">Errors</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="premium-card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Row</th>
+          <th>Student ID</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in row_results %}
+        <tr>
+          <td>{{ result.row }}</td>
+          <td>{{ result.student_id }}</td>
+          <td>{{ result.name }}</td>
+          <td>
+            {% if result.status == "created" %}
+              {% if "Verified" in result.detail %}
+                <span class="badge badge-created badge-verified">✓ {{ result.status|upper }}</span>
+              {% else %}
+                <span class="badge badge-created">{{ result.status|upper }}</span>
+              {% endif %}
+            {% elif result.status == "skipped" %}
+              <span class="badge badge-skipped">{{ result.status|upper }}</span>
+            {% else %}
+              <span class="badge badge-error">{{ result.status|upper }}</span>
+            {% endif %}
+          </td>
+          <td style="font-size: 12px;">{{ result.detail }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 20px; text-align: center;">
+    <a href="{% url 'account:alumni_records' %}" class="btn btn-secondary">← Back to Records</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

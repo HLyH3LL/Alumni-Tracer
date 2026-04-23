@@ -31,31 +31,18 @@ def staff_required(view_func):
 
 
 # ===============================
-# ✅ ADMIN LOGIN (NEW)
+# ✅ ADMIN LOGIN — redirects to the unified login page
+# Kept so existing links/bookmarks to /account/admin/login/ still work.
 # ===============================
 def admin_login(request):
-    # 🔥 Redirect if already logged in
+    # If already authenticated, send straight to the right dashboard
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect("account:admin_dashboard")
         return redirect("account:alumni_dashboard")
 
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            if user.is_active and user.is_staff:
-                login(request, user)
-                return redirect("account:admin_dashboard")
-            else:
-                messages.error(request, "You are not authorized as admin.")
-        else:
-            messages.error(request, "Invalid username or password.")
-
-    return render(request, "account/admin/admin_login.html")
+    # Otherwise forward to the single shared login page
+    return redirect("account:login")
 
 
 def admin_logout(request):
@@ -106,10 +93,10 @@ def face_login(request):
         return JsonResponse({"success": False})
 
 # ===============================
-# ✅ USER LOGIN (UPDATED)
+# ✅ USER LOGIN — unified login for alumni and admins
 # ===============================
 def user_login(request):
-    # 🔥 Redirect if already logged in
+    # Already logged in: send each role to their own dashboard
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect("account:admin_dashboard")
@@ -128,13 +115,12 @@ def user_login(request):
 
             if user is not None:
                 if user.is_active:
-
-                    # ❌ BLOCK ADMINS HERE
-                    if user.is_staff:
-                        messages.error(request, "Please use the admin login page.")
-                        return redirect("account:admin_login")
-
                     login(request, user)
+
+                    # ✅ Route by role after login
+                    if user.is_staff:
+                        return redirect("account:admin_dashboard")
+
                     next_url = request.GET.get('next') or request.POST.get('next')
                     if next_url:
                         return redirect(next_url)
@@ -788,6 +774,75 @@ def reject_alumni(request, id):
     return redirect('account:profile_verification')
 
 
+# ===============================
+# ✅ BULK VERIFICATION FUNCTION
+# ===============================
+@staff_required
+def bulk_verify_imported_alumni(request):
+    """
+    Bulk verification endpoint for recently imported alumni.
+    GET:  Show unverified alumni for bulk verification
+    POST: Verify selected alumni by IDs
+    """
+    if request.method == "GET":
+        unverified_alumni = Alumni.objects.filter(is_verified=False).order_by('-created_at')
+        return render(request, 'account/admin/bulk_verify_alumni.html', {
+            'unverified_alumni': unverified_alumni,
+            'count': unverified_alumni.count()
+        })
+    
+    # POST - verify selected alumni
+    if request.method == "POST":
+        alumni_ids = request.POST.getlist('alumni_ids')
+        
+        if not alumni_ids:
+            messages.error(request, "No alumni selected for verification.")
+            return redirect('account:bulk_verify_imported')
+        
+        try:
+            verified_count = Alumni.objects.filter(
+                id__in=alumni_ids
+            ).update(is_verified=True)
+            
+            # Log activities for verification
+            for alumni_id in alumni_ids:
+                alumni = Alumni.objects.get(id=alumni_id)
+                Activity.objects.create(
+                    alumni=alumni,
+                    activity_type='PROFILE_VERIFIED',
+                    description='Your profile has been verified by the administrator.'
+                )
+            
+            messages.success(request, f"{verified_count} alumni record(s) verified successfully.")
+        except Exception as e:
+            messages.error(request, f"Error verifying alumni: {str(e)}")
+        
+        return redirect('account:bulk_verify_imported')
+
+
+# ===============================
+# ✅ UTILITY FUNCTION: Verify Single Alumni by Student ID  
+# ===============================
+def verify_alumni_by_id(student_id: str) -> bool:
+    """
+    Verify/unverify a single alumni by student_id.
+    Returns True if successful, False otherwise.
+    """
+    try:
+        alumni = Alumni.objects.get(student_id=student_id)
+        alumni.is_verified = True
+        alumni.save()
+        
+        Activity.objects.create(
+            alumni=alumni,
+            activity_type='PROFILE_VERIFIED',
+            description='Profile verified via bulk operation.'
+        )
+        return True
+    except Alumni.DoesNotExist:
+        return False
+
+
 @staff_required
 def announcements(request):
     return render(request, 'account/admin/announcements.html')
@@ -982,6 +1037,315 @@ def admin_settings(request):
     return render(request, 'account/admin/settings.html')
 
 
+# ===============================
+# ✅ ALUMNI EXCEL IMPORT
+# ===============================
+
+VALID_PROGRAMS = {
+    "BS CS", "BS CpE", "BS ECE", "BS EE",
+    "BS ME", "BS CE", "BS Arch", "BS IE",
+    "BS Accountancy", "BS BA",
+}
+
+VALID_EMPLOYMENT_STATUS = {
+    "EMPLOYED", "UNEMPLOYED", "SELF_EMPLOYED", "STUDENT", "UNKNOWN",
+}
+
+VALID_SENIORITY = {
+    "ENTRY", "JUNIOR", "SENIOR", "LEAD", "DIRECTOR", "UNKNOWN", "",
+}
+
+REQUIRED_HEADERS = {
+    "student_id", "first_name", "last_name",
+    "program", "graduation_year", "employment_status",
+}
+
+@staff_required
+def import_alumni_excel(request):
+    """
+    POST: Accept an .xlsx file, validate each row, and bulk-import alumni with optional verification.
+    GET:  Render the import page with past results (stored in session).
+    """
+    if request.method == "GET":
+        # Clear any leftover import results from session on fresh page load
+        request.session.pop("import_results", None)
+        return render(request, "account/admin/import_alumni.html")
+
+    # ── POST ─────────────────────────────────────────────────────────────────
+    uploaded = request.FILES.get("excel_file")
+    verify_on_import = request.POST.get("verify_on_import") == "on"
+    
+    if not uploaded:
+        messages.error(request, "No file was uploaded.")
+        return render(request, "account/admin/import_alumni.html")
+
+    # Check extension
+    if not uploaded.name.lower().endswith((".xlsx", ".xls")):
+        messages.error(request, "Please upload a valid Excel file (.xlsx or .xls).")
+        return render(request, "account/admin/import_alumni.html")
+
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(uploaded, read_only=True, data_only=True)
+        ws = wb.active
+    except Exception as e:
+        messages.error(request, f"Could not read the Excel file: {e}")
+        return render(request, "account/admin/import_alumni.html")
+
+    rows = list(ws.iter_rows(values_only=True))
+    if len(rows) < 2:
+        messages.error(request, "The file appears to be empty or missing a header row.")
+        return render(request, "account/admin/import_alumni.html")
+
+    # Find the header row — skip blank / title rows above it
+    header_row_idx = None
+    headers = []
+    for i, row in enumerate(rows):
+        cells = [str(c).strip().lower() if c is not None else "" for c in row]
+        if "student_id" in cells:
+            header_row_idx = i
+            headers = cells
+            break
+
+    if header_row_idx is None:
+        messages.error(request, "Could not find the header row. Make sure row 2 contains 'student_id', 'first_name', etc.")
+        return render(request, "account/admin/import_alumni.html")
+
+    # Check required columns exist
+    missing_cols = REQUIRED_HEADERS - set(headers)
+    if missing_cols:
+        messages.error(request, f"Missing required columns: {', '.join(missing_cols)}")
+        return render(request, "account/admin/import_alumni.html")
+
+    col = {name: idx for idx, name in enumerate(headers)}
+
+    def cell(row, name):
+        idx = col.get(name)
+        if idx is None:
+            return ""
+        val = row[idx]
+        return str(val).strip() if val is not None else ""
+
+    data_rows = rows[header_row_idx + 1:]
+
+    created_count  = 0
+    skipped_count  = 0
+    error_count    = 0
+    row_results    = []   # detailed log shown in template
+
+    for i, row in enumerate(data_rows, start=header_row_idx + 2):
+        student_id        = cell(row, "student_id")
+        first_name        = cell(row, "first_name")
+        last_name         = cell(row, "last_name")
+        email             = cell(row, "email") or None
+        contact_number    = cell(row, "contact_number") or None
+        program           = cell(row, "program")
+        graduation_year   = cell(row, "graduation_year")
+        employment_status = cell(row, "employment_status").upper()
+        current_job_title = cell(row, "current_job_title") or None
+        current_company   = cell(row, "current_company") or None
+        seniority_level   = cell(row, "seniority_level").upper() or "UNKNOWN"
+
+        # Skip fully blank rows
+        if not any([student_id, first_name, last_name]):
+            continue
+
+        # ── Validation ───────────────────────────────────────────────────
+        row_errors = []
+
+        if not student_id:
+            row_errors.append("student_id is required")
+        elif not student_id.isdigit() or len(student_id) != 7:
+            row_errors.append(f"student_id '{student_id}' must be exactly 7 digits")
+
+        if not first_name:
+            row_errors.append("first_name is required")
+
+        if not last_name:
+            row_errors.append("last_name is required")
+
+        if not program:
+            row_errors.append("program is required")
+        elif program not in VALID_PROGRAMS:
+            row_errors.append(f"program '{program}' is not valid (see template instructions)")
+
+        if not graduation_year:
+            row_errors.append("graduation_year is required")
+        else:
+            try:
+                graduation_year = int(float(graduation_year))
+                if not (1950 <= graduation_year <= 2100):
+                    row_errors.append(f"graduation_year {graduation_year} is out of range")
+            except ValueError:
+                row_errors.append(f"graduation_year '{graduation_year}' is not a valid year")
+
+        if not employment_status:
+            employment_status = "UNKNOWN"
+        elif employment_status not in VALID_EMPLOYMENT_STATUS:
+            row_errors.append(f"employment_status '{employment_status}' is not valid")
+
+        if seniority_level and seniority_level not in VALID_SENIORITY:
+            seniority_level = "UNKNOWN"
+
+        if row_errors:
+            error_count += 1
+            row_results.append({
+                "row": i,
+                "student_id": student_id,
+                "name": f"{first_name} {last_name}",
+                "status": "error",
+                "detail": "; ".join(row_errors),
+            })
+            continue
+
+        # ── Duplicate check ───────────────────────────────────────────────
+        if Alumni.objects.filter(student_id=student_id).exists():
+            skipped_count += 1
+            row_results.append({
+                "row": i,
+                "student_id": student_id,
+                "name": f"{first_name} {last_name}",
+                "status": "skipped",
+                "detail": "Student ID already exists — skipped",
+            })
+            continue
+
+        # ── Create Alumni (no linked User account for bulk imports) ───────
+        try:
+            alumni = Alumni.objects.create(
+                student_id=student_id,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                contact_number=contact_number,
+                program=program,
+                graduation_year=graduation_year,
+                employment_status=employment_status,
+                current_job_title=current_job_title,
+                current_company=current_company,
+                seniority_level=seniority_level if seniority_level else "UNKNOWN",
+                is_verified=verify_on_import,  # ✅ Mark verified if option checked
+            )
+            created_count += 1
+            verify_status = "Verified" if verify_on_import else "Pending verification"
+            row_results.append({
+                "row": i,
+                "student_id": student_id,
+                "name": f"{first_name} {last_name}",
+                "status": "created",
+                "detail": f"Added successfully — {verify_status}",
+            })
+        except Exception as e:
+            error_count += 1
+            row_results.append({
+                "row": i,
+                "student_id": student_id,
+                "name": f"{first_name} {last_name}",
+                "status": "error",
+                "detail": str(e),
+            })
+
+    # ── Summary message ───────────────────────────────────────────────────
+    if created_count:
+        verify_msg = " and verified" if verify_on_import else ""
+        messages.success(request, f"{created_count} alumni record(s) imported successfully{verify_msg}.")
+    if skipped_count:
+        messages.warning(request, f"{skipped_count} row(s) skipped (duplicate student ID).")
+    if error_count:
+        messages.error(request, f"{error_count} row(s) had errors and were not imported.")
+
+    context = {
+        "row_results": row_results,
+        "created_count": created_count,
+        "skipped_count": skipped_count,
+        "error_count": error_count,
+        "total_processed": created_count + skipped_count + error_count,
+        "verify_on_import": verify_on_import,
+    }
+    return render(request, "account/admin/import_alumni.html", context)
+
+
+@staff_required
+def download_import_template(request):
+    """Serve the alumni import Excel template."""
+    import os
+    from django.http import FileResponse
+    from django.conf import settings
+
+    template_path = os.path.join(settings.BASE_DIR, "account", "static", "templates", "alumni_import_template.xlsx")
+
+    # If you prefer to generate it on-the-fly instead of keeping a static file:
+    if not os.path.exists(template_path):
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Alumni Import"
+
+        headers = ["student_id","first_name","last_name","email","contact_number",
+                   "program","graduation_year","employment_status",
+                   "current_job_title","current_company","seniority_level"]
+        notes   = [
+            "Required. 7-digit ID e.g. 2012345",
+            "Required","Required","Optional","Optional",
+            "Required. e.g. BS CS | BS CpE | BS ECE | BS EE | BS ME | BS CE | BS Arch | BS IE | BS Accountancy | BS BA",
+            "Required. e.g. 2022",
+            "Required. EMPLOYED | UNEMPLOYED | SELF_EMPLOYED | STUDENT | UNKNOWN",
+            "Optional","Optional",
+            "Optional. ENTRY | JUNIOR | SENIOR | LEAD | DIRECTOR | UNKNOWN",
+        ]
+        sample  = ["2012345","Juan","Dela Cruz","juan@example.com","09171234567",
+                   "BS CS","2022","EMPLOYED","Software Engineer","Tech Company Inc.","JUNIOR"]
+
+        gold   = PatternFill("solid", start_color="FFD700")
+        green  = PatternFill("solid", start_color="E8F5E9")
+        yellow = PatternFill("solid", start_color="FFF9E6")
+        thin   = Border(left=Side(style="thin"),right=Side(style="thin"),
+                        top=Side(style="thin"),bottom=Side(style="thin"))
+
+        ws.merge_cells("A1:K1")
+        ws["A1"] = "Alumni Import Template — T.I.P.ians Connect"
+        ws["A1"].font  = Font(bold=True, size=14)
+        ws["A1"].fill  = gold
+        ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[1].height = 30
+
+        for c, (h, n, s) in enumerate(zip(headers, notes, sample), 1):
+            hcell = ws.cell(row=2, column=c, value=h)
+            hcell.font = Font(bold=True); hcell.fill = gold
+            hcell.alignment = Alignment(horizontal="center"); hcell.border = thin
+
+            ncell = ws.cell(row=3, column=c, value=n)
+            ncell.font = Font(italic=True, size=9, color="555555")
+            ncell.fill = yellow
+            ncell.alignment = Alignment(wrap_text=True); ncell.border = thin
+
+            scell = ws.cell(row=4, column=c, value=s)
+            scell.fill = green; scell.border = thin
+
+        for row in range(5, 55):
+            for col in range(1, 12):
+                ws.cell(row=row, column=col).border = thin
+
+        ws.row_dimensions[3].height = 40
+        ws.freeze_panes = "A4"
+        widths = [14,14,14,26,16,40,16,22,24,26,16]
+        for i, w in enumerate(widths, 1):
+            ws.column_dimensions[get_column_letter(i)].width = w
+
+        os.makedirs(os.path.dirname(template_path), exist_ok=True)
+        wb.save(template_path)
+
+    response = FileResponse(
+        open(template_path, "rb"),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = 'attachment; filename="alumni_import_template.xlsx"'
+    return response
+
+
 from django.shortcuts import render
 
 def terms_conditions(request):
@@ -997,5 +1361,3 @@ def privacy_policy(request):
         'tagline': 'Connecting TIP alumni',
     }
     return render(request, 'account/PRIVACY_POLICY.html', {'config': config})
-
-

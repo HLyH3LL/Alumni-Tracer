@@ -40,11 +40,16 @@ urlpatterns = [
     path('admin/settings/', views.admin_settings, name='admin_settings'),
 
     # ===============================
+    # 📥 EXCEL IMPORT
+    # ===============================
+    path('admin/import-alumni/', views.import_alumni_excel, name='import_alumni'),
+    path('admin/import-alumni/template/', views.download_import_template, name='import_alumni_template'),
+    path('admin/bulk-verify-alumni/', views.bulk_verify_imported_alumni, name='bulk_verify_imported'),
+
+    # ===============================
     # ⚙️ ACCOUNT SETTINGS (USER)
     # ===============================
     path('settings/', views.account_settings, name='account_settings'),
-
-    # ✅ 🔥 SAFE FIX (IMPORTANT — prevents NoReverseMatch)
     path('settings-fallback/', views.account_settings, name='settings'),
 
     # ===============================
@@ -62,20 +67,20 @@ urlpatterns = [
     path('studies/add/', views.add_study, name='add_study'),
     path('studies/<int:study_id>/edit/', views.edit_study, name='edit_study'),
     path('studies/<int:study_id>/delete/', views.delete_study, name='delete_study'),
-    
-    # =============================== 
+
+    # ===============================
     # 📜 TERMS AND CONDITIONS & PRIVACY POLICY
     # ===============================
-    path('terms/', views.terms_conditions, name='terms_and_conditions'),   # legacy alias
-    path('privacy/', views.privacy_policy, name='privacy_policy'),       
-    
+    path('terms/', views.terms_conditions, name='terms_and_conditions'),
+    path('privacy/', views.privacy_policy, name='privacy_policy'),
+
     # ===============================
     # 🔑 PASSWORD MANAGEMENT
     # ===============================
     path('password_change/',
          auth_views.PasswordChangeView.as_view(
              template_name='registration/password_change_form.html',
-             success_url='/account/password_change/done/'   # absolute path
+             success_url='/account/password_change/done/'
          ),
          name='password_change'),
 
@@ -114,5 +119,4 @@ urlpatterns = [
     # 🎤 VOICE UPDATE
     # ===============================
     path('voice-update/', voice_views.voice_update, name='voice_update'),
-
 ]
