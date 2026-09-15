@@ -9,10 +9,4 @@ class Migration(migrations.Migration):
         ('account', '0006_employmentstatus_feature_program_and_more'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='employment',
-            name='date_left',
-            field=models.DateField(blank=True, null=True, verbose_name='Date Left'),
-        ),
-    ]
+    operations = []
