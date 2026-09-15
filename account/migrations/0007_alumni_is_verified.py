@@ -9,10 +9,4 @@ class Migration(migrations.Migration):
         ('account', '0006_employmentstatus_feature_program_and_more'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='alumni',
-            name='is_verified',
-            field=models.BooleanField(default=False),
-        ),
-    ]
+    operations = []
