@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'bookmarks.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(
-        'postgresql://tipiansconnect_oj79_user:7WJTQcpX2qQME4PSVQsV8dGx950pnlk8@dpg-d7kp200js32c7383isbg-a.oregon-postgres.render.com/tipiansconnect_oj79',
+        os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True  # 🔥 REQUIRED for Render
+        ssl_require=True
     )
 }
 
