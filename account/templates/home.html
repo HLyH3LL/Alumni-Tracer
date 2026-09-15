@@ -731,7 +731,15 @@
     <nav>
         <div class="nav-container">
             <a href="{% url 'account:home' %}" class="header-logo">
-                <img src="{{ config.logo_main.url }}" alt="Site Logo">
+            <a href="{% url 'account:home' %}" class="header-logo">
+            {% if config.logo_main %}
+        <img src="{{ config.logo_main.url }}" alt="Site Logo">
+        {% endif %}
+
+        <span class="header-logo-text">
+        T.I.P.IANS<span>CONNECT</span>
+    </span>
+            </a>
                 <span class="header-logo-text">
                     T.I.P.IANS<span>CONNECT</span>
                 </span>
